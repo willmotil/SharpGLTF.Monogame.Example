@@ -81,7 +81,7 @@ namespace SharpGLTF.Runtime
             if (_Device == null) throw new InvalidOperationException();            
 
             var srcPrims = _GetValidPrimitives(srcMesh)
-                .ToDictionary(item => item, item => new MeshPrimitiveReader(item, item.Material?.DoubleSided ?? false));
+                .ToDictionary(item => item, item => new MeshPrimitiveReader(item));
 
             VertexNormalsFactory.CalculateSmoothNormals(srcPrims.Values.ToList());
             VertexTangentsFactory.CalculateTangents(srcPrims.Values.ToList());
@@ -139,15 +139,15 @@ namespace SharpGLTF.Runtime
                 }
             }
             
-            WriteMeshPrimitive(srcPrim, effect, blending);
+            WriteMeshPrimitive(srcPrim, effect, blending, srcMaterial.DoubleSided ? RasterizerState.CullNone : RasterizerState.CullCounterClockwise);
         }        
 
-        protected abstract void WriteMeshPrimitive(MeshPrimitiveReader srcPrimitive, Effect effect, BlendState blending);
+        protected abstract void WriteMeshPrimitive(MeshPrimitiveReader srcPrimitive, Effect effect, BlendState blending, RasterizerState fc);
 
-        protected void WriteMeshPrimitive<TVertex>(Effect effect, BlendState blending, MeshPrimitiveReader primitive)
+        protected void WriteMeshPrimitive<TVertex>(Effect effect, BlendState blending, RasterizerState fc, MeshPrimitiveReader primitive)
             where TVertex : unmanaged, IVertexType
         {
-            _MeshWriter.WriteMeshPrimitive<TVertex>(_CurrentMeshIndex, effect, blending, primitive);
+            _MeshWriter.WriteMeshPrimitive<TVertex>(_CurrentMeshIndex, effect, blending, fc, primitive);
         }
 
         #endregion
@@ -166,6 +166,31 @@ namespace SharpGLTF.Runtime
         {
             return _MatFactory.UseTexture(channel, name);
         }
+
+        protected virtual SamplerState UseSampler(Schema2.TextureSampler gltfSampler)
+        {
+            // glTF default is LinearWrap
+            if (gltfSampler == null) return SamplerState.LinearWrap;
+
+            // First we check if we can use one of the SamplerState predefined values.
+            if (gltfSampler.MinFilter == TextureMipMapFilter.DEFAULT && gltfSampler.MagFilter == TextureInterpolationFilter.DEFAULT)
+            {
+                if (gltfSampler.WrapS == TextureWrapMode.CLAMP_TO_EDGE && gltfSampler.WrapT == TextureWrapMode.CLAMP_TO_EDGE)
+                {
+                    return SamplerState.LinearClamp;
+                }
+
+                if (gltfSampler.WrapS == TextureWrapMode.REPEAT && gltfSampler.WrapT == TextureWrapMode.REPEAT)
+                {
+                    return SamplerState.LinearWrap;
+                }                
+            }
+
+            // if we cannot use a predefined value, we have to create a new SamplerState.
+            return _MatFactory.UseSampler(gltfSampler);
+        }
+
+        
 
         #endregion
 

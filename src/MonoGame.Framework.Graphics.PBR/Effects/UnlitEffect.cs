@@ -14,9 +14,9 @@ namespace Microsoft.Xna.Framework.Graphics.Effects
         /// </summary>
         public UnlitEffect(GraphicsDevice device) : base(device, Resources.GetShaderByteCode("Unlit"))
         {
-            _BaseColorMap = new EffectTexture2D.ScalarXYZW(this.Parameters, "Primary");
-            _EmissiveMap = new EffectTexture2D.ScalarXYZ(this.Parameters, "Emissive");
-            _OcclusionMap = new EffectTexture2D.ScalarX(this.Parameters, "Occlusion");
+            _BaseColorMap = new EffectTexture2D.ScalarXYZW(device, this.Parameters, "Primary", 1);
+            _EmissiveMap = new EffectTexture2D.ScalarXYZ(device, this.Parameters, "Emissive", 3);
+            _OcclusionMap = new EffectTexture2D.ScalarX(device, this.Parameters, "Occlusion", 4);
         }
 
         #endregion
@@ -76,9 +76,9 @@ namespace Microsoft.Xna.Framework.Graphics.Effects
             int techniqueIndex = 0;
             if (BoneCount != 0) techniqueIndex += 1;
             
-            if (_BaseColorMap != null) techniqueIndex += 4;            
-            if (EmissiveMap != null) techniqueIndex += 8;
-            if (OcclusionMap != null) techniqueIndex += 16;
+            if (_BaseColorMap.Texture != null) techniqueIndex += 4;            
+            if (EmissiveMap.Texture != null) techniqueIndex += 8;
+            if (OcclusionMap.Texture != null) techniqueIndex += 16;
 
             return techniqueIndex;
         }
