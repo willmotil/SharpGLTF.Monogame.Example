@@ -1,9 +1,10 @@
 ﻿
-float getAmbientOcclusion(float2 uv)
+float GetOcclusionSample(float2 uv0, float2 uv1)
 {
-	float3 uv1 = float3(uv, 1);
-	uv.x = dot(uv1, OcclusionTransformU);
-	uv.y = dot(uv1, OcclusionTransformV);
+	float3 uvw = float3(OcclusionTextureIdx < 1 ? uv0 : uv1, 1);
+	uv0.x = dot(uvw, OcclusionTransformU);
+	uv0.y = dot(uvw, OcclusionTransformV);
 
-	return SAMPLE_TEXTURE(OcclusionTexture, uv).r;
+	return SAMPLE_TEXTURE(OcclusionTexture, uv0).r;
 }
+

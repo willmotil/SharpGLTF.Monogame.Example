@@ -40,25 +40,32 @@ BEGIN_CONSTANTS
     float4 LightParam2[3];
     float4 LightParam3[3];
 
-    // Metallic Roughness Material.
 
+    
     float NormalScale;
+    int NormalTextureIdx;
     float3 NormalTransformU;
     float3 NormalTransformV;
 
-    float4 PrimaryScale;    // either BaseColor or Diffuse
+    // either BaseColor or Diffuse
+    float4 PrimaryScale;
+    int PrimaryTextureIdx;
     float3 PrimaryTransformU;
     float3 PrimaryTransformV;
 
-    float4 SecondaryScale;  // either MetallicRoughness or SpecularGlossiness
+    // either MetallicRoughness or SpecularGlossiness
+    float4 SecondaryScale;
+    int SecondaryTextureIdx;
     float3 SecondaryTransformU;
     float3 SecondaryTransformV;
 
     float OcclusionScale;
+    int OcclusionTextureIdx;
     float3 OcclusionTransformU;
     float3 OcclusionTransformV;
 
     float3 EmissiveScale;
+    int EmissiveTextureIdx;
     float3 EmissiveTransformU;
     float3 EmissiveTransformV;
 
@@ -100,14 +107,15 @@ struct VsOutTexNorm
     float4 PositionPS : SV_Position;
 
     float4 Color: COLOR0;
-    float2 TextureCoordinate : TEXCOORD0;
-    float3 PositionWS : TEXCOORD1;
+    float2 TextureCoordinate0 : TEXCOORD0;
+    float2 TextureCoordinate1 : TEXCOORD1;
+    float3 PositionWS : TEXCOORD2;
 
     // float3x3 TangentBasis : TBASIS; requires Shader Model 4 :(
 
-    float3 TangentBasisX : TEXCOORD2;
-    float3 TangentBasisY : TEXCOORD3;
-    float3 TangentBasisZ : TEXCOORD4;
+    float3 TangentBasisX : TEXCOORD3;
+    float3 TangentBasisY : TEXCOORD4;
+    float3 TangentBasisZ : TEXCOORD5;
 };
 
 
@@ -119,12 +127,12 @@ struct VsOutTexNorm
 #include "Sampler.Emissive.fx"
 #include "Sampler.Occlusion.fx"
 
-float4 PsShader(VsOutTexNorm input, bool hasPerturbedNormals, bool hasPrimary, bool hasSecondary, bool hasEmissive, bool hasOcclusion)
+float4 PsShader(VsOutTexNorm input, bool hasPerturbedNormals, bool hasPrimary, bool hasSecondary, bool hasEmissive, bool hasOcclusionMap)
 {
     // get primary color
 
     float4 f_primary = PrimaryScale * input.Color;
-    if (hasPrimary) f_primary *= GetPrimaryColor(input.TextureCoordinate);
+    if (hasPrimary) f_primary *= GetPrimarySample(input.TextureCoordinate0, input.TextureCoordinate1);
 
     // alpha cutoff
     clip((f_primary.a < AlphaCutoff) ? -1 : 1);
@@ -138,7 +146,7 @@ float4 PsShader(VsOutTexNorm input, bool hasPerturbedNormals, bool hasPrimary, b
 
     if (hasPerturbedNormals)
     {
-        ninfo = GetNormalInfo(input);
+        ninfo = GetNormalSample(input);
     }
     else
     {        
@@ -147,26 +155,24 @@ float4 PsShader(VsOutTexNorm input, bool hasPerturbedNormals, bool hasPrimary, b
         ninfo.t = 0; // should generate some random T & b ?
         ninfo.b = 0;        
     }
-    
+
+    // get additional textures    
 
     float4 f_secondary = 1;
-    if (hasSecondary) f_secondary = GetSecondaryColor(input.TextureCoordinate);
-
-    float3 f_emissive = EmissiveScale;
-    if (hasEmissive) f_emissive *= getEmissiveColor(input.TextureCoordinate);
-
-#ifdef MATERIAL_METALLICROUGHNESS
-    float f_occlusion = f_secondary.r;
-#else
-    float f_occlusion = 1; // we could use f_primary.a if it's opaque
-#endif
-    if (hasOcclusion) f_occlusion = getAmbientOcclusion(input.TextureCoordinate);
+    if (hasSecondary) f_secondary = GetSecondarySample(input.TextureCoordinate0, input.TextureCoordinate1);    
 
     float3 color = PsWithPBR(input.PositionWS, ninfo, f_primary.rgb, f_secondary);    
 
-    color += f_emissive;
+    float3 f_emissive = EmissiveScale;
+    if (hasEmissive) f_emissive *= GetEmissiveSample(input.TextureCoordinate0, input.TextureCoordinate1);
 
-    color = lerp(color, color * f_occlusion, OcclusionScale);
+    color += f_emissive;
+    
+    if (hasOcclusionMap)
+    {
+        float f_occlusion = GetOcclusionSample(input.TextureCoordinate0, input.TextureCoordinate1);
+        color = lerp(color, color * f_occlusion, OcclusionScale);
+    }    
 
     color = toneMap(color);    
 
