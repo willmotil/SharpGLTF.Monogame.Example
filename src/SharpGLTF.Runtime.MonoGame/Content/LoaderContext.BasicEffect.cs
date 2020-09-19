@@ -9,7 +9,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 using GLTFMATERIAL = SharpGLTF.Schema2.Material;
 
-namespace SharpGLTF.Runtime
+namespace SharpGLTF.Runtime.Content
 {
     public class BasicEffectsLoaderContext : LoaderContext
     {
@@ -108,10 +108,10 @@ namespace SharpGLTF.Runtime
 
         #region meshes creation
 
-        protected override void WriteMeshPrimitive(MeshPrimitiveReader srcPrimitive, Effect effect, BlendState blending, RasterizerState fc)
+        protected override void WriteMeshPrimitive(MeshPrimitiveReader srcPrimitive, Effect effect, BlendState blending, bool doubleSided)
         {
-            if (srcPrimitive.IsSkinned) WriteMeshPrimitive<VertexSkinned>(effect, blending, fc, srcPrimitive);
-            else WriteMeshPrimitive<VertexPositionNormalTexture>(effect, blending, fc, srcPrimitive);
+            if (srcPrimitive.IsSkinned) WriteMeshPrimitive<VertexSkinned>(effect, blending, doubleSided, srcPrimitive);
+            else WriteMeshPrimitive<VertexPositionNormalTexture>(effect, blending, doubleSided, srcPrimitive);
         }
 
         #endregion

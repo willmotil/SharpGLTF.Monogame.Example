@@ -24,12 +24,22 @@ namespace Microsoft.Xna.Framework.Graphics
 
         #region data
 
-        private Matrix _World;
-        private Matrix _View;
-        private Matrix _Proj;
+        private Matrix _World = Matrix.Identity;
+        private Matrix _View = Matrix.Identity;
+        private Matrix _Proj = Matrix.Identity;
+
+        
+        private bool _WorldIsMirror = false;
 
         private int _BoneCount;
-        private readonly Matrix[] _Bones = new Matrix[128];        
+        private readonly Matrix[] _Bones = new Matrix[128];
+
+        #endregion
+
+        #region properties - material
+
+        public bool AlphaBlend { get; set; }
+        public float AlphaCutoff { get; set; }
 
         #endregion
 
@@ -42,9 +52,13 @@ namespace Microsoft.Xna.Framework.Graphics
         public Matrix World
         {
             get => _World;
-            set { _World = value; }
+            set
+            {
+                _World = value;
+                _WorldIsMirror = _World.Determinant() < 0;
+            }
         }
-
+        
         public Matrix View
         {
             get => _View;
@@ -57,14 +71,17 @@ namespace Microsoft.Xna.Framework.Graphics
             set { _Proj = value; }
         }
 
+        // True if world matrix is a mirror matrix and requires the RasterizerState to reverse face culling.
+        public bool WorldIsMirror => _WorldIsMirror;
+
         #endregion        
 
         #region API
 
-        public void SetBoneTransforms(Matrix[] boneTransforms, int boneStart, int boneCount)
+        public void SetBoneTransforms(Matrix[] boneTransforms)
         {
-            _BoneCount = boneCount; if (_BoneCount == 0) return;
-            Array.Copy(boneTransforms, boneStart, _Bones, 0, boneCount);
+            _BoneCount = boneTransforms?.Length ?? 0; if (_BoneCount == 0) return;
+            boneTransforms.CopyTo(_Bones, 0);
         }
 
         protected void UseTexture(string name, Texture2D tex)
@@ -76,14 +93,22 @@ namespace Microsoft.Xna.Framework.Graphics
             Parameters[name].SetValue(tex);
         }
 
-        protected void ApplyTransforms()
+
+        protected override void OnApply()
         {
+            base.OnApply();
+
             Parameters["World"].SetValue(World);
             Parameters["View"].SetValue(View);
             Parameters["Projection"].SetValue(Projection);
-            if (_BoneCount > 0) Parameters["Bones"].SetValue(_Bones);            
-        }
+            if (_BoneCount > 0) Parameters["Bones"].SetValue(_Bones);
 
+            Parameters["CameraPosition"].SetValue(-View.Translation);
+
+            Parameters["AlphaTransform"].SetValue(AlphaBlend ? Vector2.UnitX : Vector2.UnitY);
+            Parameters["AlphaCutoff"].SetValue(AlphaCutoff);
+        }
+        
         #endregion
     }
 }

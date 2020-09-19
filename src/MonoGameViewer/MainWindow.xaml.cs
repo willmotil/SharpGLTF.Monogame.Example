@@ -27,7 +27,9 @@ namespace MonoGameViewer
             InitializeComponent();
         }
 
-        private void _OnClick_LoadModel(object sender, RoutedEventArgs e)
+        private void _OnClick_LoadModel(object sender, RoutedEventArgs e) { _LoadModel(sender); }        
+
+        private static void _LoadModel(object sender)
         {
             if (sender is FrameworkElement fe)
             {

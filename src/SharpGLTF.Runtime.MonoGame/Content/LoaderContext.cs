@@ -10,9 +10,9 @@ using SRCMESH = SharpGLTF.Schema2.Mesh;
 using SRCPRIM = SharpGLTF.Schema2.MeshPrimitive;
 using SRCMATERIAL = SharpGLTF.Schema2.Material;
 
-using MODELMESH = SharpGLTF.Runtime.RuntimeModelMesh;
+using MODELMESH = SharpGLTF.Runtime.Content.RuntimeModelMesh;
 
-namespace SharpGLTF.Runtime
+namespace SharpGLTF.Runtime.Content
 {
     /// <summary>
     /// Helper class used to import a glTF meshes and materials into MonoGame
@@ -20,6 +20,13 @@ namespace SharpGLTF.Runtime
     public abstract class LoaderContext
     {
         #region lifecycle
+
+        public static LoaderContext CreateLoaderContext(GraphicsDevice device)
+        {
+            if (device.GraphicsProfile == GraphicsProfile.HiDef) return new PBREffectsLoaderContext(device);
+
+            return new BasicEffectsLoaderContext(device);
+        }
 
         public LoaderContext(GraphicsDevice device)
         {
@@ -123,30 +130,35 @@ namespace SharpGLTF.Runtime
 
             var blending = BlendState.Opaque;
 
-            if (effect is PBREffect pbrEffect)            
+            if (effect is AnimatedEffect animEffect)
             {
-                pbrEffect.AlphaCutoff = -1;
+                animEffect.AlphaCutoff = -1;
 
                 if (srcMaterial.Alpha == AlphaMode.BLEND)
                 {
                     blending = BlendState.NonPremultiplied;
-                    pbrEffect.AlphaBlend = true;
+                    animEffect.AlphaBlend = true;
                 }
                 if (srcMaterial.Alpha == AlphaMode.MASK)
-                {                    
-                    pbrEffect.AlphaCutoff = srcMaterial.AlphaCutoff;
+                {
+                    animEffect.AlphaCutoff = srcMaterial.AlphaCutoff;
                 }
             }
+
+            if (effect is PBREffect pbrEffect)            
+            {
+                pbrEffect.NormalMode = srcMaterial.DoubleSided ? GeometryNormalMode.DoubleSided : GeometryNormalMode.Reverse;                
+            }
             
-            WriteMeshPrimitive(srcPrim, effect, blending, srcMaterial.DoubleSided ? RasterizerState.CullNone : RasterizerState.CullCounterClockwise);
+            WriteMeshPrimitive(srcPrim, effect, blending, srcMaterial.DoubleSided);
         }        
 
-        protected abstract void WriteMeshPrimitive(MeshPrimitiveReader srcPrimitive, Effect effect, BlendState blending, RasterizerState fc);
+        protected abstract void WriteMeshPrimitive(MeshPrimitiveReader srcPrimitive, Effect effect, BlendState blending, bool doubleSided);
 
-        protected void WriteMeshPrimitive<TVertex>(Effect effect, BlendState blending, RasterizerState fc, MeshPrimitiveReader primitive)
+        protected void WriteMeshPrimitive<TVertex>(Effect effect, BlendState blending, bool doubleSided, MeshPrimitiveReader primitive)
             where TVertex : unmanaged, IVertexType
         {
-            _MeshWriter.WriteMeshPrimitive<TVertex>(_CurrentMeshIndex, effect, blending, fc, primitive);
+            _MeshWriter.WriteMeshPrimitive<TVertex>(_CurrentMeshIndex, effect, blending, doubleSided, primitive);
         }
 
         #endregion

@@ -11,22 +11,14 @@ using Microsoft.Xna.Framework.Graphics.Effects;
 
 using GLTFMATERIAL = SharpGLTF.Schema2.Material;
 
-namespace SharpGLTF.Runtime
+namespace SharpGLTF.Runtime.Content
 {
     public class PBREffectsLoaderContext : LoaderContext
     {
-        #region lifecycle
-
-        public static LoaderContext CreateLoaderContext(GraphicsDevice device)
-        {
-            if (device.GraphicsProfile == GraphicsProfile.HiDef) return new PBREffectsLoaderContext(device);
-
-            return new BasicEffectsLoaderContext(device);
-        }
+        #region lifecycle        
 
         public PBREffectsLoaderContext(GraphicsDevice device) : base(device)
-        {
-            Resources.GenerateDotTextures(device);
+        {            
         }
 
         #endregion
@@ -51,7 +43,7 @@ namespace SharpGLTF.Runtime
 
             if (srcMaterial.FindChannel("SpecularGlossiness") != null)
             {
-                var xeffect = new SpecularGlossinessEffect(this.Device);
+                var xeffect = new PBRSpecularGlossinessEffect(this.Device);
                 effect = xeffect;
 
                 TransferChannel(xeffect.DiffuseMap, srcMaterial, "Diffuse", Vector4.One);
@@ -59,7 +51,7 @@ namespace SharpGLTF.Runtime
             }
             else
             {
-                var xeffect = new MetallicRoughnessEffect(this.Device);
+                var xeffect = new PBRMetallicRoughnessEffect(this.Device);
                 effect = xeffect;
 
                 TransferChannel(xeffect.BaseColorMap, srcMaterial, "BaseColor", Vector4.One);
@@ -82,17 +74,17 @@ namespace SharpGLTF.Runtime
 
         #region meshes creation
 
-        protected override void WriteMeshPrimitive(MeshPrimitiveReader srcPrimitive, Effect effect, BlendState blending, RasterizerState fc)
+        protected override void WriteMeshPrimitive(MeshPrimitiveReader srcPrimitive, Effect effect, BlendState blending, bool doubleSided)
         {
-            if (srcPrimitive.IsSkinned) WriteMeshPrimitive<VertexSkinned>(effect, blending, fc, srcPrimitive);
-            else WriteMeshPrimitive<VertexRigid>(effect, blending, fc, srcPrimitive);
+            if (srcPrimitive.IsSkinned) WriteMeshPrimitive<VertexSkinned>(effect, blending, doubleSided, srcPrimitive);
+            else WriteMeshPrimitive<VertexRigid>(effect, blending, doubleSided, srcPrimitive);
         }
 
         #endregion
 
         #region gltf helpers
         
-        private void TransferChannel(EffectTexture2D.ScalarX dst, GLTFMATERIAL src, string name, float defval)
+        private void TransferChannel(EffectTexture2D.Scalar1 dst, GLTFMATERIAL src, string name, float defval)
         {            
             dst.Texture = UseTexture(src, name);
             dst.Sampler = UseSampler(src, name);
@@ -101,7 +93,7 @@ namespace SharpGLTF.Runtime
             dst.Transform = GetTransform(src, name);
         }
 
-        private void TransferChannel(EffectTexture2D.ScalarXY dst, GLTFMATERIAL src, string name, Vector2 defval)
+        private void TransferChannel(EffectTexture2D.Scalar2 dst, GLTFMATERIAL src, string name, Vector2 defval)
         {
             dst.Texture = UseTexture(src, name);
             dst.Sampler = UseSampler(src, name);
@@ -110,7 +102,7 @@ namespace SharpGLTF.Runtime
             dst.Transform = GetTransform(src, name);
         }
 
-        private void TransferChannel(EffectTexture2D.ScalarXYZ dst, GLTFMATERIAL src, string name, Vector3 defval)
+        private void TransferChannel(EffectTexture2D.Scalar3 dst, GLTFMATERIAL src, string name, Vector3 defval)
         {
             dst.Texture = UseTexture(src, name);
             dst.Sampler = UseSampler(src, name);
@@ -119,7 +111,7 @@ namespace SharpGLTF.Runtime
             dst.Transform = GetTransform(src, name);
         }
 
-        private void TransferChannel(EffectTexture2D.ScalarXYZW dst, GLTFMATERIAL src, string name, Vector4 defval)
+        private void TransferChannel(EffectTexture2D.Scalar4 dst, GLTFMATERIAL src, string name, Vector4 defval)
         {
             dst.Texture = UseTexture(src, name);
             dst.Sampler = UseSampler(src, name);
