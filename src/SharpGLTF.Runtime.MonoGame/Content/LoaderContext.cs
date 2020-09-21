@@ -6,7 +6,11 @@ using Microsoft.Xna.Framework.Graphics;
 
 using SharpGLTF.Schema2;
 
-using MODELMESH = SharpGLTF.Runtime.RuntimeModelMesh;
+using SRCMESH = SharpGLTF.Schema2.Mesh;
+using SRCPRIM = SharpGLTF.Schema2.MeshPrimitive;
+using SRCMATERIAL = SharpGLTF.Schema2.Material;
+
+using MODELMESH = SharpGLTF.Runtime.Content.RuntimeModelMesh;
 
 namespace SharpGLTF.Runtime.Content
 {
@@ -40,7 +44,7 @@ namespace SharpGLTF.Runtime.Content
         private EffectsFactory _MatFactory;
 
         // gathers all meshes using shared vertex and index buffers whenever possible.
-        private MeshPrimitiveBuilder _MeshWriter;
+        private MeshPrimitiveWriter _MeshWriter;
         private int _CurrentMeshIndex;
 
         // used as a container to a default material;
@@ -62,7 +66,7 @@ namespace SharpGLTF.Runtime.Content
         {
             _Disposables = new GraphicsResourceTracker();
             _MatFactory = new EffectsFactory(_Device, _Disposables);
-            _MeshWriter = new MeshPrimitiveBuilder();
+            _MeshWriter = new MeshPrimitiveWriter();
         }
 
         public MonoGameDeviceContent<MonoGameModelTemplate> LoadDeviceModel(string modelFilepath)
@@ -77,34 +81,51 @@ namespace SharpGLTF.Runtime.Content
 
         #endregion
 
-        #region API - Mesh conversion
-        
-        internal void _WriteMesh(IMeshDecoder<Material> srcMesh)
+        #region Mesh API
+
+        internal void _WriteMesh(SRCMESH srcMesh)
         {
-            if (_Device == null) throw new InvalidOperationException();
+            if (_Device == null) throw new InvalidOperationException();            
+
+            var srcPrims = _GetValidPrimitives(srcMesh)
+                .ToDictionary(item => item, item => new MeshPrimitiveReader(item));
+
+            MeshPrimitiveReader.GenerateNormalsAndTangents(srcPrims.Values);
             
+            foreach (var srcPrim in srcPrims)
+            {
+                _CurrentMeshIndex = srcMesh.LogicalIndex;
+
+                _WriteMeshPrimitive(srcPrim.Value, srcPrim.Key.Material);                
+            }            
+        }
+
+        private static IEnumerable<SRCPRIM> _GetValidPrimitives(SRCMESH srcMesh)
+        {
             foreach (var srcPrim in srcMesh.Primitives)
             {
-                if (!srcPrim.TriangleIndices.Any()) continue; // skip empty primitives.
+                var ppp = srcPrim.GetVertexAccessor("POSITION");
+                if (ppp.Count < 3) continue;
 
-                _CurrentMeshIndex = srcMesh.LogicalIndex;
-                _WriteMeshPrimitive(srcPrim);
+                if (srcPrim.DrawPrimitiveType == Schema2.PrimitiveType.POINTS) continue;
+                if (srcPrim.DrawPrimitiveType == Schema2.PrimitiveType.LINES) continue;
+                if (srcPrim.DrawPrimitiveType == Schema2.PrimitiveType.LINE_LOOP) continue;
+                if (srcPrim.DrawPrimitiveType == Schema2.PrimitiveType.LINE_STRIP) continue;
+
+                yield return srcPrim;
             }
         }
 
-        private void _WriteMeshPrimitive(IMeshPrimitiveDecoder<Material> srcPrim)
+        private void _WriteMeshPrimitive(MeshPrimitiveReader srcPrim, SRCMATERIAL srcMaterial)
         {
-            var srcMaterial = srcPrim.Material;
             if (srcMaterial == null) srcMaterial = GetDefaultMaterial();
 
-            bool isSkinned = srcPrim.JointsWeightsCount > 0;
-
-            var effect = _MatFactory.GetMaterial(srcMaterial, isSkinned);
+            var effect = _MatFactory.GetMaterial(srcMaterial, srcPrim.IsSkinned);
 
             if (effect == null)
             {
-                effect = CreateEffect(srcMaterial, isSkinned);
-                _MatFactory.Register(srcMaterial, isSkinned, effect);
+                effect = CreateEffect(srcMaterial, srcPrim.IsSkinned);
+                _MatFactory.Register(srcMaterial, srcPrim.IsSkinned, effect);
             }
 
             var blending = BlendState.Opaque;
@@ -124,21 +145,25 @@ namespace SharpGLTF.Runtime.Content
                 }
             }
 
-            if (effect is PBREffect pbrEffect)
+            if (effect is PBREffect pbrEffect)            
             {
-                pbrEffect.NormalMode = srcMaterial.DoubleSided ? GeometryNormalMode.DoubleSided : GeometryNormalMode.Reverse;
-            }            
+                pbrEffect.NormalMode = srcMaterial.DoubleSided ? GeometryNormalMode.DoubleSided : GeometryNormalMode.Reverse;                
+            }
+            
+            WriteMeshPrimitive(srcPrim, effect, blending, srcMaterial.DoubleSided);
+        }        
 
-            var vtype = GetPreferredVertexType(srcPrim, effect);
+        protected abstract void WriteMeshPrimitive(MeshPrimitiveReader srcPrimitive, Effect effect, BlendState blending, bool doubleSided);
 
-            _MeshWriter.AppendMeshPrimitive(vtype, srcPrim, _CurrentMeshIndex, effect, blending, srcMaterial.DoubleSided);
+        protected void WriteMeshPrimitive<TVertex>(Effect effect, BlendState blending, bool doubleSided, MeshPrimitiveReader primitive)
+            where TVertex : unmanaged, IVertexType
+        {
+            _MeshWriter.WriteMeshPrimitive<TVertex>(_CurrentMeshIndex, effect, blending, doubleSided, primitive);
         }
-
-        protected abstract Type GetPreferredVertexType(IMeshPrimitiveDecoder srcPrimitive, Effect effect);        
 
         #endregion
 
-        #region API - Effects conversion
+        #region EFfects API
 
         /// <summary>
         /// Called when finding a new material that needs to be converted to an Effect.
@@ -174,11 +199,13 @@ namespace SharpGLTF.Runtime.Content
 
             // if we cannot use a predefined value, we have to create a new SamplerState.
             return _MatFactory.UseSampler(gltfSampler);
-        }        
+        }
+
+        
 
         #endregion
 
-        #region API - Resources management
+        #region resources API
 
         internal IReadOnlyDictionary<int, MODELMESH> CreateRuntimeModels()
         {
