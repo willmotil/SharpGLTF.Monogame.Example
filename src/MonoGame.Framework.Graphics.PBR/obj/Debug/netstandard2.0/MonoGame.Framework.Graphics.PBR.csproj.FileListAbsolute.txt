@@ -1,0 +1,9 @@
+C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\MonoGame.Framework.Graphics.PBR\bin\Debug\netstandard2.0\MonoGame.Framework.Graphics.PBR.deps.json
+C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\MonoGame.Framework.Graphics.PBR\bin\Debug\netstandard2.0\MonoGame.Framework.Graphics.PBR.dll
+C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\MonoGame.Framework.Graphics.PBR\bin\Debug\netstandard2.0\MonoGame.Framework.Graphics.PBR.pdb
+C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\MonoGame.Framework.Graphics.PBR\obj\Debug\netstandard2.0\MonoGame.Framework.Graphics.PBR.csprojAssemblyReference.cache
+C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\MonoGame.Framework.Graphics.PBR\obj\Debug\netstandard2.0\MonoGame.Framework.Graphics.PBR.AssemblyInfoInputs.cache
+C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\MonoGame.Framework.Graphics.PBR\obj\Debug\netstandard2.0\MonoGame.Framework.Graphics.PBR.AssemblyInfo.cs
+C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\MonoGame.Framework.Graphics.PBR\obj\Debug\netstandard2.0\MonoGame.Framework.Graphics.PBR.csproj.CoreCompileInputs.cache
+C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\MonoGame.Framework.Graphics.PBR\obj\Debug\netstandard2.0\MonoGame.Framework.Graphics.PBR.dll
+C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\MonoGame.Framework.Graphics.PBR\obj\Debug\netstandard2.0\MonoGame.Framework.Graphics.PBR.pdb

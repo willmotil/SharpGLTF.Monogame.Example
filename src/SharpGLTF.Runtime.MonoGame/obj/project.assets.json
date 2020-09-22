@@ -63,7 +63,7 @@
           }
         }
       },
-      "SharpGLTF.Core/1.0.0-alpha0018": {
+      "SharpGLTF.Core/1.0.0-alpha0019": {
         "type": "package",
         "dependencies": {
           "System.Text.Json": "4.7.2"
@@ -200,6 +200,9 @@
       "MonoGame.Framework.Graphics.PBR/1.0.0": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.5.2",
+        "dependencies": {
+          "System.ValueTuple": "4.5.0"
+        },
         "compile": {
           "bin/placeholder/MonoGame.Framework.Graphics.PBR.dll": {}
         },
@@ -259,17 +262,17 @@
         "runtimes/win-x86/native/soft_oal.dll"
       ]
     },
-    "SharpGLTF.Core/1.0.0-alpha0018": {
-      "sha512": "XHC5tsyqml7o5bkJYprCOV8Tav0k9C0VC7k88NJOxvQsrY1YJuYDgNpj5u0o26sJUrBRIVNYP8ZhWUuwaW1XzQ==",
+    "SharpGLTF.Core/1.0.0-alpha0019": {
+      "sha512": "k5MR2xk6SqHJWkvfAEMXLZF2d4rjet5iB0+WxHY8ODjOoZIcYAmLjxzkhJGwbhNRUsenqv+VNstvRTEWAXvbUA==",
       "type": "package",
-      "path": "sharpgltf.core/1.0.0-alpha0018",
+      "path": "sharpgltf.core/1.0.0-alpha0019",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
         "glTF2Sharp.png",
         "lib/netstandard2.0/SharpGLTF.Core.dll",
         "lib/netstandard2.0/SharpGLTF.Core.xml",
-        "sharpgltf.core.1.0.0-alpha0018.nupkg.sha512",
+        "sharpgltf.core.1.0.0-alpha0019.nupkg.sha512",
         "sharpgltf.core.nuspec"
       ]
     },
@@ -541,7 +544,7 @@
     ".NETFramework,Version=v4.7.1": [
       "MonoGame.Framework.DesktopGL >= 3.8.0.1375-develop",
       "MonoGame.Framework.Graphics.PBR >= 1.0.0",
-      "SharpGLTF.Core >= 1.0.0-alpha0018"
+      "SharpGLTF.Core >= 1.0.0-alpha0019"
     ]
   },
   "packageFolders": {
@@ -561,6 +564,7 @@
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
       ],
       "configFilePaths": [
+        "C:\\Users\\will\\MainFiles\\GitPrjs\\SharpGLTF.Monogame.Example\\src\\NuGet.Config",
         "C:\\Users\\will\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
@@ -569,6 +573,7 @@
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "C:\\Users\\will\\MainFiles\\GitPrjs\\SharpGLTF.Monogame.Example\\src\\Nugets": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -596,7 +601,7 @@
           },
           "SharpGLTF.Core": {
             "target": "Package",
-            "version": "[1.0.0-alpha0018, )"
+            "version": "[1.0.0-alpha0019, )"
           }
         },
         "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.302\\RuntimeIdentifierGraph.json"

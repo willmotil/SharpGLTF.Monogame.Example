@@ -10,11 +10,11 @@ none
 false
 TRACE;DEBUG;NETCOREAPP;NETCOREAPP3_1
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\MonoGameViewer\App.xaml
-11151548125
+2-363162581
 
-12-322685695
-212772144313
-MainWindow.xaml;
+121915002095
+2141105829308
+MainWindow.xaml;WPF\LightSettingsBox.xaml;
 
-False
+True
 

@@ -384,6 +384,31 @@
           "System.Xml.XDocument": "4.0.11"
         }
       },
+      "PropertyTools/3.1.0-alpha0041": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard2.0/PropertyTools.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.0/PropertyTools.dll": {}
+        }
+      },
+      "PropertyTools.Wpf/3.1.0-alpha0041": {
+        "type": "package",
+        "dependencies": {
+          "PropertyTools": "3.1.0-alpha0041",
+          "System.ComponentModel.Annotations": "4.6.0"
+        },
+        "compile": {
+          "lib/netcoreapp3.0/PropertyTools.Wpf.dll": {}
+        },
+        "runtime": {
+          "lib/netcoreapp3.0/PropertyTools.Wpf.dll": {}
+        },
+        "frameworkReferences": [
+          "Microsoft.WindowsDesktop.App.WPF"
+        ]
+      },
       "runtime.native.System/4.0.0": {
         "type": "package",
         "dependencies": {
@@ -570,7 +595,7 @@
           "lib/netcoreapp1.0/SharpDX.XInput.dll": {}
         }
       },
-      "SharpGLTF.Core/1.0.0-alpha0018": {
+      "SharpGLTF.Core/1.0.0-alpha0019": {
         "type": "package",
         "dependencies": {
           "System.Text.Json": "4.7.2"
@@ -582,10 +607,10 @@
           "lib/netstandard2.0/SharpGLTF.Core.dll": {}
         }
       },
-      "SharpGLTF.Toolkit/1.0.0-alpha0018": {
+      "SharpGLTF.Toolkit/1.0.0-alpha0019": {
         "type": "package",
         "dependencies": {
-          "SharpGLTF.Core": "1.0.0-alpha0018"
+          "SharpGLTF.Core": "1.0.0-alpha0019"
         },
         "compile": {
           "lib/netstandard2.0/SharpGLTF.Toolkit.dll": {}
@@ -685,26 +710,13 @@
           "lib/netstandard1.3/System.ComponentModel.dll": {}
         }
       },
-      "System.ComponentModel.Annotations/4.1.0": {
+      "System.ComponentModel.Annotations/4.6.0": {
         "type": "package",
-        "dependencies": {
-          "System.Collections": "4.0.11",
-          "System.ComponentModel": "4.0.1",
-          "System.Globalization": "4.0.11",
-          "System.Linq": "4.1.0",
-          "System.Reflection": "4.1.0",
-          "System.Reflection.Extensions": "4.0.1",
-          "System.Resources.ResourceManager": "4.0.1",
-          "System.Runtime": "4.1.0",
-          "System.Runtime.Extensions": "4.1.0",
-          "System.Text.RegularExpressions": "4.1.0",
-          "System.Threading": "4.0.11"
-        },
         "compile": {
-          "ref/netstandard1.4/System.ComponentModel.Annotations.dll": {}
+          "ref/netstandard2.1/System.ComponentModel.Annotations.dll": {}
         },
         "runtime": {
-          "lib/netstandard1.4/System.ComponentModel.Annotations.dll": {}
+          "lib/netstandard2.1/System.ComponentModel.Annotations.dll": {}
         }
       },
       "System.Console/4.0.0": {
@@ -2728,6 +2740,34 @@
         "netstandard.library.nuspec"
       ]
     },
+    "PropertyTools/3.1.0-alpha0041": {
+      "sha512": "Yk1bxCmhSq0AM6e5TI2QmhuWxu01H7PRtcTJlS9Gl9ksDuogvrHd7MoFL5JZi7DgqziOYIXkymtj57VSO+PxVw==",
+      "type": "package",
+      "path": "propertytools/3.1.0-alpha0041",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "icon.png",
+        "lib/net45/PropertyTools.dll",
+        "lib/netstandard2.0/PropertyTools.dll",
+        "propertytools.3.1.0-alpha0041.nupkg.sha512",
+        "propertytools.nuspec"
+      ]
+    },
+    "PropertyTools.Wpf/3.1.0-alpha0041": {
+      "sha512": "hJIcLMtYd+uIh4XgkbKG6ZwAI3KuL6Ao6QUFQaS5i2EolX6EE1CAoUJLaEuVuYXjmdAX8D6HdG7wUYmUKPkzlw==",
+      "type": "package",
+      "path": "propertytools.wpf/3.1.0-alpha0041",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "icon.png",
+        "lib/net45/PropertyTools.Wpf.dll",
+        "lib/netcoreapp3.0/PropertyTools.Wpf.dll",
+        "propertytools.wpf.3.1.0-alpha0041.nupkg.sha512",
+        "propertytools.wpf.nuspec"
+      ]
+    },
     "runtime.native.System/4.0.0": {
       "sha512": "QfS/nQI7k/BLgmLrw7qm7YBoULEvgWnPI+cYsbfCVFTW8Aj+i8JhccxcFMu1RWms0YZzF+UHguNBK4Qn89e2Sg==",
       "type": "package",
@@ -2986,31 +3026,31 @@
         "sharpdx.xinput.nuspec"
       ]
     },
-    "SharpGLTF.Core/1.0.0-alpha0018": {
-      "sha512": "XHC5tsyqml7o5bkJYprCOV8Tav0k9C0VC7k88NJOxvQsrY1YJuYDgNpj5u0o26sJUrBRIVNYP8ZhWUuwaW1XzQ==",
+    "SharpGLTF.Core/1.0.0-alpha0019": {
+      "sha512": "k5MR2xk6SqHJWkvfAEMXLZF2d4rjet5iB0+WxHY8ODjOoZIcYAmLjxzkhJGwbhNRUsenqv+VNstvRTEWAXvbUA==",
       "type": "package",
-      "path": "sharpgltf.core/1.0.0-alpha0018",
+      "path": "sharpgltf.core/1.0.0-alpha0019",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
         "glTF2Sharp.png",
         "lib/netstandard2.0/SharpGLTF.Core.dll",
         "lib/netstandard2.0/SharpGLTF.Core.xml",
-        "sharpgltf.core.1.0.0-alpha0018.nupkg.sha512",
+        "sharpgltf.core.1.0.0-alpha0019.nupkg.sha512",
         "sharpgltf.core.nuspec"
       ]
     },
-    "SharpGLTF.Toolkit/1.0.0-alpha0018": {
-      "sha512": "JK98XSSzz3uoojU6zm1vx5lRrYzRs7/eLmi22o2A8cb90+SOxdDh0b2rlPKbNp/zhbFwYkTKWr6iQyhcCep0Wg==",
+    "SharpGLTF.Toolkit/1.0.0-alpha0019": {
+      "sha512": "RGuPshUKNxmuPa/SkMBk5peDQYkc8rH3b5RN/YAf4V9/UenkWfMaosMSuxyxLquqhNL2AU2Xdf8pFEwWE7fvXw==",
       "type": "package",
-      "path": "sharpgltf.toolkit/1.0.0-alpha0018",
+      "path": "sharpgltf.toolkit/1.0.0-alpha0019",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
         "glTF2Sharp.png",
         "lib/netstandard2.0/SharpGLTF.Toolkit.dll",
         "lib/netstandard2.0/SharpGLTF.Toolkit.xml",
-        "sharpgltf.toolkit.1.0.0-alpha0018.nupkg.sha512",
+        "sharpgltf.toolkit.1.0.0-alpha0019.nupkg.sha512",
         "sharpgltf.toolkit.nuspec"
       ]
     },
@@ -3290,21 +3330,24 @@
         "system.componentmodel.nuspec"
       ]
     },
-    "System.ComponentModel.Annotations/4.1.0": {
-      "sha512": "rhnz80h8NnHJzoi0nbQJLRR2cJznyqG168q1bgoSpe5qpaME2SguXzuEzpY68nFCi2kBgHpbU4bRN2cP3unYRA==",
+    "System.ComponentModel.Annotations/4.6.0": {
+      "sha512": "pOd+UhZ3X8xfwKDlgAzowUJNjp8VYVmOHZm++vCd0kq1HZ0zK3mNo2yRXjYgv7Ik/Xi43fmJfND2PLEsQSALCg==",
       "type": "package",
-      "path": "system.componentmodel.annotations/4.1.0",
+      "path": "system.componentmodel.annotations/4.6.0",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
-        "ThirdPartyNotices.txt",
-        "dotnet_library_license.txt",
+        "LICENSE.TXT",
+        "THIRD-PARTY-NOTICES.TXT",
         "lib/MonoAndroid10/_._",
         "lib/MonoTouch10/_._",
         "lib/net45/_._",
         "lib/net461/System.ComponentModel.Annotations.dll",
         "lib/netcore50/System.ComponentModel.Annotations.dll",
         "lib/netstandard1.4/System.ComponentModel.Annotations.dll",
+        "lib/netstandard2.0/System.ComponentModel.Annotations.dll",
+        "lib/netstandard2.1/System.ComponentModel.Annotations.dll",
+        "lib/netstandard2.1/System.ComponentModel.Annotations.xml",
         "lib/portable-net45+win8/_._",
         "lib/win8/_._",
         "lib/xamarinios10/_._",
@@ -3315,6 +3358,7 @@
         "ref/MonoTouch10/_._",
         "ref/net45/_._",
         "ref/net461/System.ComponentModel.Annotations.dll",
+        "ref/net461/System.ComponentModel.Annotations.xml",
         "ref/netcore50/System.ComponentModel.Annotations.dll",
         "ref/netcore50/System.ComponentModel.Annotations.xml",
         "ref/netcore50/de/System.ComponentModel.Annotations.xml",
@@ -3359,14 +3403,20 @@
         "ref/netstandard1.4/ru/System.ComponentModel.Annotations.xml",
         "ref/netstandard1.4/zh-hans/System.ComponentModel.Annotations.xml",
         "ref/netstandard1.4/zh-hant/System.ComponentModel.Annotations.xml",
+        "ref/netstandard2.0/System.ComponentModel.Annotations.dll",
+        "ref/netstandard2.0/System.ComponentModel.Annotations.xml",
+        "ref/netstandard2.1/System.ComponentModel.Annotations.dll",
+        "ref/netstandard2.1/System.ComponentModel.Annotations.xml",
         "ref/portable-net45+win8/_._",
         "ref/win8/_._",
         "ref/xamarinios10/_._",
         "ref/xamarinmac20/_._",
         "ref/xamarintvos10/_._",
         "ref/xamarinwatchos10/_._",
-        "system.componentmodel.annotations.4.1.0.nupkg.sha512",
-        "system.componentmodel.annotations.nuspec"
+        "system.componentmodel.annotations.4.6.0.nupkg.sha512",
+        "system.componentmodel.annotations.nuspec",
+        "useSharedDesignerContext.txt",
+        "version.txt"
       ]
     },
     "System.Console/4.0.0": {
@@ -7324,8 +7374,9 @@
     ".NETCoreApp,Version=v3.1": [
       "MonoGame.Framework.Graphics.PBR >= 1.0.0",
       "MonoGame.Framework.WindowsDX >= 3.8.0.1375-develop",
+      "PropertyTools.Wpf >= 3.1.0-alpha0041",
       "SharpGLTF.Runtime.MonoGame >= 1.0.0",
-      "SharpGLTF.Toolkit >= 1.0.0-alpha0018"
+      "SharpGLTF.Toolkit >= 1.0.0-alpha0019"
     ]
   },
   "packageFolders": {
@@ -7345,6 +7396,7 @@
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
       ],
       "configFilePaths": [
+        "C:\\Users\\will\\MainFiles\\GitPrjs\\SharpGLTF.Monogame.Example\\src\\NuGet.Config",
         "C:\\Users\\will\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
@@ -7353,6 +7405,7 @@
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "C:\\Users\\will\\MainFiles\\GitPrjs\\SharpGLTF.Monogame.Example\\src\\Nugets": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -7380,9 +7433,13 @@
             "target": "Package",
             "version": "[3.8.0.1375-develop, )"
           },
+          "PropertyTools.Wpf": {
+            "target": "Package",
+            "version": "[3.1.0-alpha0041, )"
+          },
           "SharpGLTF.Toolkit": {
             "target": "Package",
-            "version": "[1.0.0-alpha0018, )"
+            "version": "[1.0.0-alpha0019, )"
           }
         },
         "imports": [
