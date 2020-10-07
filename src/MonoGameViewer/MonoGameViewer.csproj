@@ -7,14 +7,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-      <PackageReference Include="MonoGame.Framework.WindowsDX" Version="3.8.0.1375-develop" />
-      <PackageReference Include="PropertyTools.Wpf" Version="3.1.0-alpha0041" />
-      <PackageReference Include="SharpGLTF.Toolkit" Version="1.0.0-alpha0019" />
+    <PackageReference Include="MonoGame.Framework.WindowsDX" Version="3.8.0.1375-develop" />
+    <PackageReference Include="PropertyTools.Wpf" Version="3.1.0-alpha0041" />
+    <PackageReference Include="SharpGLTF.Toolkit" Version="1.0.0-alpha0020" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MonoGame.Framework.Graphics.PBR\MonoGame.Framework.Graphics.PBR.csproj" />
-    <ProjectReference Include="..\SharpGLTF.Runtime.MonoGame\SharpGLTF.Runtime.MonoGame.csproj" />
+    <ProjectReference Include="..\MonoGame.Framework.Graphics.GLTF\MonoGame.Framework.Pipeline.GLTF.csproj" />
+    <ProjectReference Include="..\MonoGame.Framework.Graphics.Scene3D\MonoGame.Framework.Graphics.Scene3D.csproj" />
   </ItemGroup>
 
 

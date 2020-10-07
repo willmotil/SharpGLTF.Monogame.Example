@@ -6,6 +6,7 @@ using System.Windows.Controls;
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 
 using MonoGame.WpfCore.MonoGameControls;
 
@@ -18,12 +19,12 @@ namespace MonoGameViewer
         #region data
 
         SharpGLTF.Schema2.ModelRoot _Model;
-        SharpGLTF.Runtime.MonoGameDeviceContent<SharpGLTF.Runtime.MonoGameModelTemplate> _ModelTemplate;
-        BoundingSphere _ModelBounds;
+        ModelCollectionContent _ModelTemplate;
+        BoundingSphere _ModelSphere;
 
         private bool _UseClassicEffects;
 
-        private SharpGLTF.Runtime.MonoGameModelInstance _ModelInstance;
+        private ModelInstance _ModelInstance;
 
         private Quaternion _Rotation = Quaternion.Identity;
 
@@ -58,26 +59,26 @@ namespace MonoGameViewer
 
         public void LoadModel(string filePath)
         {
-            SharpGLTF.Schema2.ModelRoot model = null;
+            SharpGLTF.Schema2.ModelRoot model;
 
-            if (filePath.ToLower().EndsWith(".zip"))
+            try
             {
-                model = SharpGLTF.IO.ZipReader.LoadSchema2(filePath, ValidationMode.TryFix);
+                if (filePath.ToLower().EndsWith(".zip"))
+                {
+                    model = SharpGLTF.IO.ZipReader.LoadSchema2(filePath, ValidationMode.TryFix);
+                }
+                else
+                {
+                    model = SharpGLTF.Schema2.ModelRoot.Load(filePath, ValidationMode.TryFix);
+                }
             }
-            else
+            catch(Exception ex)
             {
-                model = SharpGLTF.Schema2.ModelRoot.Load(filePath, ValidationMode.TryFix);
+                System.Windows.MessageBox.Show(ex.Message, "Error", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+                return;
             }
-
-            // evaluate a single frame of the model to determine the actual bounds, even for a skinned object.
-            var points = SharpGLTF.Schema2.Toolkit.EvaluateTriangles(model.DefaultScene)
-                .SelectMany(item => new[] { item.A.GetGeometry().GetPosition(), item.B.GetGeometry().GetPosition(), item.C.GetGeometry().GetPosition() })
-                .Distinct()
-                .Select(item => new Vector3(item.X, item.Y, item.Z))
-                .ToList();
-
-            _Model = model;
-            _ModelBounds = BoundingSphere.CreateFromPoints(points);
+            
+            _Model = model;            
 
             _ProcessModel();
         }
@@ -87,11 +88,8 @@ namespace MonoGameViewer
             if (_Model == null) return;
             if (_ModelTemplate != null) { _ModelTemplate.Dispose(); _ModelTemplate = null; }
 
-            var loader = _UseClassicEffects
-                ? new SharpGLTF.Runtime.Content.BasicEffectsLoaderContext(this.GraphicsDevice)
-                : SharpGLTF.Runtime.Content.LoaderContext.CreateLoaderContext(this.GraphicsDevice);
-
-            _ModelTemplate = loader.CreateDeviceModel(_Model);
+            _ModelTemplate = Microsoft.Xna.Framework.Content.Pipeline.Graphics.FormatGLTF.ReadModel(_Model, GraphicsDevice, _UseClassicEffects);
+            _ModelSphere = _ModelTemplate.DefaultModel.ModelBounds;
             _ModelInstance = null;
         }
 
@@ -111,7 +109,7 @@ namespace MonoGameViewer
 
         public override void Update(GameTime gameTime)
         {
-            if (_ModelInstance == null && _ModelTemplate != null) _ModelInstance = _ModelTemplate.Content.CreateInstance();
+            if (_ModelInstance == null && _ModelTemplate != null) _ModelInstance = _ModelTemplate.DefaultModel.CreateInstance();
         }
 
         public override void Draw(GameTime gameTime)
@@ -120,12 +118,12 @@ namespace MonoGameViewer
 
             if (_ModelInstance == null) return;
 
-            _ModelInstance.Controller.SetAnimationFrame(0, (float)gameTime.TotalGameTime.TotalSeconds);
+            _ModelInstance.Armature.SetAnimationFrame(0, (float)gameTime.TotalGameTime.TotalSeconds);
 
-            var bounds = _ModelBounds;
+            
 
-            var lookAt = bounds.Center;
-            var camPos = bounds.Center + new Vector3(0, 0, bounds.Radius * 3);
+            var lookAt = _ModelSphere.Center;
+            var camPos = _ModelSphere.Center + new Vector3(0, 0, _ModelSphere.Radius * 2.5f);
 
             var camera = Matrix.CreateWorld(camPos, lookAt - camPos, Vector3.UnitY);
 
@@ -142,7 +140,10 @@ namespace MonoGameViewer
             {
                 _ModelInstance.WorldMatrix = Matrix.CreateFromQuaternion(_Rotation);
 
-                var ctx = new SharpGLTF.Runtime.MonoGameDrawingContext(this.GraphicsDevice);
+                var ctx = new ModelDrawingContext(this.GraphicsDevice);
+
+                ctx.NearPlane = Math.Min(1, _ModelSphere.Radius);
+
                 ctx.SetCamera(camera);                
                 ctx.DrawModelInstance(env, _ModelInstance);
             }
