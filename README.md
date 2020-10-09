@@ -43,6 +43,9 @@ These effects can be used on their own, and dont' require anything from the rest
 Defines a number of classes to represent 3D models, using a new architecture that can handle
 animated models in a modern way.
 
+- [Model Architecture docs (WIP)](src/MonoGame.Framework.Graphics.Toolkit3D/Graphics/ModelArchitecture.md)
+- [Skinning considerations (WIP)](src/MonoGame.Framework.Graphics.Toolkit3D/Graphics/Skinning.MD)
+
 ##### Graphics.Scene3D
 
 This is a package that can be optinally used, and simplifies drawing scenes with multiple objects.
@@ -74,3 +77,10 @@ at runtime, so only projects able to consume Pipeline.GLTF library will be able 
 Textures are loaded using Monogame's Texture2D.FromStream, which means all of its limitations apply:
 - No Mipmaps
 - glTF texture formats WEBP and Universal Basis KTX2 can't be loaded.
+
+
+#### Credits
+
+- [MonoGame](https://github.com/MonoGame/MonoGame)
+- [PBR Shaders from Khronos Viewer](https://github.com/KhronosGroup/glTF-Sample-Viewer)
+- [SharlGLTF library](https://github.com/vpenades/SharpGLTF)
