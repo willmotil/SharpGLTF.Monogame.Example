@@ -99,5 +99,20 @@ float4 PsShader(VsOutTexNorm input, bool hasPerturbedNormals, bool hasPrimary, b
 
     ApplyFog(sRGBA, input.PositionWS);
 
+    // Tests begin
+
+    // Test 1
+    //float3 lookUpTexel = getLutTexel(input.TextureCoordinate0);
+
+    //////  Test 2  lets make sure i can even get texels from a cubemap via lod proper in dx here.     ... not working as expected ... not good.
+    //float3  norm = ninfo.ng; // norm = ninfo.n   norm = input.Normal  //float3 norm = float3(1.0f, 0.0f, 0.0f);
+    //////u_GGXEnvSampler  texCUBElod(samplerCube, float4(ninfo.n, 0));
+    //float3 reflectColor = getEnviromentalCubePixel(norm, 0); // getEnviromentalCubePixel(norm, GetPerceptualRoughness() ); // getEnviromentalCubePixel(norm, 0); //getEnviromentalCubePixelLevel(norm); //getEnviromentalCubePixel(norm, materialInfo.perceptualRoughness);  // ibl.fx
+
+    ////sRGBA.rgb = (lookUpTexel * 0.10f + reflectColor.rgb * 0.40f + sRGBA.rgb * 0.50f);
+    //sRGBA.rgb = (reflectColor.rgb * 0.40f + sRGBA.rgb * 0.50f);
+
+    // Tests end.
+
     return sRGBA;
 }

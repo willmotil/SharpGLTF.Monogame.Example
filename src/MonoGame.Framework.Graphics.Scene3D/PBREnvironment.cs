@@ -30,6 +30,15 @@ namespace Microsoft.Xna.Framework.Graphics
 
         #endregion
 
+        #region cubemap for enviroment.
+
+        private static TextureCube _iblCubeMap;
+        private static Texture2D _iblLutMap;
+        public void SetEnviromentalCubeMap(TextureCube iblCubeMap) { _iblCubeMap = iblCubeMap; }
+        public void SetEnviromentalLUTMap(Texture2D iblLutMap) { _iblLutMap = iblLutMap; }
+
+        #endregion
+
         #region API
 
         public void SetExposure(float exposure) { _Exposure = exposure; }
@@ -55,6 +64,20 @@ namespace Microsoft.Xna.Framework.Graphics
         public void ApplyTo(Effect effect)
         {
             if (effect is IEffectFog fog) { fog.FogEnabled = false; }
+
+            //if (effect is IEffectFog)
+            //{
+            if (_iblCubeMap != null && effect.Name != "Unlit")
+            {
+                //Console.WriteLine("_iblCubeMap ok, " + effect + " , " + effect.Name + " , " + effect.CurrentTechnique.Name);
+                effect.Parameters["envCubeMap"].SetValue(_iblCubeMap);  // u_GGXEnvSampler   u_EnvCubeSampler
+                effect.Parameters["u_GGXLUT"].SetValue(_iblLutMap); // u_GGXLUT  u_CharlieLUT
+            }
+            else
+            {
+                //Console.WriteLine("_iblCubeMap  null " + effect + " , " + effect.Name + " , " + effect.CurrentTechnique.Name);
+            }
+            //}
 
             PBRPunctualLight.ApplyLights(effect, _Exposure, _AmbientLight, _PunctualLights);
         }

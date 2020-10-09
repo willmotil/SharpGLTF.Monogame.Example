@@ -1,0 +1,171 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v3.1",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v3.1": {
+      "Demo1/1.0.0": {
+        "dependencies": {
+          "MonoGame.Content.Builder.Task": "3.8.0.1641",
+          "MonoGame.Framework.DesktopGL": "3.8.0.1641",
+          "MonoGame.Framework.Graphics.Scene3D": "1.0.0",
+          "MonoGame.Framework.Pipeline.GLTF": "1.0.0"
+        },
+        "runtime": {
+          "Demo1.dll": {}
+        }
+      },
+      "MonoGame.Content.Builder.Task/3.8.0.1641": {},
+      "MonoGame.Framework.DesktopGL/3.8.0.1641": {
+        "runtime": {
+          "lib/netstandard2.0/MonoGame.Framework.dll": {
+            "assemblyVersion": "3.8.0.1641",
+            "fileVersion": "3.8.0.1641"
+          }
+        },
+        "runtimeTargets": {
+          "runtimes/linux-x64/native/libSDL2-2.0.so.0": {
+            "rid": "linux-x64",
+            "assetType": "native",
+            "fileVersion": "0.0.0.0"
+          },
+          "runtimes/linux-x64/native/libopenal.so.1": {
+            "rid": "linux-x64",
+            "assetType": "native",
+            "fileVersion": "0.0.0.0"
+          },
+          "runtimes/osx/native/libSDL2-2.0.0.dylib": {
+            "rid": "osx",
+            "assetType": "native",
+            "fileVersion": "0.0.0.0"
+          },
+          "runtimes/osx/native/libopenal.1.dylib": {
+            "rid": "osx",
+            "assetType": "native",
+            "fileVersion": "0.0.0.0"
+          },
+          "runtimes/win-x64/native/SDL2.dll": {
+            "rid": "win-x64",
+            "assetType": "native",
+            "fileVersion": "2.0.12.0"
+          },
+          "runtimes/win-x64/native/soft_oal.dll": {
+            "rid": "win-x64",
+            "assetType": "native",
+            "fileVersion": "0.0.0.0"
+          },
+          "runtimes/win-x86/native/SDL2.dll": {
+            "rid": "win-x86",
+            "assetType": "native",
+            "fileVersion": "2.0.12.0"
+          },
+          "runtimes/win-x86/native/soft_oal.dll": {
+            "rid": "win-x86",
+            "assetType": "native",
+            "fileVersion": "0.0.0.0"
+          }
+        }
+      },
+      "SharpGLTF.Core/1.0.0-alpha0020": {
+        "runtime": {
+          "lib/netcoreapp3.1/SharpGLTF.Core.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "System.Memory/4.5.4": {},
+      "MonoGame.Framework.Graphics.EffectsPBR/1.0.0": {
+        "runtime": {
+          "MonoGame.Framework.Graphics.EffectsPBR.dll": {}
+        }
+      },
+      "MonoGame.Framework.Graphics.Model3D/1.0.0": {
+        "dependencies": {
+          "MonoGame.Framework.Graphics.EffectsPBR": "1.0.0",
+          "System.Memory": "4.5.4"
+        },
+        "runtime": {
+          "MonoGame.Framework.Graphics.Model3D.dll": {}
+        }
+      },
+      "MonoGame.Framework.Graphics.Scene3D/1.0.0": {
+        "dependencies": {
+          "MonoGame.Framework.Graphics.EffectsPBR": "1.0.0",
+          "MonoGame.Framework.Graphics.Model3D": "1.0.0",
+          "System.Memory": "4.5.4"
+        },
+        "runtime": {
+          "MonoGame.Framework.Graphics.Scene3D.dll": {}
+        }
+      },
+      "MonoGame.Framework.Pipeline.GLTF/1.0.0": {
+        "dependencies": {
+          "MonoGame.Framework.Graphics.EffectsPBR": "1.0.0",
+          "MonoGame.Framework.Graphics.Model3D": "1.0.0",
+          "SharpGLTF.Core": "1.0.0-alpha0020"
+        },
+        "runtime": {
+          "MonoGame.Framework.Pipeline.GLTF.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "Demo1/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "MonoGame.Content.Builder.Task/3.8.0.1641": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-oHA60q9MhkqGnSiJlXosdynD400sQ/j1Ef+0XkJYIQT4Io9RQ6Zk8i0vjpnIbQ0PgsoaQN3IRYjNzkhqq3uUGA==",
+      "path": "monogame.content.builder.task/3.8.0.1641",
+      "hashPath": "monogame.content.builder.task.3.8.0.1641.nupkg.sha512"
+    },
+    "MonoGame.Framework.DesktopGL/3.8.0.1641": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-rJQlrlHQbnOECYV6EcQ8GlGRQ2lzPTroXQcyyOZ0ki+BQRSJEN2zVBm9skqLiXya348aGAfTSSGTaSKjAy9NaA==",
+      "path": "monogame.framework.desktopgl/3.8.0.1641",
+      "hashPath": "monogame.framework.desktopgl.3.8.0.1641.nupkg.sha512"
+    },
+    "SharpGLTF.Core/1.0.0-alpha0020": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-9NKvMD5lL7AVXQ+9bRKDhzmEvXTatpdrybd3F2uZVJsXR/cOkdJl+g4xBy6fjKsILTNUPWXcyquAyo/Pjs1uCw==",
+      "path": "sharpgltf.core/1.0.0-alpha0020",
+      "hashPath": "sharpgltf.core.1.0.0-alpha0020.nupkg.sha512"
+    },
+    "System.Memory/4.5.4": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-1MbJTHS1lZ4bS4FmsJjnuGJOu88ZzTT2rLvrhW7Ygic+pC0NWA+3hgAen0HRdsocuQXCkUTdFn9yHJJhsijDXw==",
+      "path": "system.memory/4.5.4",
+      "hashPath": "system.memory.4.5.4.nupkg.sha512"
+    },
+    "MonoGame.Framework.Graphics.EffectsPBR/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "MonoGame.Framework.Graphics.Model3D/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "MonoGame.Framework.Graphics.Scene3D/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "MonoGame.Framework.Pipeline.GLTF/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}
