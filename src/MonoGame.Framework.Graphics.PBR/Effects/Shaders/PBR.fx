@@ -7,6 +7,7 @@
 #include "ToneMapping.fx"
 #include "Alpha.fx"
 
+#include "IBL.fx"
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // CONSTANTS
@@ -15,6 +16,8 @@
 float3 CameraPosition;
     
 float3 AmbientLight;
+
+float testValue;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // PIXEL SHADERS
@@ -46,7 +49,7 @@ struct VsOutTexNorm
 #include "Sampler.Occlusion.fx"
 
 #include "PunctualLight.fx"
-// #include "IBL.fx"
+
 #include "PBR.Pixel.fx"
 
 float4 PsShader(VsOutTexNorm input, bool hasPerturbedNormals, bool hasPrimary, bool hasSecondary, bool hasEmissive, bool hasOcclusion)
@@ -106,14 +109,19 @@ float4 PsShader(VsOutTexNorm input, bool hasPerturbedNormals, bool hasPrimary, b
     // Tests begin
 
     // Test 1
-    //float3 lookUpTexel = getLutTexel(input.TextureCoordinate0);
+    float3 lookUpTexel = getLutTexel(input.TextureCoordinate0);
 
-    //////  Test 2  lets make sure i can even get texels from a cubemap via lod proper in dx here.     ... not working as expected ... not good.
-    //float3  norm = ninfo.ng; // norm = ninfo.n   norm = input.Normal  //float3 norm = float3(1.0f, 0.0f, 0.0f);
-    //////u_GGXEnvSampler  texCUBElod(samplerCube, float4(ninfo.n, 0));
-    //float3 reflectColor = getEnviromentalCubePixel(norm, 0); // getEnviromentalCubePixel(norm, GetPerceptualRoughness() ); // getEnviromentalCubePixel(norm, 0); //getEnviromentalCubePixelLevel(norm); //getEnviromentalCubePixel(norm, materialInfo.perceptualRoughness);  // ibl.fx
+    ////  Test 2  lets make sure i can even get texels from a cubemap via lod proper in dx here.     ... not working as expected ... not good.
+    float3  norm = ninfo.ng; // norm = ninfo.n   norm = input.Normal  //float3 norm = float3(1.0f, 0.0f, 0.0f);
+    ////u_GGXEnvSampler  texCUBElod(samplerCube, float4(ninfo.n, 0));
 
-    ////sRGBA.rgb = (lookUpTexel * 0.10f + reflectColor.rgb * 0.40f + sRGBA.rgb * 0.50f);
+    // test mip levels.
+
+    //float maxmip = 7.0f;
+    //float currentmip = minfo.perceptualRoughness / maxmip;
+    float3 reflectColor = getEnviromentalCubePixel(norm, testValue); // getEnviromentalCubePixel(norm, GetPerceptualRoughness() ); // getEnviromentalCubePixel(norm, 0); //getEnviromentalCubePixelLevel(norm); //getEnviromentalCubePixel(norm, materialInfo.perceptualRoughness);  // ibl.fx
+
+    sRGBA.rgb = (lookUpTexel * 0.10f + reflectColor.rgb * 0.40f + sRGBA.rgb * 0.50f);
     //sRGBA.rgb = (reflectColor.rgb * 0.40f + sRGBA.rgb * 0.50f);
 
     // Tests end.

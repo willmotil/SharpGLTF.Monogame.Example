@@ -14,6 +14,7 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </summary>
         public UnlitEffect(GraphicsDevice device) : base(device, Resources.GetShaderByteCode("Unlit"))
         {
+            this.Name = "Unlit";
             _BaseColorMap = new EffectTexture2D.Scalar4(device, this.Parameters, "Primary", 1);
             _EmissiveMap = new EffectTexture2D.Scalar3(device, this.Parameters, "Emissive", 3);
             _OcclusionMap = new EffectTexture2D.Scalar1(device, this.Parameters, "Occlusion", 4);

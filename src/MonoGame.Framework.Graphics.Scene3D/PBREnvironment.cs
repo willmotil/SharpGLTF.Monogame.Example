@@ -37,6 +37,9 @@ namespace Microsoft.Xna.Framework.Graphics
         public void SetEnviromentalCubeMap(TextureCube iblCubeMap) { _iblCubeMap = iblCubeMap; }
         public void SetEnviromentalLUTMap(Texture2D iblLutMap) { _iblLutMap = iblLutMap; }
 
+        private static float _testValue;
+        public void SetTestingValue(float testValue) { _testValue = testValue; }
+
         #endregion
 
         #region API
@@ -72,6 +75,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 //Console.WriteLine("_iblCubeMap ok, " + effect + " , " + effect.Name + " , " + effect.CurrentTechnique.Name);
                 effect.Parameters["envCubeMap"].SetValue(_iblCubeMap);  // u_GGXEnvSampler   u_EnvCubeSampler
                 effect.Parameters["u_GGXLUT"].SetValue(_iblLutMap); // u_GGXLUT  u_CharlieLUT
+                effect.Parameters["testValue"].SetValue(_testValue);
             }
             else
             {

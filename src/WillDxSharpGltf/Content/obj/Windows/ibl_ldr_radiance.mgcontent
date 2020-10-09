@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PipelineBuildEvent xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <SourceFile>C:/Users/will/MainFiles/GitPrjs/SharpGLTF.Monogame.Example/src/WillDxSharpGltf/Content/ibl_ldr_radiance.png</SourceFile>
-  <SourceTime>2020-09-23T10:19:29.8630411-04:00</SourceTime>
+  <SourceTime>2020-10-08T20:34:09.027709-04:00</SourceTime>
   <DestFile>C:/Users/will/MainFiles/GitPrjs/SharpGLTF.Monogame.Example/src/WillDxSharpGltf/Content/bin/Windows/ibl_ldr_radiance.xnb</DestFile>
-  <DestTime>2020-10-05T16:03:15.1717032-04:00</DestTime>
+  <DestTime>2020-10-08T22:22:49.2039946-04:00</DestTime>
   <Importer>TextureImporter</Importer>
   <ImporterTime>2020-05-27T15:15:40-04:00</ImporterTime>
   <Processor>TextureProcessor</Processor>

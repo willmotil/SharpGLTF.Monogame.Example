@@ -10,6 +10,7 @@ namespace Microsoft.Xna.Framework.Graphics
         
         public PBRSpecularGlossinessEffect(GraphicsDevice device) : base(device, Resources.GetShaderByteCode("SpecularGlossinessEffect"))
         {
+            this.Name = "SpecularGlossinessEffect";
             _DiffuseMap = new EffectTexture2D.Scalar4(device, this.Parameters, "Primary", 1);
             _SpecularGlossinessMap = new EffectTexture2D.Scalar4(device, this.Parameters, "Secondary", 2);
         }

@@ -86,7 +86,6 @@ C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillDxSharpGltf\b
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillDxSharpGltf\bin\Debug\netcoreapp3.1\MonoGame.Framework.Graphics.Scene3D.pdb
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillDxSharpGltf\bin\Debug\netcoreapp3.1\MonoGame.Framework.Graphics.EffectsPBR.pdb
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillDxSharpGltf\bin\Debug\netcoreapp3.1\MonoGame.Framework.Graphics.Model3D.pdb
-C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillDxSharpGltf\obj\Debug\netcoreapp3.1\WillDxSharpGltf.csprojAssemblyReference.cache
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillDxSharpGltf\obj\Debug\netcoreapp3.1\WillDxSharpGltf.AssemblyInfoInputs.cache
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillDxSharpGltf\obj\Debug\netcoreapp3.1\WillDxSharpGltf.AssemblyInfo.cs
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillDxSharpGltf\obj\Debug\netcoreapp3.1\WillDxSharpGltf.csproj.CoreCompileInputs.cache
@@ -94,3 +93,5 @@ C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillDxSharpGltf\o
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillDxSharpGltf\obj\Debug\netcoreapp3.1\WillDxSharpGltf.dll
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillDxSharpGltf\obj\Debug\netcoreapp3.1\WillDxSharpGltf.pdb
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillDxSharpGltf\obj\Debug\netcoreapp3.1\WillDxSharpGltf.genruntimeconfig.cache
+C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillDxSharpGltf\bin\Debug\netcoreapp3.1\Content\MipLevelTestEffect.xnb
+C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillDxSharpGltf\obj\Debug\netcoreapp3.1\WillDxSharpGltf.csprojAssemblyReference.cache

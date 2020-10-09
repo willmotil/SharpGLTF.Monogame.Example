@@ -6,12 +6,13 @@ using System.Threading.Tasks;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-    public abstract class PBREffect : AnimatedEffect, PBRPunctualLight.IEffect , IEffectFog
+    public abstract class PBREffect : AnimatedEffect, PBRPunctualLight.IEffect, IEffectFog
     {
         #region lifecycle
-        
+
         public PBREffect(GraphicsDevice device, byte[] effectCode) : base(device, effectCode)
         {
+            this.Name = "PBREffect";
             _NormalMap = new EffectTexture2D.Scalar1(device, this.Parameters, "Normal", 0);
             _EmissiveMap = new EffectTexture2D.Scalar3(device, this.Parameters, "Emissive", 3);
             _OcclusionMap = new EffectTexture2D.Scalar1(device, this.Parameters, "Occlusion", 4);
@@ -33,6 +34,8 @@ namespace Microsoft.Xna.Framework.Graphics
         private readonly EffectTexture2D.Scalar3 _EmissiveMap;
         private readonly EffectTexture2D.Scalar1 _OcclusionMap;
 
+
+
         private readonly EffectBasicFog _Fog;
 
         #endregion
@@ -47,8 +50,8 @@ namespace Microsoft.Xna.Framework.Graphics
         /// In order to convert from linear to screen space, we need to "Tone Map" the linear RGB color.
         /// </remarks>
         public float Exposure { get; set; } = 1;
-        
-        public Vector3 AmbientLightColor { get; set; }        
+
+        public Vector3 AmbientLightColor { get; set; }
 
         public int MaxPunctualLights => 3;
 
@@ -57,7 +60,7 @@ namespace Microsoft.Xna.Framework.Graphics
         #endregion
 
         #region properties - material
-        
+
         /// <summary>
         /// Gets or sets the mode indicating whether geometry normals must be flipped in the pixel shader.        
         /// </summary>
@@ -114,7 +117,7 @@ namespace Microsoft.Xna.Framework.Graphics
             _NormalMap.Apply();
             _EmissiveMap.Apply();
             _OcclusionMap.Apply();
-        }    
+        }
 
         #endregion
     }

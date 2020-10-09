@@ -121,3 +121,9 @@
 /processorParam:TextureFormat=Color
 /build:MG_Logo_Small_exCanvs.png
 
+#begin MipLevelTestEffect.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:MipLevelTestEffect.fx
+

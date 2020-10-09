@@ -4,6 +4,8 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
+// need to take a look at this later i want to create a skycube ect not require a user to load one.
+//https://github.com/vpenades/MonoGame.AnimAndPBR/blob/master/src/MonoGame.Framework.Graphics.Toolkit3D/Graphics/ModelArchitecture.md
 
 namespace WillDxSharpGltf
 {
@@ -14,6 +16,13 @@ namespace WillDxSharpGltf
     public class Game2 : Game
     {
         SpriteBatch _spriteBatch;
+        SpriteFont font;
+        public static Effect primitivesEffect;
+
+        SpherePNTT cube, cube2, sky;
+        float TestValue1 = 0;
+        float TestValue2 = 1;
+        string msg = "";
 
         private Texture2D _texture;
         private Texture2D _generatedTexture;
@@ -99,6 +108,51 @@ namespace WillDxSharpGltf
 
         #endregion
 
+        #region resources
+
+        private readonly GraphicsDeviceManager _Graphics;
+
+        // these are the actual hardware resources that represent every model's geometry.        
+
+        ModelCollectionContent _TestTemplate;
+        ModelCollectionContent _VertexColorTestTemplate;
+        ModelCollectionContent _TextureCoordinateTestTemplate;
+        ModelCollectionContent _TextureSettingsTestTemplate;
+        ModelCollectionContent _MultiUvTestTemplate;
+        ModelCollectionContent _TextureTransformMultiTestTemplate;
+        ModelCollectionContent _TextureTransformTestTemplate;
+        ModelCollectionContent _AlphaBlendModeTestTemplate;
+        ModelCollectionContent _NormalTangentMirrorTestTemplate;
+        ModelCollectionContent _UnlitTestTemplate;
+        ModelCollectionContent _InterpolationTestTemplate;
+        //ModelCollectionContent _AnimatedMorphCubeTemplate;
+        ModelCollectionContent _ClearCoatTestTemplate;
+        ModelCollectionContent _SpecGlossVsMetalRoughTemplate;
+
+
+        private PBREnvironment _LightsAndFog = PBREnvironment.CreateDefault();
+
+        // these are the scene instances we create for every glTF model we want to render on screen.
+        // Instances are designed to be as lightweight as possible, so it should not be a problem to
+        // create as many of them as you need at runtime.
+        private ModelInstance _Test;
+        private ModelInstance _VertexColorTest;
+        private ModelInstance _AlphaBlendModeTest;
+        private ModelInstance _MultiUvTest;
+        private ModelInstance _TextureCoordinateTest;
+        private ModelInstance _NormalTangentMirrorTest;
+        private ModelInstance _TextureSettingsTest;
+        private ModelInstance _UnlitTest;
+        private ModelInstance _InterpolationTest;
+        //private ModelInstance _AnimatedMorphCube;
+        private ModelInstance _TextureTransformMultiTest;
+        private ModelInstance _TextureTransformTest;
+        private ModelInstance _ClearCoatTest;
+        private ModelInstance _SpecGlossVsMetalRough;
+
+
+        #endregion
+
         #region lifecycle
 
         public Game2()
@@ -127,29 +181,7 @@ namespace WillDxSharpGltf
 
         #endregion
 
-        #region resources
 
-        private readonly GraphicsDeviceManager _Graphics;
-
-        // these are the actual hardware resources that represent every model's geometry.        
-
-        ModelCollectionContent _TestTemplate;
-        ModelCollectionContent _VertexColorTestTemplate;
-        ModelCollectionContent _TextureCoordinateTestTemplate;
-        ModelCollectionContent _TextureSettingsTestTemplate;
-        ModelCollectionContent _MultiUvTestTemplate;
-        ModelCollectionContent _TextureTransformMultiTestTemplate;
-        ModelCollectionContent _TextureTransformTestTemplate;
-        ModelCollectionContent _AlphaBlendModeTestTemplate;
-        ModelCollectionContent _NormalTangentMirrorTestTemplate;
-        ModelCollectionContent _UnlitTestTemplate;
-        ModelCollectionContent _InterpolationTestTemplate;
-        //ModelCollectionContent _AnimatedMorphCubeTemplate;
-        ModelCollectionContent _ClearCoatTestTemplate;
-        ModelCollectionContent _SpecGlossVsMetalRoughTemplate;
-        
-
-        #endregion
 
         #region content loading
 
@@ -157,31 +189,74 @@ namespace WillDxSharpGltf
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             _texture = Content.Load<Texture2D>("MG_Logo_Small_exCanvs");
+
+            _LightsAndFog = new PBREnvironment();
+
+            LoadGenerateCpuSideEnvStuff();
+
+            LoadPrimitives();
+
+            SelectTestModel();
+
+            LoadStandardTestingModels();
+
+            SetupCamera();
+        }
+
+        public void SetupCamera()
+        {
+            _camera = new DemoCamera(GraphicsDevice, _spriteBatch, null, new Vector3(2, 2, 10), new Vector3(0, 0, 0), Vector3.UnitY, 0.1f, 10000f, 1f, true, false);
+            _camera.TransformCamera(_camera.World.Translation, _testTarget, _camera.World.Up);
+            _camera.Up = Vector3.Up;
+            _camera.WayPointCycleDurationInTotalSeconds = 50f;
+            _camera.MovementSpeedPerSecond = 3f;
+            _camera.SetWayPoints(_wayPoints, true, 200);
+        }
+
+        public void LoadGenerateCpuSideEnvStuff()
+        {
             _premadeLut = Content.Load<Texture2D>("ibl_brdf_lut"); // need to probably generate this instead of just loading a premade one.
             _ldrTexture = Content.Load<Texture2D>("ibl_ldr_radiance");
             //_ldrTextureFaces = CubeMapHelper.SphericalMapToTextureFaces(GraphicsDevice, 256, _ldrTexture); // prototype test need to fix this now that i see what i did wrong.
             _ldrTextureFaces = CubeMapHelper.GetMapFacesTextureArrayFromEquaRectangularMap(GraphicsDevice, _ldrTexture, 200); // this is sphereical map to a texture array.
             LoadIndivdualFaces();
-            //_textureCubeMap = CubeMapHelper.SetIndividualFacesToCubeMap(GraphicsDevice, 256, _textureCubeMap, cmLeft, cmBottom, cmBack, cmRight, cmTop, cmFront);
-            _textureCubeMap = CubeMapHelper.GetCubeMapFromEquaRectangularMap(GraphicsDevice, _ldrTexture, 200);
+            _textureCubeMap = CubeMapHelper.SetIndividualFacesToCubeMap(GraphicsDevice, 256, _textureCubeMap, cmLeft, cmBottom, cmBack, cmRight, cmTop, cmFront);
+            //_textureCubeMap = CubeMapHelper.GetCubeMapFromEquaRectangularMap(GraphicsDevice, _ldrTexture, 200);
             // This creates a new equaRectangularMap.
             _generatedTexture = CubeMapHelper.GetEquaRectangularMapFromSixImageFaces(GraphicsDevice, 400, 200, cmLeft, cmBottom, cmBack, cmRight, cmTop, cmFront);
             // need to generate the irradiance maps and mips and all that also.
             _LightsAndFog.SetEnviromentalCubeMap(_textureCubeMap);
             _LightsAndFog.SetEnviromentalLUTMap(_premadeLut);
+        }
 
+        public void LoadPrimitives()
+        {
+            font = new HardCodedSpriteFont().LoadHardCodeSpriteFont(GraphicsDevice);
+            primitivesEffect = Content.Load<Effect>("MipLevelTestEffect");
+            sky = new SpherePNTT(true, false, false, 10, 1000f, true, false);  // since i ussally map this using a left cross texture, i need the extra flip normal option on this time.
+            cube = new SpherePNTT(false, false, false, 2, 1f);
+            cube2 = new SpherePNTT(false, false, false, 5, 2f);
+            primitivesEffect.Parameters["CubeMap"].SetValue(_textureCubeMap);
+        }
+
+        public void LoadIndivdualFaces()
+        {
+            cmLeft = Content.Load<Texture2D>("CubeFaces/_left256");
+            cmRight = Content.Load<Texture2D>("CubeFaces/_right256");
+            cmFront = Content.Load<Texture2D>("CubeFaces/_front256");
+            cmBack = Content.Load<Texture2D>("CubeFaces/_back256");
+            cmTop = Content.Load<Texture2D>("CubeFaces/_top256");
+            cmBottom = Content.Load<Texture2D>("CubeFaces/_bottom256");
+        }
+
+        public void LoadStandardTestingModels()
+        {
             ModelCollectionContent _load(string filePath)
             {
                 return Microsoft.Xna.Framework.Content.Pipeline.Graphics.FormatGLTF.LoadModel(filePath, this.GraphicsDevice);
             }
 
-            //Msg.Tracking = true;
-
-            SelectTestModel();
-
-            //Msg.Tracking = false;
-
-             _VertexColorTestTemplate = _load("Models\\VertexColorTest.glb");
+            _VertexColorTestTemplate = _load("Models\\VertexColorTest.glb");
             _TextureCoordinateTestTemplate = _load("Models\\TextureCoordinateTest.glb");
             _TextureSettingsTestTemplate = _load("Models\\TextureSettingsTest.glb");
             _MultiUvTestTemplate = _load("Models\\MultiUvTest.glb");
@@ -194,27 +269,6 @@ namespace WillDxSharpGltf
             //_AnimatedMorphCubeTemplate = _load("Models\\AnimatedMorphCube.glb");
             _ClearCoatTestTemplate = _load("Models\\ClearCoatTest.glb");
             _SpecGlossVsMetalRoughTemplate = _load("Models\\SpecGlossVsMetalRough.glb");
-
-
-            _spriteBatch = new SpriteBatch(GraphicsDevice);
-            _camera = new DemoCamera(GraphicsDevice, _spriteBatch, null, new Vector3(2, 2, 10), new Vector3(0, 0, 0), Vector3.UnitY, 0.1f, 10000f, 1f, true, false);
-            _camera.TransformCamera(_camera.World.Translation, _testTarget, _camera.World.Up);
-            _camera.Up = Vector3.Up;
-            _camera.WayPointCycleDurationInTotalSeconds = 50f;
-            _camera.MovementSpeedPerSecond = 3f;
-            _camera.SetWayPoints(_wayPoints, true, 200);
-
-            _LightsAndFog = new PBREnvironment();
-        }
-
-        public void LoadIndivdualFaces()
-        {
-            cmLeft = Content.Load<Texture2D>("CubeFaces/_left256");
-            cmRight = Content.Load<Texture2D>("CubeFaces/_right256");
-            cmFront = Content.Load<Texture2D>("CubeFaces/_front256");
-            cmBack = Content.Load<Texture2D>("CubeFaces/_back256");
-            cmTop = Content.Load<Texture2D>("CubeFaces/_top256");
-            cmBottom = Content.Load<Texture2D>("CubeFaces/_bottom256");
         }
 
         public void SelectTestModel()
@@ -290,7 +344,7 @@ namespace WillDxSharpGltf
             // This caused a application crashing null reference exception.  
             // This appears to have a null material not sure if that needs to be null checked too.
             // https://github.com/vpenades/SharpGLTF.Monogame.Example/blob/master/src/SharpGLTF.Runtime.MonoGame/LoaderContext.cs#L159
-            //_TestTemplate = _load("Models\\MetalRoughSpheresNoTextures.glb");        _targetScale = 100;
+            _TestTemplate = _load("Models\\MetalRoughSpheresNoTextures.glb");        _targetScale = 500;
 
             //  appears to pass, need a better test model inconclusive, need a clear test to check both normal and bump types especially with this double sided thing going on.
             //_TestTemplate = _load("Models\\NormalTangentTest.glb");                     _targetScale = 1;
@@ -326,7 +380,8 @@ namespace WillDxSharpGltf
             //_TestTemplate = _load("Models\\duck.glb"); _targetScale = 1;
             //_TestTemplate = _load("Models\\underwaterScene.glb"); _targetScale = 1;
             //_TestTemplate = _load("Models\\underwaterSceneRocksBarnaclesMussels.glb"); _targetScale = 1;
-            _TestTemplate = _load("Models\\BrainStem.glb"); _targetScale = 1;
+            
+            //_TestTemplate = _load("Models\\BrainStem.glb"); _targetScale = 1;
 
             // The energy output of this DGF shader for point lights appears to be too high but that is trivial.
             // Already starting to get stutters im almost afraid to put my counter back in and look at the collections now.
@@ -381,25 +436,6 @@ namespace WillDxSharpGltf
 
         #region game loop
 
-        private PBREnvironment _LightsAndFog = PBREnvironment.CreateDefault();
-
-        // these are the scene instances we create for every glTF model we want to render on screen.
-        // Instances are designed to be as lightweight as possible, so it should not be a problem to
-        // create as many of them as you need at runtime.
-        private ModelInstance _Test;
-        private ModelInstance _VertexColorTest;
-        private ModelInstance _AlphaBlendModeTest;
-        private ModelInstance _MultiUvTest;
-        private ModelInstance _TextureCoordinateTest;
-        private ModelInstance _NormalTangentMirrorTest;
-        private ModelInstance _TextureSettingsTest;
-        private ModelInstance _UnlitTest;
-        private ModelInstance _InterpolationTest;
-        //private ModelInstance _AnimatedMorphCube;
-        private ModelInstance _TextureTransformMultiTest;
-        private ModelInstance _TextureTransformTest;
-        private ModelInstance _ClearCoatTest;
-        private ModelInstance _SpecGlossVsMetalRough;
 
 
 
@@ -462,14 +498,54 @@ namespace WillDxSharpGltf
 
             _camera.Update(_testTarget, _useDemoWaypoints, gameTime);
 
+            UpdateTestingUiShaderVariables(gameTime);
+
             base.Update(gameTime);
+        }
+
+        public void UpdateTestingUiShaderVariables(GameTime gameTime)
+        {
+            // test mip maps press the 1 key.
+            if (Keyboard.GetState().IsKeyDown(Keys.D1) && Pause(gameTime))
+            {
+                TestValue1++;
+                if (TestValue1 > cmLeft.LevelCount)
+                    TestValue1 = 0;
+
+                msg =
+                    " cube size " + _textureCubeMap.Size +
+                    " \n mip Level: " + TestValue1 + "  /  " + cmLeft.LevelCount;
+                if (TestValue2 == 0)
+                    msg += " \n mip CallType: texCubeBias " + TestValue2;
+                if (TestValue2 == 1)
+                    msg += " \n mip CallType: texCubeLod " + TestValue2;
+            }
+
+            if (Keyboard.GetState().IsKeyDown(Keys.D2) && Pause(gameTime))
+            {
+                TestValue2++;
+                if (TestValue2 > 1)
+                    TestValue2 = 0;
+
+                msg =
+                    " cube size " + _textureCubeMap.Size +
+                    " \n mip Level: " + TestValue1 + "  /  " + cmLeft.LevelCount
+                    ;
+                if (TestValue2 == 0)
+                    msg += " \n mip CallType: texCubeBias " + TestValue2;
+                if (TestValue2 == 1)
+                    msg += " \n mip CallType: texCubeLod " + TestValue2;
+                ;
+            }
         }
 
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.DarkSlateGray);
 
-            base.Draw(gameTime);
+            // draw primitives
+
+            DrawPrimitives(gameTime);
 
             // draw all the instances.
 
@@ -483,6 +559,8 @@ namespace WillDxSharpGltf
             
             dir = Vector3.Normalize(new Vector3(1, 1, -25));
             _LightsAndFog.SetDirectLight(2, dir, Color.White, 1.0f);
+
+            _LightsAndFog.SetTestingValue(TestValue1);
 
             //StackTraceToStringBuilder.Tracing = false;
 
@@ -504,11 +582,45 @@ namespace WillDxSharpGltf
 
             _camera.DrawCurveThruWayPointsWithSpriteBatch(2f, new Vector3(100,100, 100), 1 ,gameTime);
 
+            _spriteBatch.DrawString(font, msg, new Vector2(10, 20), Color.Red);
+
             _spriteBatch.End();
 
+            base.Draw(gameTime);
         }
 
         #endregion
+
+        protected void DrawPrimitives(GameTime gameTime)
+        {
+            var projectionMatrix = Matrix.CreatePerspectiveFieldOfView(90 * (float)((3.14159265358f) / 180f), GraphicsDevice.Viewport.Width / GraphicsDevice.Viewport.Height, 0.01f, 1000f);
+            primitivesEffect.Parameters["World"].SetValue(Matrix.Identity);
+            primitivesEffect.Parameters["View"].SetValue(_camera.View);   // just add defaults here or dont add anything.
+            primitivesEffect.Parameters["CameraPosition"].SetValue( Vector3.Zero); //_camera.Position);
+            primitivesEffect.Parameters["Projection"].SetValue(projectionMatrix);
+            primitivesEffect.Parameters["testValue1"].SetValue((int)TestValue1);
+            primitivesEffect.Parameters["testValue2"].SetValue((int)TestValue2);
+
+            sky.Draw(GraphicsDevice, primitivesEffect, cmFront, cmBack, cmLeft, cmRight, cmTop, cmBottom);
+            cube.Draw(GraphicsDevice, primitivesEffect, cmFront, cmBack, cmLeft, cmRight, cmTop, cmBottom);
+            cube2.Draw(GraphicsDevice, primitivesEffect, cmFront, cmBack, cmLeft, cmRight, cmTop, cmBottom);
+        }
+
+
+        float pause = 0f;
+        bool Pause(GameTime gametime)
+        {
+            if (pause < 0)
+            {
+                pause = .5f;
+                return true;
+            }
+            else
+            {
+                pause -= (float)gametime.ElapsedGameTime.TotalSeconds;
+                return false;
+            }
+        }
     }
 
 }

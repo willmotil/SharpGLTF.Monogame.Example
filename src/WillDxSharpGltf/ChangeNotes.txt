@@ -1,0 +1,100 @@
+﻿The effect cs files all have names added in the constructor need to make a pr for that.  such as  this.Name = "PBREffect";
+
+// IBL
+
+
+
+DECLARE_TEXTURE(u_GGXLUT, 5);
+
+//DECLARE_CUBEMAP(u_EnvCubeSampler, 0);
+
+// uniform int u_MipCount;
+//uniform samplerCUBE u_LambertianEnvSampler;
+//uniform samplerCUBE u_GGXEnvSampler;
+
+///uniform samplerCUBE u_CharlieEnvSampler;
+uniform sampler2D u_CharlieLUT;
+
+static TextureCube envCubeMap;
+uniform samplerCUBE envCubeMapSampler = sampler_state
+//sampler CubeMapSampler = sampler_state
+{
+    texture = <envCubeMap>;
+    magfilter = Linear;
+    minfilter = Linear;
+    mipfilter = Linear;
+    AddressU = clamp;
+    AddressV = clamp;
+};
+
+
+//float3 getEnviromentalCubePixelLevel(float3 reflectionNorm)
+//{
+//    return texCUBElod(envCubeMapSampler, float4(reflectionNorm, materialInfo.perceptualRoughness)).rgb;
+//}
+
+float3 getEnviromentalCubePixel(float3 reflectionNorm, int lod)
+{
+    return texCUBElod(envCubeMapSampler, float4(reflectionNorm, abs(lod))).rgb;
+}
+
+float3 getLutTexel(float2 uv)
+{
+    //return tex2D(u_CharlieLUT, uv);
+    return SAMPLE_TEXTURE(u_GGXLUT, uv).rgb;
+}
+
+
+pbr.fx
+
+ // Tests begin
+
+    // Test 1
+    float3 lookUpTexel = getLutTexel(input.TextureCoordinate0);
+
+    ////  Test 2  lets make sure i can even get texels from a cubemap via lod proper in dx here.     ... not working as expected ... not good.
+    float3  norm = ninfo.ng; // norm = ninfo.n   norm = input.Normal  //float3 norm = float3(1.0f, 0.0f, 0.0f);
+    ////u_GGXEnvSampler  texCUBElod(samplerCube, float4(ninfo.n, 0));
+    float3 reflectColor = getEnviromentalCubePixel(norm, 0); // getEnviromentalCubePixel(norm, GetPerceptualRoughness() ); // getEnviromentalCubePixel(norm, 0); //getEnviromentalCubePixelLevel(norm); //getEnviromentalCubePixel(norm, materialInfo.perceptualRoughness);  // ibl.fx
+
+    sRGBA.rgb = (lookUpTexel * 0.10f + reflectColor.rgb * 0.40f + sRGBA.rgb * 0.50f);
+    //sRGBA.rgb = (reflectColor.rgb * 0.40f + sRGBA.rgb * 0.50f);
+
+    // Tests end.
+
+
+    PBREnviroment.cs
+
+    #region cubemap for enviroment.
+
+        private static TextureCube _iblCubeMap;
+        private static Texture2D _iblLutMap;
+        public void SetEnviromentalCubeMap(TextureCube iblCubeMap) { _iblCubeMap = iblCubeMap; }
+        public void SetEnviromentalLUTMap(Texture2D iblLutMap) { _iblLutMap = iblLutMap; }
+
+        #endregion
+
+
+        public void ApplyTo(Effect effect)
+        {
+            if (effect is IEffectFog fog) { fog.FogEnabled = false; }
+
+            //if (effect is IEffectFog)
+            //{
+            if (_iblCubeMap != null && effect.Name != "Unlit")
+            {
+                //Console.WriteLine("_iblCubeMap ok, " + effect + " , " + effect.Name + " , " + effect.CurrentTechnique.Name);
+                effect.Parameters["envCubeMap"].SetValue(_iblCubeMap);  // u_GGXEnvSampler   u_EnvCubeSampler
+                effect.Parameters["u_GGXLUT"].SetValue(_iblLutMap); // u_GGXLUT  u_CharlieLUT
+            }
+            else
+            {
+                //Console.WriteLine("_iblCubeMap  null " + effect + " , " + effect.Name + " , " + effect.CurrentTechnique.Name);
+            }
+            //}
+
+            PBRPunctualLight.ApplyLights(effect, _Exposure, _AmbientLight, _PunctualLights);
+        }
+
+        #endregion
+    }

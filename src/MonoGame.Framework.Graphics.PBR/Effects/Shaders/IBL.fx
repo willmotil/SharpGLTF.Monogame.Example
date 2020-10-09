@@ -33,16 +33,16 @@ uniform samplerCUBE envCubeMapSampler = sampler_state
 //    return texCUBElod(envCubeMapSampler, float4(reflectionNorm, materialInfo.perceptualRoughness)).rgb;
 //}
 
-//float3 getEnviromentalCubePixel(float3 reflectionNorm, int lod)
-//{
-//    return texCUBElod(envCubeMapSampler, float4(reflectionNorm, abs(lod))).rgb;
-//}
+float3 getEnviromentalCubePixel(float3 reflectionNorm, int lod)
+{
+    return texCUBElod(envCubeMapSampler, float4(reflectionNorm, abs(lod))).rgb;
+}
 
-//float3 getLutTexel(float2 uv)
-//{
-//    //return tex2D(u_CharlieLUT, uv);
-//    return SAMPLE_TEXTURE(u_GGXLUT, uv).rgb;
-//}
+float3 getLutTexel(float2 uv)
+{
+    //return tex2D(u_CharlieLUT, uv);
+    return SAMPLE_TEXTURE(u_GGXLUT, uv).rgb;
+}
 
 //float3 getIBLRadianceGGX(float3 n, float3 v, float perceptualRoughness, float3 specularColor)
 //{
