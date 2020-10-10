@@ -414,9 +414,9 @@ namespace Microsoft.Xna.Framework
         /// Single texture multi faced cube or sphere or sky
         /// This method is pretty dependant on being able to pass to textureA not good but....
         /// </summary>
-        public void Draw(GraphicsDevice gd, Effect effect, Texture2D cubeTexture)
+        public void Draw(GraphicsDevice gd, Effect effect, TextureCube cubeTexture)
         {
-            effect.Parameters["TextureA"].SetValue(cubeTexture);
+            effect.Parameters["CubeMap"].SetValue(cubeTexture);
             for (int t = 0; t < 6; t++)
             {
                 int ifoffset = t * indicesPerFace;

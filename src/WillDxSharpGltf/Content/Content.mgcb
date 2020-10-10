@@ -97,6 +97,18 @@
 /processorParam:TextureFormat=Color
 /build:ibl_brdf_lut.png
 
+#begin ibl_ldr_facesSpherical.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:ibl_ldr_facesSpherical.png
+
 #begin ibl_ldr_radiance.png
 /importer:TextureImporter
 /processor:TextureProcessor

@@ -5,8 +5,10 @@ C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillDxSharpGltf\b
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillDxSharpGltf\bin\Debug\netcoreapp3.1\Content\CubeFaces\_right256.xnb
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillDxSharpGltf\bin\Debug\netcoreapp3.1\Content\CubeFaces\_top256.xnb
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillDxSharpGltf\bin\Debug\netcoreapp3.1\Content\ibl_brdf_lut.xnb
+C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillDxSharpGltf\bin\Debug\netcoreapp3.1\Content\ibl_ldr_facesSpherical.xnb
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillDxSharpGltf\bin\Debug\netcoreapp3.1\Content\ibl_ldr_radiance.xnb
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillDxSharpGltf\bin\Debug\netcoreapp3.1\Content\MG_Logo_Small_exCanvs.xnb
+C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillDxSharpGltf\bin\Debug\netcoreapp3.1\Content\MipLevelTestEffect.xnb
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillDxSharpGltf\bin\Debug\netcoreapp3.1\Models\AlphaBlendModeTest.glb
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillDxSharpGltf\bin\Debug\netcoreapp3.1\Models\AnimatedMorphCube.glb
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillDxSharpGltf\bin\Debug\netcoreapp3.1\Models\AnimatedMorphSphere.glb
@@ -93,5 +95,3 @@ C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillDxSharpGltf\o
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillDxSharpGltf\obj\Debug\netcoreapp3.1\WillDxSharpGltf.dll
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillDxSharpGltf\obj\Debug\netcoreapp3.1\WillDxSharpGltf.pdb
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillDxSharpGltf\obj\Debug\netcoreapp3.1\WillDxSharpGltf.genruntimeconfig.cache
-C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillDxSharpGltf\bin\Debug\netcoreapp3.1\Content\MipLevelTestEffect.xnb
-C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillDxSharpGltf\obj\Debug\netcoreapp3.1\WillDxSharpGltf.csprojAssemblyReference.cache

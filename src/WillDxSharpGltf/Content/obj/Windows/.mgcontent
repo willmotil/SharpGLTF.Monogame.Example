@@ -11,11 +11,13 @@
     <File>C:/Users/will/MainFiles/GitPrjs/SharpGLTF.Monogame.Example/src/WillDxSharpGltf/Content/CubeFaces/_right256.png</File>
     <File>C:/Users/will/MainFiles/GitPrjs/SharpGLTF.Monogame.Example/src/WillDxSharpGltf/Content/CubeFaces/_top256.png</File>
     <File>C:/Users/will/MainFiles/GitPrjs/SharpGLTF.Monogame.Example/src/WillDxSharpGltf/Content/ibl_brdf_lut.png</File>
+    <File>C:/Users/will/MainFiles/GitPrjs/SharpGLTF.Monogame.Example/src/WillDxSharpGltf/Content/ibl_ldr_facesSpherical.png</File>
     <File>C:/Users/will/MainFiles/GitPrjs/SharpGLTF.Monogame.Example/src/WillDxSharpGltf/Content/ibl_ldr_radiance.png</File>
     <File>C:/Users/will/MainFiles/GitPrjs/SharpGLTF.Monogame.Example/src/WillDxSharpGltf/Content/MG_Logo_Small_exCanvs.png</File>
     <File>C:/Users/will/MainFiles/GitPrjs/SharpGLTF.Monogame.Example/src/WillDxSharpGltf/Content/MipLevelTestEffect.fx</File>
   </SourceFiles>
   <DestFiles>
+    <File xsi:nil="true" />
     <File xsi:nil="true" />
     <File xsi:nil="true" />
     <File xsi:nil="true" />

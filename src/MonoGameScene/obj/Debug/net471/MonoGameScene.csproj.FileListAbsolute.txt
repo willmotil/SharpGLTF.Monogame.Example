@@ -1,5 +1,7 @@
-C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\MonoGameScene\bin\Debug\net471\Models\Avocado.glb
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\MonoGameScene\bin\Debug\net471\Models\BrainStem.glb
+C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\MonoGameScene\obj\Debug\net471\MonoGameScene.exe
+C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\MonoGameScene\obj\Debug\net471\MonoGameScene.pdb
+C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\MonoGameScene\bin\Debug\net471\Models\Avocado.glb
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\MonoGameScene\bin\Debug\net471\Models\CesiumMan.glb
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\MonoGameScene\bin\Debug\net471\Models\haunted_house.glb
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\MonoGameScene\bin\Debug\net471\Models\shark.glb
@@ -45,5 +47,3 @@ C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\MonoGameScene\obj
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\MonoGameScene\obj\Debug\net471\MonoGameScene.AssemblyInfo.cs
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\MonoGameScene\obj\Debug\net471\MonoGameScene.csproj.CoreCompileInputs.cache
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\MonoGameScene\obj\Debug\net471\MonoGameScene.csproj.CopyComplete
-C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\MonoGameScene\obj\Debug\net471\MonoGameScene.exe
-C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\MonoGameScene\obj\Debug\net471\MonoGameScene.pdb

@@ -1,5 +1,5 @@
 ﻿using System;
-
+using System.IO;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -31,12 +31,12 @@ namespace WillDxSharpGltf
         private Texture2D _premadeLut;
         private TextureCube _textureCubeMap;
         private Texture2D[] _ldrTextureFaces;
-        private Texture2D cmLeft;
-        private Texture2D cmRight;
-        private Texture2D cmFront;
-        private Texture2D cmBack;
-        private Texture2D cmTop;
-        private Texture2D cmBottom;
+        private Texture2D _cmLeft;
+        private Texture2D _cmRight;
+        private Texture2D _cmFront;
+        private Texture2D _cmBack;
+        private Texture2D _cmTop;
+        private Texture2D _cmBottom;
 
         #region camera variables.
 
@@ -170,6 +170,7 @@ namespace WillDxSharpGltf
             this.Window.Title = "SharpGLTF - MonoGame Scene";
             this.Window.AllowUserResizing = true;
             this.Window.AllowAltF4 = true;
+            this.IsMouseVisible = true;
 
             base.Initialize();
         }
@@ -215,18 +216,24 @@ namespace WillDxSharpGltf
 
         public void LoadGenerateCpuSideEnvStuff()
         {
-            _premadeLut = Content.Load<Texture2D>("ibl_brdf_lut"); // need to probably generate this instead of just loading a premade one.
-            _ldrTexture = Content.Load<Texture2D>("ibl_ldr_radiance");
-            //_ldrTextureFaces = CubeMapHelper.SphericalMapToTextureFaces(GraphicsDevice, 256, _ldrTexture); // prototype test need to fix this now that i see what i did wrong.
-            _ldrTextureFaces = CubeMapHelper.GetMapFacesTextureArrayFromEquaRectangularMap(GraphicsDevice, _ldrTexture, 200); // this is sphereical map to a texture array.
             LoadIndivdualFaces();
-            _textureCubeMap = CubeMapHelper.SetIndividualFacesToCubeMap(GraphicsDevice, 256, _textureCubeMap, cmLeft, cmBottom, cmBack, cmRight, cmTop, cmFront);
-            //_textureCubeMap = CubeMapHelper.GetCubeMapFromEquaRectangularMap(GraphicsDevice, _ldrTexture, 200);
             // This creates a new equaRectangularMap.
-            _generatedTexture = CubeMapHelper.GetEquaRectangularMapFromSixImageFaces(GraphicsDevice, 400, 200, cmLeft, cmBottom, cmBack, cmRight, cmTop, cmFront);
+            _generatedTexture = CubeMapHelper.GetEquaRectangularMapFromSixImageFaces(GraphicsDevice, 400, 200, _cmLeft, _cmBottom, _cmBack, _cmRight, _cmTop, _cmFront);
+            //_textureCubeMap = CubeMapHelper.SetIndividualFacesToCubeMap(GraphicsDevice, 256, _textureCubeMap, _cmLeft, _cmBottom, _cmBack, _cmRight, _cmTop, _cmFront);
+
+            _premadeLut = Content.Load<Texture2D>("ibl_brdf_lut"); // need to probably generate this instead of just loading a premade one.
+            _ldrTexture = Content.Load<Texture2D>("ibl_ldr_facesSpherical");
+            //_ldrTexture = Content.Load<Texture2D>("ibl_ldr_radiance");
+
+            _ldrTextureFaces = CubeMapHelper.GetMapFacesTextureArrayFromEquaRectangularMap(GraphicsDevice, _ldrTexture, 200); // this is sphereical map to a texture array.
+            _textureCubeMap = CubeMapHelper.GetCubeMapFromEquaRectangularMap(GraphicsDevice, _ldrTexture, 200);
+
             // need to generate the irradiance maps and mips and all that also.
             _LightsAndFog.SetEnviromentalCubeMap(_textureCubeMap);
             _LightsAndFog.SetEnviromentalLUTMap(_premadeLut);
+
+            // save the created spherical map to disk.
+            //CubeMapHelper.SaveTexture2D(Path.Combine(Environment.CurrentDirectory, "Ldr_TestSphericalOutput.png"), _generatedTexture);
         }
 
         public void LoadPrimitives()
@@ -241,12 +248,12 @@ namespace WillDxSharpGltf
 
         public void LoadIndivdualFaces()
         {
-            cmLeft = Content.Load<Texture2D>("CubeFaces/_left256");
-            cmRight = Content.Load<Texture2D>("CubeFaces/_right256");
-            cmFront = Content.Load<Texture2D>("CubeFaces/_front256");
-            cmBack = Content.Load<Texture2D>("CubeFaces/_back256");
-            cmTop = Content.Load<Texture2D>("CubeFaces/_top256");
-            cmBottom = Content.Load<Texture2D>("CubeFaces/_bottom256");
+            _cmLeft = Content.Load<Texture2D>("CubeFaces/_left256");
+            _cmRight = Content.Load<Texture2D>("CubeFaces/_right256");
+            _cmFront = Content.Load<Texture2D>("CubeFaces/_front256");
+            _cmBack = Content.Load<Texture2D>("CubeFaces/_back256");
+            _cmTop = Content.Load<Texture2D>("CubeFaces/_top256");
+            _cmBottom = Content.Load<Texture2D>("CubeFaces/_bottom256");
         }
 
         public void LoadStandardTestingModels()
@@ -509,33 +516,13 @@ namespace WillDxSharpGltf
             if (Keyboard.GetState().IsKeyDown(Keys.D1) && Pause(gameTime))
             {
                 TestValue1++;
-                if (TestValue1 > cmLeft.LevelCount)
+                if (TestValue1 > _textureCubeMap.LevelCount)
                     TestValue1 = 0;
 
                 msg =
                     " cube size " + _textureCubeMap.Size +
-                    " \n mip Level: " + TestValue1 + "  /  " + cmLeft.LevelCount;
-                if (TestValue2 == 0)
-                    msg += " \n mip CallType: texCubeBias " + TestValue2;
-                if (TestValue2 == 1)
-                    msg += " \n mip CallType: texCubeLod " + TestValue2;
-            }
-
-            if (Keyboard.GetState().IsKeyDown(Keys.D2) && Pause(gameTime))
-            {
-                TestValue2++;
-                if (TestValue2 > 1)
-                    TestValue2 = 0;
-
-                msg =
-                    " cube size " + _textureCubeMap.Size +
-                    " \n mip Level: " + TestValue1 + "  /  " + cmLeft.LevelCount
-                    ;
-                if (TestValue2 == 0)
-                    msg += " \n mip CallType: texCubeBias " + TestValue2;
-                if (TestValue2 == 1)
-                    msg += " \n mip CallType: texCubeLod " + TestValue2;
-                ;
+                    " \n mip Level: " + TestValue1 + "  /  " + _textureCubeMap.LevelCount;
+                    msg += " \n mip CallType: texCubeLod ";
             }
         }
 
@@ -580,6 +567,24 @@ namespace WillDxSharpGltf
 
             _spriteBatch.Begin();
 
+            _spriteBatch.Draw(_generatedTexture, new Rectangle(0,0,300, 150), Color.White);
+
+            int x = 0; int y = 150;
+            _spriteBatch.Draw(_cmLeft, new Rectangle(x, y, 100, 100), Color.White); x += 100;
+            _spriteBatch.Draw(_cmBottom, new Rectangle(x, y, 100, 100), Color.White); x += 100;
+            _spriteBatch.Draw(_cmBack, new Rectangle(x, y, 100, 100), Color.White); x += 100;
+            _spriteBatch.Draw(_cmRight, new Rectangle(x, y, 100, 100), Color.White); x += 100;
+            _spriteBatch.Draw(_cmTop, new Rectangle(x, y, 100, 100), Color.White); x += 100;
+            _spriteBatch.Draw(_cmFront, new Rectangle(x, y, 100, 100), Color.White); x += 100;
+
+            x = 0; y = 250;
+            _spriteBatch.Draw(_ldrTextureFaces[CubeMapHelper.FACE_LEFT], new Rectangle(x, y, 100, 100), Color.White); x += 100;
+            _spriteBatch.Draw(_ldrTextureFaces[CubeMapHelper.FACE_BOTTOM], new Rectangle(x, y, 100, 100), Color.White); x += 100;
+            _spriteBatch.Draw(_ldrTextureFaces[CubeMapHelper.FACE_BACK], new Rectangle(x, y, 100, 100), Color.White); x += 100;
+            _spriteBatch.Draw(_ldrTextureFaces[CubeMapHelper.FACE_RIGHT], new Rectangle(x, y, 100, 100), Color.White); x += 100;
+            _spriteBatch.Draw(_ldrTextureFaces[CubeMapHelper.FACE_TOP], new Rectangle(x, y, 100, 100), Color.White); x += 100;
+            _spriteBatch.Draw(_ldrTextureFaces[CubeMapHelper.FACE_FRONT], new Rectangle(x, y, 100, 100), Color.White); x += 100;
+
             _camera.DrawCurveThruWayPointsWithSpriteBatch(2f, new Vector3(100,100, 100), 1 ,gameTime);
 
             _spriteBatch.DrawString(font, msg, new Vector2(10, 20), Color.Red);
@@ -594,16 +599,51 @@ namespace WillDxSharpGltf
         protected void DrawPrimitives(GameTime gameTime)
         {
             var projectionMatrix = Matrix.CreatePerspectiveFieldOfView(90 * (float)((3.14159265358f) / 180f), GraphicsDevice.Viewport.Width / GraphicsDevice.Viewport.Height, 0.01f, 1000f);
-            primitivesEffect.Parameters["World"].SetValue(Matrix.Identity);
             primitivesEffect.Parameters["View"].SetValue(_camera.View);   // just add defaults here or dont add anything.
             primitivesEffect.Parameters["CameraPosition"].SetValue( Vector3.Zero); //_camera.Position);
             primitivesEffect.Parameters["Projection"].SetValue(projectionMatrix);
             primitivesEffect.Parameters["testValue1"].SetValue((int)TestValue1);
-            primitivesEffect.Parameters["testValue2"].SetValue((int)TestValue2);
 
-            sky.Draw(GraphicsDevice, primitivesEffect, cmFront, cmBack, cmLeft, cmRight, cmTop, cmBottom);
-            cube.Draw(GraphicsDevice, primitivesEffect, cmFront, cmBack, cmLeft, cmRight, cmTop, cmBottom);
-            cube2.Draw(GraphicsDevice, primitivesEffect, cmFront, cmBack, cmLeft, cmRight, cmTop, cmBottom);
+            primitivesEffect.Parameters["World"].SetValue(Matrix.Identity);
+            sky.Draw(GraphicsDevice, primitivesEffect, _textureCubeMap);
+
+            //primitivesEffect.Parameters["World"].SetValue(Matrix.Identity);
+            //cube.Draw(GraphicsDevice, primitivesEffect, _textureCubeMap);
+            //cube2.Draw(GraphicsDevice, primitivesEffect, _textureCubeMap);
+
+            //primitivesEffect.Parameters["testValue2"].SetValue((int)TestValue2);
+            //effect.Parameters["TextureA"].SetValue(front);
+            //sky.Draw(GraphicsDevice, primitivesEffect, cmFront, cmBack, cmLeft, cmRight, cmTop, cmBottom);
+            //cube.Draw(GraphicsDevice, primitivesEffect, cmFront, cmBack, cmLeft, cmRight, cmTop, cmBottom);
+            //cube2.Draw(GraphicsDevice, primitivesEffect, cmFront, cmBack, cmLeft, cmRight, cmTop, cmBottom);
+        }
+
+        void ReflectionRenderToSceneFaces(Vector3 reflectionCameraPosition, RenderTargetCube renderTargetReflectionCube)
+        {
+            Matrix view = new Matrix();
+            GraphicsDevice.SetRenderTarget(renderTargetReflectionCube, CubeMapFace.NegativeX);
+            view = CubeMapHelper.CreateAndSetCubeFaceView(reflectionCameraPosition, Vector3.Left, Vector3.Up);
+           // ReflectionRenderScene();
+
+            GraphicsDevice.SetRenderTarget(renderTargetReflectionCube, CubeMapFace.NegativeY);
+            view = CubeMapHelper.CreateAndSetCubeFaceView(reflectionCameraPosition, Vector3.Down, Vector3.Backward);
+           // ReflectionRenderScene();
+
+            GraphicsDevice.SetRenderTarget(renderTargetReflectionCube, CubeMapFace.NegativeZ);
+            view = CubeMapHelper.CreateAndSetCubeFaceView(reflectionCameraPosition, Vector3.Forward, Vector3.Up);
+           // ReflectionRenderScene();
+
+            GraphicsDevice.SetRenderTarget(renderTargetReflectionCube, CubeMapFace.PositiveX);
+            view = CubeMapHelper.CreateAndSetCubeFaceView(reflectionCameraPosition, Vector3.Right, Vector3.Up);
+          //  ReflectionRenderScene();
+
+            GraphicsDevice.SetRenderTarget(renderTargetReflectionCube, CubeMapFace.PositiveY);
+            view = CubeMapHelper.CreateAndSetCubeFaceView(reflectionCameraPosition, Vector3.Up, Vector3.Forward);
+           // ReflectionRenderScene();
+
+            GraphicsDevice.SetRenderTarget(renderTargetReflectionCube, CubeMapFace.PositiveZ);
+            view = CubeMapHelper.CreateAndSetCubeFaceView(reflectionCameraPosition, Vector3.Backward, Vector3.Up);
+           // ReflectionRenderScene();
         }
 
 

@@ -1,7 +1,3 @@
-C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillGLSharpGltf\bin\Debug\netcoreapp3.1\Models\haunted_house.glb
-C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillGLSharpGltf\bin\Debug\netcoreapp3.1\Models\sceneMetalnessTest.glb
-C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillGLSharpGltf\bin\Debug\netcoreapp3.1\Models\underwaterScene.glb
-C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillGLSharpGltf\bin\Debug\netcoreapp3.1\runtimes\win-x86\native\soft_oal.dll
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillGLSharpGltf\bin\Debug\netcoreapp3.1\Models\AlphaBlendModeTest.glb
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillGLSharpGltf\bin\Debug\netcoreapp3.1\Models\AnimatedMorphCube.glb
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillGLSharpGltf\bin\Debug\netcoreapp3.1\Models\AnimatedMorphSphere.glb
@@ -18,6 +14,7 @@ C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillGLSharpGltf\b
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillGLSharpGltf\bin\Debug\netcoreapp3.1\Models\Duck.glb
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillGLSharpGltf\bin\Debug\netcoreapp3.1\Models\flightHelmet.glb
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillGLSharpGltf\bin\Debug\netcoreapp3.1\Models\Fox.glb
+C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillGLSharpGltf\bin\Debug\netcoreapp3.1\Models\haunted_house.glb
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillGLSharpGltf\bin\Debug\netcoreapp3.1\Models\InterpolationTest.glb
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillGLSharpGltf\bin\Debug\netcoreapp3.1\Models\Lantern.glb
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillGLSharpGltf\bin\Debug\netcoreapp3.1\Models\LevelOfDetail.glb
@@ -30,12 +27,14 @@ C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillGLSharpGltf\b
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillGLSharpGltf\bin\Debug\netcoreapp3.1\Models\OrientationTest.glb
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillGLSharpGltf\bin\Debug\netcoreapp3.1\Models\scene.glb
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillGLSharpGltf\bin\Debug\netcoreapp3.1\Models\sceneMaterialBallA.glb
+C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillGLSharpGltf\bin\Debug\netcoreapp3.1\Models\sceneMetalnessTest.glb
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillGLSharpGltf\bin\Debug\netcoreapp3.1\Models\shark.glb
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillGLSharpGltf\bin\Debug\netcoreapp3.1\Models\SpecGlossVsMetalRough.glb
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillGLSharpGltf\bin\Debug\netcoreapp3.1\Models\TextureCoordinateTest.glb
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillGLSharpGltf\bin\Debug\netcoreapp3.1\Models\TextureSettingsTest.glb
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillGLSharpGltf\bin\Debug\netcoreapp3.1\Models\TextureTransformMultiTest.glb
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillGLSharpGltf\bin\Debug\netcoreapp3.1\Models\TextureTransformTest.glb
+C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillGLSharpGltf\bin\Debug\netcoreapp3.1\Models\underwaterScene.glb
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillGLSharpGltf\bin\Debug\netcoreapp3.1\Models\underwaterSceneRocksBarnaclesMussels.glb
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillGLSharpGltf\bin\Debug\netcoreapp3.1\Models\UnlitTest.glb
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillGLSharpGltf\bin\Debug\netcoreapp3.1\Models\VertexColorTest.glb
@@ -56,6 +55,7 @@ C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillGLSharpGltf\b
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillGLSharpGltf\bin\Debug\netcoreapp3.1\runtimes\win-x64\native\SDL2.dll
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillGLSharpGltf\bin\Debug\netcoreapp3.1\runtimes\win-x64\native\soft_oal.dll
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillGLSharpGltf\bin\Debug\netcoreapp3.1\runtimes\win-x86\native\SDL2.dll
+C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillGLSharpGltf\bin\Debug\netcoreapp3.1\runtimes\win-x86\native\soft_oal.dll
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillGLSharpGltf\bin\Debug\netcoreapp3.1\MonoGame.Framework.Graphics.EffectsPBR.dll
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillGLSharpGltf\bin\Debug\netcoreapp3.1\MonoGame.Framework.Graphics.Model3D.dll
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillGLSharpGltf\bin\Debug\netcoreapp3.1\MonoGame.Framework.Graphics.Scene3D.dll

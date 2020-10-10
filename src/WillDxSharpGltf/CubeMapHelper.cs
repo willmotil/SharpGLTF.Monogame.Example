@@ -9,15 +9,15 @@ namespace WillDxSharpGltf
 {
     public static class CubeMapHelper
     {
-        private const int FACE_LEFT = 0; // NegativeX
-        private const int FACE_BOTTOM = 1; // NegativeY
-        private const int FACE_BACK = 2; // NegativeZ
-        private const int FACE_RIGHT = 3; // PositiveX
-        private const int FACE_TOP = 4; // PositiveY
-        private const int FACE_FRONT = 5; // PositiveZ
+        public const int FACE_LEFT = 0; // NegativeX
+        public const int FACE_BOTTOM = 1; // NegativeY
+        public const int FACE_BACK = 2; // NegativeZ
+        public const int FACE_RIGHT = 3; // PositiveX
+        public const int FACE_TOP = 4; // PositiveY
+        public const int FACE_FRONT = 5; // PositiveZ
 
         /// <summary>
-        /// Set faces to cubemap by name, neg xyz,  pos  xyz.
+        /// Set faces to cubemap by name, neg xyz,  pos  xyz.  tested passes.
         /// </summary>
         public static TextureCube SetIndividualFacesToCubeMap(GraphicsDevice gd, int size, TextureCube map, Texture2D textureLeft, Texture2D textureBottom, Texture2D textureBack, Texture2D textureRight, Texture2D textureTop, Texture2D textureFront)
         {
@@ -25,7 +25,7 @@ namespace WillDxSharpGltf
         }
 
         /// <summary>
-        /// Set faces to cubemap, neg xyz,  pos  xyz.
+        /// Set faces to cubemap, neg xyz,  pos  xyz. tested passes
         /// </summary>
         public static TextureCube SetIndividualCubeFacesToCubeMap(GraphicsDevice gd, int size, TextureCube map, Texture2D textureNegativeX, Texture2D textureNegativeY, Texture2D textureNegativeZ, Texture2D texturePositiveX, Texture2D texturePositiveY, Texture2D texturePositiveZ)
         {
@@ -41,7 +41,7 @@ namespace WillDxSharpGltf
         }
 
         /// <summary>
-        /// This sets a individual texture and its mipmaps to a cubemap.
+        /// This sets a individual texture and its mipmaps to a cubemap.   tested passes
         /// </summary>
         public static void SetTextureToCubeMapFace(TextureCube cubeMap, Texture2D textureFace, CubeMapFace faceId)
         {
@@ -54,14 +54,50 @@ namespace WillDxSharpGltf
             }
         }
 
-        /// <summary>
-        /// Ok so this is a destination pixel version this version attempts to include mip levels.
+        ///// <summary>
+        ///// Ok so this is a destination pixel version this version attempts to include mip levels.    testing Fails.
+        ///// However lots of dimensional variables to account for here.
+        ///// </summary>
+        //public static TextureCube GetCubeMapFromEquaRectangularMap(GraphicsDevice gd, Texture2D equaRectangularMap, int faceSize)
+        //{
+        //    TextureCube cubeMap = new TextureCube(gd, faceSize, true, SurfaceFormat.Color);
+        //    var eqLevelCount = equaRectangularMap.LevelCount;
+        //    for (int level = 0; level < eqLevelCount; level += 1)
+        //    {
+        //        int eqw = equaRectangularMap.Width >> level;
+        //        int eqh = equaRectangularMap.Height >> level;
+        //        var mapColorData = new Color[(equaRectangularMap.Width >> level) * (equaRectangularMap.Height >> level)];
+        //        equaRectangularMap.GetData(level, null, mapColorData, 0, mapColorData.Length);
+        //        for (int faceIndex = 0; faceIndex < 6; faceIndex++)
+        //        {
+        //            var adjFaceSize = faceSize >> level;
+        //            var wh = new Vector2(adjFaceSize - 1, adjFaceSize - 1);
+        //            var faceData = new Color[adjFaceSize * adjFaceSize];
+        //            for (int y = 0; y < adjFaceSize; y++)
+        //            {
+        //                for (int x = 0; x < adjFaceSize; x++)
+        //                {
+        //                    var fuv = new Vector2(x, y) / wh;
+        //                    var v = UvFaceToCubeMapVector(fuv, faceIndex);
+        //                    var uv = CubeMapNormalTo2dEquaRectangularMapUvCoordinates(v);
+        //                    var eqIndex = (int)(uv.X * eqw) + ((int)(uv.Y * eqh) * eqw);
+        //                    faceData[x + (y * adjFaceSize)] = mapColorData[eqIndex];
+        //                }
+        //            }
+        //            var cubeMapFace = GetFaceFromInt(faceIndex);
+        //            cubeMap.SetData(cubeMapFace, level, null, faceData, 0, faceData.Length);
+        //        }
+        //    }
+        //    return cubeMap;
+        //}
+
+        /// <summary>  v2
+        /// Ok so this is a destination pixel version this version attempts to include mip levels.    testing Fails.
         /// However lots of dimensional variables to account for here.
         /// </summary>
         public static TextureCube GetCubeMapFromEquaRectangularMap(GraphicsDevice gd, Texture2D equaRectangularMap, int faceSize)
         {
-            TextureCube cubeMap;
-            cubeMap = new TextureCube(gd, faceSize, true, SurfaceFormat.Color);
+            TextureCube cubeMap = new TextureCube(gd, faceSize, true, SurfaceFormat.Color);
             var eqLevelCount = equaRectangularMap.LevelCount;
             for (int level = 0; level < eqLevelCount; level += 1)
             {
@@ -93,7 +129,7 @@ namespace WillDxSharpGltf
         }
 
         /// <summary>
-        /// This doesn't handle mip maps it wouldn't make much sense for it to.
+        /// This doesn't handle mip maps it wouldn't make much sense for it to.   Mapping is correct in this one.
         /// </summary>
         public static Texture2D GetEquaRectangularMapFromSixImageFaces(GraphicsDevice gd, int outputWidth, int outputHeight, Texture2D textureLeft, Texture2D textureBottom, Texture2D textureBack, Texture2D textureRight, Texture2D textureTop, Texture2D textureFront)
         {
@@ -127,22 +163,22 @@ namespace WillDxSharpGltf
                     int findex = (int)(fuv.X * fwm) + (int)(fuv.Y * fhm) * fw;
                     switch (face)
                     {
-                        case 0:
+                        case FACE_LEFT:
                             mapColorData[eqIndex] = leftColorData[findex]; // NegativeX;
                             break;
-                        case 1:
+                        case FACE_BOTTOM:
                             mapColorData[eqIndex] = bottomColorData[findex]; // NegativeY;
                             break;
-                        case 2:
+                        case FACE_BACK:
                             mapColorData[eqIndex] = backColorData[findex]; // NegativeZ;
                             break;
-                        case 3:
+                        case FACE_RIGHT:
                             mapColorData[eqIndex] = rightColorData[findex]; // PositiveX;
                             break;
-                        case 4:
+                        case FACE_TOP:
                             mapColorData[eqIndex] = topColorData[findex]; // PositiveY;
                             break;
-                        case 5:
+                        case FACE_FRONT:
                             mapColorData[eqIndex] = frontColorData[findex]; // PositiveZ;
                             break;
                         default:
@@ -252,22 +288,22 @@ namespace WillDxSharpGltf
             CubeMapFace f;
             switch (face)
             {
-                case 0:
+                case FACE_LEFT:
                     f = CubeMapFace.NegativeX;
                     break;
-                case 1:
+                case FACE_BOTTOM:
                     f = CubeMapFace.NegativeY;
                     break;
-                case 2:
+                case FACE_BACK:
                     f = CubeMapFace.NegativeZ;
                     break;
-                case 3:
+                case FACE_RIGHT:
                     f = CubeMapFace.PositiveX;
                     break;
-                case 4:
+                case FACE_TOP:
                     f = CubeMapFace.PositiveY;
                     break;
-                case 5:
+                case FACE_FRONT:
                     f = CubeMapFace.PositiveZ;
                     break;
                 default:
@@ -284,6 +320,8 @@ namespace WillDxSharpGltf
         {
             var u = uv.X * 2f - 1.0f;
             var v = uv.Y * 2f - 1.0f;
+            //var u = uv.X - .5f;
+            //var v = uv.Y - .5f;
             Vector3 dir = new Vector3(0f, 0f, 1f);
 
             switch (faceIndex)
@@ -325,6 +363,94 @@ namespace WillDxSharpGltf
         private static Vector2 UvFromTexturePixel(Texture2D texture, Vector2 pixel)
         {
             return pixel / new Vector2(texture.Width - 1, texture.Height - 1);
+        }
+
+        /// <summary>
+        /// Required when obtaining a inflected position from a camera thru a plane typically used to place a camera to gain a reflection snapshot for static or dynamic water reflections.
+        /// </summary>
+        private static Vector3 InflectionPositionFromPlane(Vector3 theCameraPostion, Vector3 thePlanesSurfaceNormal, Vector3 anyPositionOnThePlane)
+        {
+            // the dot product gives the length, when placed againsts a unit normal so any unit n * a distance is the distance to that normals plane no matter the normals direction. 
+            float camToPlaneDist = Vector3.Dot(thePlanesSurfaceNormal, theCameraPostion - anyPositionOnThePlane);
+            return theCameraPostion - thePlanesSurfaceNormal * camToPlaneDist * 2;
+        }
+
+        public static RenderTargetCube GetEnvRenderTargetCube(GraphicsDevice graphicsDevice, int size, bool mipmaps)
+        {
+            return new RenderTargetCube(graphicsDevice, size, mipmaps, SurfaceFormat.Color, DepthFormat.Depth24);
+        }
+        /// <summary>
+        /// This returns a perspective projection matrix suitable for a rendertarget cube
+        /// </summary>
+        public static Matrix GetRenderTargetCubeProjectionMatrix(float near, float far)
+        {
+            return Matrix.CreatePerspectiveFieldOfView((float)MathHelper.Pi * .5f, 1, near, far);
+        }
+
+        public static Matrix CreateAndSetCubeFaceView(Vector3 position, Vector3 forward, Vector3 up)
+        {
+            return CreateLhLookAt(position, forward + position, up);
+        }
+        /// <summary>
+        /// Creates a opposite monogame createlookat version or a left handed matrix.
+        /// This returns a matrix suitable for a render target cube.
+        /// </summary>
+        public static Matrix CreateLhLookAt(Vector3 cameraPosition, Vector3 cameraTarget, Vector3 cameraUpVector)
+        {
+            var vector = Vector3.Normalize(cameraPosition - cameraTarget);
+            var vector2 = -Vector3.Normalize(Vector3.Cross(cameraUpVector, vector));
+            var vector3 = Vector3.Cross(-vector, vector2);
+            Matrix result = Matrix.Identity;
+            result.M11 = vector2.X;
+            result.M12 = vector3.X;
+            result.M13 = vector.X;
+            result.M14 = 0f;
+            result.M21 = vector2.Y;
+            result.M22 = vector3.Y;
+            result.M23 = vector.Y;
+            result.M24 = 0f;
+            result.M31 = vector2.Z;
+            result.M32 = vector3.Z;
+            result.M33 = vector.Z;
+            result.M34 = 0f;
+            result.M41 = -Vector3.Dot(vector2, cameraPosition);
+            result.M42 = -Vector3.Dot(vector3, cameraPosition);
+            result.M43 = -Vector3.Dot(vector, cameraPosition);
+            result.M44 = 1f;
+            return result;
+        }
+
+        /// <summary>
+        /// Takes a screen position Point and reurns a ray in world space using viewport . unproject(...) , 
+        /// The near and far are the z plane depth values used and found in your projection matrix.
+        /// </summary>
+        public static Ray GetScreenPointAsRayInto3dWorld(this Point screenPosition, Matrix projectionMatrix, Matrix viewMatrix, Matrix world, float near, float far, GraphicsDevice device)
+        {
+            return GetScreenVector2AsRayInto3dWorld(screenPosition.ToVector2(), projectionMatrix, viewMatrix, world, near, far, device);
+        }
+
+        /// <summary>
+        /// Or not ?
+        /// Takes a screen position Vector2 and reurns a ray in world space using viewport . unproject(...) , 
+        /// The near and far are the z plane depth values used and found in your projection matrix.
+        /// </summary>
+        public static Ray GetScreenVector2AsRayInto3dWorld(this Vector2 screenPosition, Matrix projectionMatrix, Matrix viewMatrix, Matrix world, float near, float far, GraphicsDevice device)
+        {
+            Vector3 farScreenPoint = new Vector3(screenPosition.X, screenPosition.Y, far); // the projection matrice's far plane value.
+            Vector3 nearScreenPoint = new Vector3(screenPosition.X, screenPosition.Y, near); // must be more then zero.
+            Vector3 nearWorldPoint = device.Viewport.Unproject(nearScreenPoint, projectionMatrix, viewMatrix, world);
+            Vector3 farWorldPoint = device.Viewport.Unproject(farScreenPoint, projectionMatrix, viewMatrix, world);
+            Vector3 worldRaysNormal = Vector3.Normalize(farWorldPoint - nearWorldPoint);
+
+            return new Ray(nearWorldPoint, worldRaysNormal);
+        }
+
+        public static void SaveTexture2D(string path, Texture2D t)
+        {
+            using (System.IO.Stream fs = System.IO.File.OpenWrite(path))
+            {
+                t.SaveAsPng(fs, t.Width, t.Height);
+            }
         }
     }
 }
