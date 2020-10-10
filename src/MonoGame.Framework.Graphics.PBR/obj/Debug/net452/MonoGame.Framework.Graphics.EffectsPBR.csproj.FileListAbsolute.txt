@@ -8,4 +8,3 @@ C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\MonoGame.Framewor
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\MonoGame.Framework.Graphics.PBR\obj\Debug\net452\MonoGame.Framework.Graphics.EffectsPBR.csproj.CopyComplete
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\MonoGame.Framework.Graphics.PBR\obj\Debug\net452\MonoGame.Framework.Graphics.EffectsPBR.dll
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\MonoGame.Framework.Graphics.PBR\obj\Debug\net452\MonoGame.Framework.Graphics.EffectsPBR.pdb
-C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\MonoGame.Framework.Graphics.PBR\obj\Debug\net452\MonoGame.Framework.Graphics.EffectsPBR.csprojAssemblyReference.cache

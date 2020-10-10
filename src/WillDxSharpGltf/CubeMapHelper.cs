@@ -214,6 +214,7 @@ namespace WillDxSharpGltf
                         var fuv = new Vector2(x, y) / wh;
                         var v = UvFaceToCubeMapVector(fuv, index);
                         var uv = CubeMapNormalTo2dEquaRectangularMapUvCoordinates(v);
+                        //var uv = CubeMapNormalTo2dEquaRectangularMapUvCoordinatesAlt(v);
                         var eqIndex = (int)(uv.X * eqw) + ((int)(uv.Y * eqh) * eqw);
                         faceColorData[x + (y * faceSize)] = mapColorData[eqIndex];
                     }
@@ -240,7 +241,7 @@ namespace WillDxSharpGltf
         }
 
         /// <summary>
-        /// Gets cube uv from normal.
+        /// Gets cube uv from normal.   Ok at this point im not 100% convinced this is actually aligned properly to a dx cubemap normal.
         /// </summary>
         private static Vector2 CubeMapNormalTo2dEquaRectangularMapUvCoordinates(Vector3 normal)
         {
@@ -249,6 +250,16 @@ namespace WillDxSharpGltf
             uv *= INVERT_ATAN;
             uv += new Vector2(0.5f, 0.5f);
             return uv;
+        }
+
+        private static Vector2 CubeMapNormalTo2dEquaRectangularMapUvCoordinatesAlt(Vector3 a_coords)
+        {
+            float PI = 3.141592653589793f;
+            Vector3 a_coords_n = Vector3.Normalize(a_coords);
+            float lon = (float)Math.Atan2(a_coords_n.Z, a_coords_n.X);
+            float lat = (float)Math.Acos(a_coords_n.Y);
+            Vector2 sphereCoords = new Vector2(lon, lat) * (1.0f / PI);
+            return new Vector2(sphereCoords.X * 0.5f + 0.5f, 1f - sphereCoords.Y);
         }
 
         /// <summary>
@@ -320,37 +331,70 @@ namespace WillDxSharpGltf
         {
             var u = uv.X * 2f - 1.0f;
             var v = uv.Y * 2f - 1.0f;
-            //var u = uv.X - .5f;
-            //var v = uv.Y - .5f;
             Vector3 dir = new Vector3(0f, 0f, 1f);
-
             switch (faceIndex)
             {
-                case FACE_LEFT:
-                    dir = new Vector3(-1f, v, u);
+                case FACE_BACK: // FACE_LEFT:
+                    dir = new Vector3(-1f, v, -u); // back
                     break;
-                case FACE_BOTTOM:
-                    dir = new Vector3(-u, -1f, v);
+                case FACE_TOP: // FACE_BOTTOM:
+                    dir = new Vector3(v, -1f, u); // top
                     break;
-                case FACE_BACK:
-                    dir = new Vector3(-u, v, 1f);
+                case FACE_LEFT: // FACE_BACK:
+                    dir = new Vector3(u, v, -1f); // left
                     break;
-                case FACE_RIGHT:
-                    dir = new Vector3(1f, v, -u);
+                case FACE_FRONT: // FACE_RIGHT:
+                    dir = new Vector3(1f, v, u); // front
                     break;
-                case FACE_TOP:
-                    dir = new Vector3(u, 1f, -v);
+                case FACE_BOTTOM: // FACE_TOP:
+                    dir = new Vector3(-v, 1f, u); // bottom
                     break;
-                case FACE_FRONT:
-                    dir = new Vector3(u, v, -1f);
+                case FACE_RIGHT: // FACE_FRONT:
+                    dir = new Vector3(-u, v, 1f); // right
                     break;
                 default:
-                    dir = new Vector3(u, v, -1f);
+                    dir = new Vector3(-1f, -1f, -1f); // na
                     break;
             }
             dir.Normalize();
             return dir;
         }
+
+        //private static Vector3 UvFaceToCubeMapVector(Vector2 uv, int faceIndex)
+        //{
+        //    var u = uv.X * 2f - 1.0f;
+        //    var v = uv.Y * 2f - 1.0f;
+        //    //var u = uv.X - .5f;
+        //    //var v = uv.Y - .5f;
+        //    Vector3 dir = new Vector3(0f, 0f, 1f);
+
+        //    switch (faceIndex)
+        //    {
+        //        case FACE_LEFT:
+        //            dir = new Vector3(-1f, v, u);
+        //            break;
+        //        case FACE_BOTTOM:
+        //            dir = new Vector3(-u, -1f, v);
+        //            break;
+        //        case FACE_BACK:
+        //            dir = new Vector3(u, v, -1f);
+        //            break;
+        //        case FACE_RIGHT:
+        //            dir = new Vector3(1f, v, -u);
+        //            break;
+        //        case FACE_TOP:
+        //            dir = new Vector3(u, 1f, -v);
+        //            break;
+        //        case FACE_FRONT:
+        //            dir = new Vector3(-u, v, 1f);
+        //            break;
+        //        default:
+        //            dir = new Vector3(-1f, v, u);
+        //            break;
+        //    }
+        //    dir.Normalize();
+        //    return dir;
+        //}
 
         private static Vector3 Abs(Vector3 v)
         {
@@ -602,6 +646,16 @@ return uv;
         //        cubeMap.SetData(faceId, level, null, faceData, 0, faceData.Length);
         //    }
         //}
+
+#define PI 3.141592653589793
+                inline float2 RadialCoords(float3 a_coords)
+                {
+                    float3 a_coords_n = normalize(a_coords);
+                    float lon = atan2(a_coords_n.z, a_coords_n.x);
+                    float lat = acos(a_coords_n.y);
+                    float2 sphereCoords = float2(lon, lat) * (1.0 / PI);
+                    return float2(sphereCoords.x * 0.5 + 0.5, 1 - sphereCoords.y);
+                }
 
 */
 

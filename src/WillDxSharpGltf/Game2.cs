@@ -225,8 +225,8 @@ namespace WillDxSharpGltf
             _ldrTexture = Content.Load<Texture2D>("ibl_ldr_facesSpherical");
             //_ldrTexture = Content.Load<Texture2D>("ibl_ldr_radiance");
 
-            _ldrTextureFaces = CubeMapHelper.GetMapFacesTextureArrayFromEquaRectangularMap(GraphicsDevice, _ldrTexture, 200); // this is sphereical map to a texture array.
-            _textureCubeMap = CubeMapHelper.GetCubeMapFromEquaRectangularMap(GraphicsDevice, _ldrTexture, 200);
+            _ldrTextureFaces = CubeMapHelper.GetMapFacesTextureArrayFromEquaRectangularMap(GraphicsDevice, _ldrTexture, 256); // this is sphereical map to a texture array.
+            _textureCubeMap = CubeMapHelper.GetCubeMapFromEquaRectangularMap(GraphicsDevice, _ldrTexture, 256);
 
             // need to generate the irradiance maps and mips and all that also.
             _LightsAndFog.SetEnviromentalCubeMap(_textureCubeMap);
@@ -562,7 +562,7 @@ namespace WillDxSharpGltf
                 // environment lights and fog
                 _LightsAndFog,
                 // all model instances
-                _Test, _VertexColorTest, _TextureCoordinateTest, _TextureSettingsTest, _MultiUvTest, _TextureTransformMultiTest, _AlphaBlendModeTest, _NormalTangentMirrorTest, _UnlitTest, _InterpolationTest, _ClearCoatTest, _SpecGlossVsMetalRough  /* , _AnimatedMorphCube */
+                _Test, _VertexColorTest, _TextureCoordinateTest, _TextureSettingsTest, _MultiUvTest, _TextureTransformMultiTest, _TextureTransformTest, _AlphaBlendModeTest, _NormalTangentMirrorTest, _UnlitTest, _InterpolationTest, _ClearCoatTest, _SpecGlossVsMetalRough  /* , _AnimatedMorphCube */
              );
 
             _spriteBatch.Begin();
