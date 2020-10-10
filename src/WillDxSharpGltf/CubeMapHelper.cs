@@ -98,27 +98,33 @@ namespace WillDxSharpGltf
         public static TextureCube GetCubeMapFromEquaRectangularMap(GraphicsDevice gd, Texture2D equaRectangularMap, int faceSize)
         {
             TextureCube cubeMap = new TextureCube(gd, faceSize, true, SurfaceFormat.Color);
-            var eqLevelCount = equaRectangularMap.LevelCount;
-            for (int level = 0; level < eqLevelCount; level += 1)
+            var cmLevelCount = cubeMap.LevelCount;
+            int eqw = equaRectangularMap.Width;
+            int eqh = equaRectangularMap.Height;
+            var eqColorData = new Color[(equaRectangularMap.Width) * (equaRectangularMap.Height)];
+            equaRectangularMap.GetData(0, null, eqColorData, 0, eqColorData.Length);
+            for (int level = 0; level < cmLevelCount; level += 1)
             {
-                int eqw = equaRectangularMap.Width >> level;
-                int eqh = equaRectangularMap.Height >> level;
-                var mapColorData = new Color[(equaRectangularMap.Width >> level) * (equaRectangularMap.Height >> level)];
-                equaRectangularMap.GetData(level, null, mapColorData, 0, mapColorData.Length);
+                //int eqw = equaRectangularMap.Width >> level;
+                //int eqh = equaRectangularMap.Height >> level;
+                //var mapColorData = new Color[(equaRectangularMap.Width >> level) * (equaRectangularMap.Height >> level)];
+                //equaRectangularMap.GetData(level, null, mapColorData, 0, mapColorData.Length);
                 for (int faceIndex = 0; faceIndex < 6; faceIndex++)
                 {
                     var adjFaceSize = faceSize >> level;
-                    var wh = new Vector2(adjFaceSize - 1, adjFaceSize - 1);
+                    var faceWh = new Vector2(adjFaceSize, adjFaceSize);//new Vector2(adjFaceSize , adjFaceSize );//new Vector2(adjFaceSize - 1, adjFaceSize - 1);
+                    //if (faceWh.X < 1) faceWh.X = 1;
+                    //if (faceWh.Y < 1) faceWh.Y = 1;
                     var faceData = new Color[adjFaceSize * adjFaceSize];
                     for (int y = 0; y < adjFaceSize; y++)
                     {
                         for (int x = 0; x < adjFaceSize; x++)
                         {
-                            var fuv = new Vector2(x, y) / wh;
+                            var fuv = new Vector2(x, y) / faceWh;
                             var v = UvFaceToCubeMapVector(fuv, faceIndex);
                             var uv = CubeMapNormalTo2dEquaRectangularMapUvCoordinates(v);
                             var eqIndex = (int)(uv.X * eqw) + ((int)(uv.Y * eqh) * eqw);
-                            faceData[x + (y * adjFaceSize)] = mapColorData[eqIndex];
+                            faceData[x + (y * adjFaceSize)] = eqColorData[eqIndex];
                         }
                     }
                     var cubeMapFace = GetFaceFromInt(faceIndex);

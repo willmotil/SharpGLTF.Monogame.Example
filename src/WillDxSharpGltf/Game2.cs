@@ -218,22 +218,27 @@ namespace WillDxSharpGltf
         {
             LoadIndivdualFaces();
             // This creates a new equaRectangularMap.
-            _generatedTexture = CubeMapHelper.GetEquaRectangularMapFromSixImageFaces(GraphicsDevice, 400, 200, _cmLeft, _cmBottom, _cmBack, _cmRight, _cmTop, _cmFront);
+            //_generatedTexture = CubeMapHelper.GetEquaRectangularMapFromSixImageFaces(GraphicsDevice, 800, 400, _cmLeft, _cmBottom, _cmBack, _cmRight, _cmTop, _cmFront);
+            _generatedTexture = CubeMapHelper.GetEquaRectangularMapFromSixImageFaces(GraphicsDevice, 2048, 1024, _cmLeft, _cmBottom, _cmBack, _cmRight, _cmTop, _cmFront);
             //_textureCubeMap = CubeMapHelper.SetIndividualFacesToCubeMap(GraphicsDevice, 256, _textureCubeMap, _cmLeft, _cmBottom, _cmBack, _cmRight, _cmTop, _cmFront);
+            //_textureCubeMap = CubeMapHelper.SetIndividualFacesToCubeMap(GraphicsDevice, 2048, _textureCubeMap, _cmLeft, _cmBottom, _cmBack, _cmRight, _cmTop, _cmFront);
 
             _premadeLut = Content.Load<Texture2D>("ibl_brdf_lut"); // need to probably generate this instead of just loading a premade one.
-            _ldrTexture = Content.Load<Texture2D>("ibl_ldr_facesSpherical");
+            _ldrTexture = Content.Load<Texture2D>("ibl_ldr_generatedWater");
+            //_ldrTexture = Content.Load<Texture2D>("ibl_ldr_gentestWaterLabeledFaces");
+            //_ldrTexture = Content.Load<Texture2D>("ibl_ldr_generatedStPeters");
             //_ldrTexture = Content.Load<Texture2D>("ibl_ldr_radiance");
 
             _ldrTextureFaces = CubeMapHelper.GetMapFacesTextureArrayFromEquaRectangularMap(GraphicsDevice, _ldrTexture, 256); // this is sphereical map to a texture array.
-            _textureCubeMap = CubeMapHelper.GetCubeMapFromEquaRectangularMap(GraphicsDevice, _ldrTexture, 256);
+            //_textureCubeMap = CubeMapHelper.GetCubeMapFromEquaRectangularMap(GraphicsDevice, _ldrTexture, 256);
+            _textureCubeMap = CubeMapHelper.GetCubeMapFromEquaRectangularMap(GraphicsDevice, _ldrTexture, 2048);
 
             // need to generate the irradiance maps and mips and all that also.
             _LightsAndFog.SetEnviromentalCubeMap(_textureCubeMap);
             _LightsAndFog.SetEnviromentalLUTMap(_premadeLut);
 
             // save the created spherical map to disk.
-            //CubeMapHelper.SaveTexture2D(Path.Combine(Environment.CurrentDirectory, "Ldr_TestSphericalOutput.png"), _generatedTexture);
+            CubeMapHelper.SaveTexture2D(Path.Combine(Environment.CurrentDirectory, "ibl_ldr_generatedWater.png"), _generatedTexture);
         }
 
         public void LoadPrimitives()
@@ -248,12 +253,26 @@ namespace WillDxSharpGltf
 
         public void LoadIndivdualFaces()
         {
-            _cmLeft = Content.Load<Texture2D>("CubeFaces/_left256");
-            _cmRight = Content.Load<Texture2D>("CubeFaces/_right256");
-            _cmFront = Content.Load<Texture2D>("CubeFaces/_front256");
-            _cmBack = Content.Load<Texture2D>("CubeFaces/_back256");
-            _cmTop = Content.Load<Texture2D>("CubeFaces/_top256");
-            _cmBottom = Content.Load<Texture2D>("CubeFaces/_bottom256");
+            //_cmLeft = Content.Load<Texture2D>("CubeFaces/_left256");
+            //_cmRight = Content.Load<Texture2D>("CubeFaces/_right256");
+            //_cmFront = Content.Load<Texture2D>("CubeFaces/_front256");
+            //_cmBack = Content.Load<Texture2D>("CubeFaces/_back256");
+            //_cmTop = Content.Load<Texture2D>("CubeFaces/_top256");
+            //_cmBottom = Content.Load<Texture2D>("CubeFaces/_bottom256");
+
+            _cmLeft = Content.Load<Texture2D>("CubeFaces/left");
+            _cmRight = Content.Load<Texture2D>("CubeFaces/right");
+            _cmFront = Content.Load<Texture2D>("CubeFaces/front");
+            _cmBack = Content.Load<Texture2D>("CubeFaces/back");
+            _cmTop = Content.Load<Texture2D>("CubeFaces/top");
+            _cmBottom = Content.Load<Texture2D>("CubeFaces/bottom");
+
+            //_cmLeft = Content.Load<Texture2D>("CubeFaces/negx");
+            //_cmRight = Content.Load<Texture2D>("CubeFaces/posx");
+            //_cmFront = Content.Load<Texture2D>("CubeFaces/posz");
+            //_cmBack = Content.Load<Texture2D>("CubeFaces/negz");
+            //_cmTop = Content.Load<Texture2D>("CubeFaces/posy");
+            //_cmBottom = Content.Load<Texture2D>("CubeFaces/negy");
         }
 
         public void LoadStandardTestingModels()
@@ -567,7 +586,8 @@ namespace WillDxSharpGltf
 
             _spriteBatch.Begin();
 
-            _spriteBatch.Draw(_generatedTexture, new Rectangle(0,0,300, 150), Color.White);
+            _spriteBatch.Draw(_ldrTexture, new Rectangle(0, 0, 300, 150), Color.White);
+            _spriteBatch.Draw(_generatedTexture, new Rectangle(300, 0, 300, 150), Color.White);
 
             int x = 0; int y = 150;
             _spriteBatch.Draw(_cmLeft, new Rectangle(x, y, 100, 100), Color.White); x += 100;

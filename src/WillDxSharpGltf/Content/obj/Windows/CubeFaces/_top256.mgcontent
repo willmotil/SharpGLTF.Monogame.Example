@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PipelineBuildEvent xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <SourceFile>C:/Users/will/MainFiles/GitPrjs/SharpGLTF.Monogame.Example/src/WillDxSharpGltf/Content/CubeFaces/_top256.png</SourceFile>
-  <SourceTime>2020-10-08T20:34:08.9481524-04:00</SourceTime>
+  <SourceTime>2020-10-10T11:21:54.2227217-04:00</SourceTime>
   <DestFile>C:/Users/will/MainFiles/GitPrjs/SharpGLTF.Monogame.Example/src/WillDxSharpGltf/Content/bin/Windows/CubeFaces/_top256.xnb</DestFile>
-  <DestTime>2020-10-09T18:19:55.4565009-04:00</DestTime>
+  <DestTime>2020-10-10T12:19:01.6257976-04:00</DestTime>
   <Importer>TextureImporter</Importer>
   <ImporterTime>2020-05-27T15:15:40-04:00</ImporterTime>
   <Processor>TextureProcessor</Processor>
