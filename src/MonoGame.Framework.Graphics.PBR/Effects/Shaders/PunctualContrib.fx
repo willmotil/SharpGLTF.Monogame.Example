@@ -60,28 +60,29 @@ LightContrib AggregateLight(PunctualLight light, float3 positionW, float3 n, flo
     float LdotH = clampedDot(l, h);
     float VdotH = clampedDot(v, h);
 
-
     LightContrib result;
     result.f_specular = 0;
     result.f_diffuse = 0;
 
     if (NdotL > 0.0 || NdotV > 0.0)
     {
-        // Calculation of analytical light
+        // Calculation of analytical light   See Brdf.fx
         //https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#acknowledgments AppendixB
         result.f_diffuse = intensity * NdotL * BRDF_lambertian(materialInfo.f0, materialInfo.f90, materialInfo.albedoColor, VdotH);
 
 #ifdef MATERIAL_ANISOTROPY
-        float3 h = normalize(l + v);
+        //float3 h = normalize(l + v);
         float TdotL = dot(t, l);
-        float BdotL = dot(b, l);
         float TdotH = dot(t, h);
+        float BdotL = dot(b, l);
         float BdotH = dot(b, h);
         result.f_specular = intensity * NdotL * BRDF_specularAnisotropicGGX(materialInfo.f0, materialInfo.f90, materialInfo.alphaRoughness,
             VdotH, NdotL, NdotV, NdotH,
             BdotV, TdotV, TdotL, BdotL, TdotH, BdotH, materialInfo.anisotropy);
 #else
+        // This is the primary specular brdf portion of the calculation calculataion.
         result.f_specular = intensity * NdotL * BRDF_specularGGX(materialInfo.f0, materialInfo.f90, materialInfo.alphaRoughness, VdotH, NdotL, NdotV, NdotH);
+        //result.f_specular = 0.0f;  // visual check
 #endif
 
 #ifdef MATERIAL_SHEEN
@@ -97,12 +98,14 @@ LightContrib AggregateLight(PunctualLight light, float3 positionW, float3 n, flo
     }
 
 #ifdef MATERIAL_SUBSURFACE
+    // See PunctualLight.fx
     result.f_subsurface = intensity * getPunctualRadianceSubsurface(n, v, l,
         materialInfo.subsurfaceScale, materialInfo.subsurfaceDistortion, materialInfo.subsurfacePower,
         materialInfo.subsurfaceColor, materialInfo.subsurfaceThickness);
 #endif
 
 #ifdef MATERIAL_TRANSMISSION
+    // See PunctualLight.fx
     result.f_transmission = intensity * getPunctualRadianceTransmission(n, v, l, materialInfo.alphaRoughness, ior, materialInfo.f0);
 #endif
 

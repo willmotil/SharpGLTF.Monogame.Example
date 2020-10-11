@@ -33,9 +33,9 @@ uniform samplerCUBE envCubeMapSampler = sampler_state
 //    return texCUBElod(envCubeMapSampler, float4(reflectionNorm, materialInfo.perceptualRoughness)).rgb;
 //}
 
-float3 getEnviromentalCubePixel(float3 reflectionNorm, int lod)
+float3 getEnviromentalCubePixel(float3 reflectionNorm, float lod)
 {
-    return texCUBElod(envCubeMapSampler, float4(reflectionNorm, abs(lod))).rgb;
+    return texCUBElod(envCubeMapSampler, float4(reflectionNorm, lod)).rgb;
 }
 
 float3 getLutTexel(float2 uv)

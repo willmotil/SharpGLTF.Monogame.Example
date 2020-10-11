@@ -8,6 +8,8 @@
 // https://google.github.io/filament/Filament.md.html
 //
 
+#define PI 3.14159265359f
+
 float3 F_None(float3 f0, float3 f90, float VdotH)
 {
     return f0;
@@ -130,11 +132,10 @@ float3 BRDF_lambertian(float3 f0, float3 f90, float3 diffuseColor, float VdotH)
 //  https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#acknowledgments AppendixB
 float3 BRDF_specularGGX(float3 f0, float3 f90, float alphaRoughness, float VdotH, float NdotL, float NdotV, float NdotH)
 {
-    float3 F = F_Schlick(f0, f90, VdotH);
-    float Vis = V_GGX(NdotL, NdotV, alphaRoughness);
-    float D = D_GGX(NdotH, alphaRoughness);
-
-    return F * Vis * D;
+    float3 F = F_Schlick(f0, f90, VdotH); // redundant f90 , 1f - f0 = f90 and visa versa.  Roughness is not accounted for here in there schlick function.
+    float G = V_GGX(NdotL, NdotV, alphaRoughness); // vis=   this appears to be smith or a variant of smith, this is the (light geometry) G term why did they renamed it vis? thats annoying V is a commonly used term already for the camera to pixel.
+    float D = D_GGX(NdotH, alphaRoughness); // this is the distribution gradient function D.
+    return F * G * D;
 }
 
 float3 BRDF_specularAnisotropicGGX(float3 f0, float3 f90, float alphaRoughness, float VdotH, float NdotL, float NdotV, float NdotH,
@@ -158,4 +159,44 @@ float3 BRDF_specularSheen(float3 sheenColor, float sheenIntensity, float sheenRo
     float sheenDistribution = D_Charlie(sheenRoughness, NdotH);
     float sheenVisibility = V_Ashikhmin(NdotL, NdotV);
     return sheenColor * sheenIntensity * sheenDistribution * sheenVisibility;
+}
+
+//  Added for comparison especially for debuging cause there is a problem houston.
+
+float xDistributionGGX(float3 N, float3 H, float roughness)
+{
+    float a = roughness * roughness;
+    float a2 = a * a;
+    float NdotH = max(dot(N, H), 0.0f);
+    float NdotH2 = NdotH * NdotH;
+    float num = a2;
+    float denom = (NdotH2 * (a2 - 1.0f) + 1.0f);
+    denom = PI * denom * denom;
+    return num / denom;
+}
+
+float xGeometrySchlickGGX(float NdotV, float roughness)
+{
+    float r = (roughness + 1.0f);
+    float k = (r * r) / 8.0f;
+    float num = NdotV;
+    float denom = NdotV * (1.0f - k) + k;
+    return num / denom;
+}
+float xGeometrySmith(float3 N, float3 V, float3 L, float roughness)
+{
+    float NdotV = max(dot(N, V), 0.0f);
+    float NdotL = max(dot(N, L), 0.0f);
+    float ggx2 = xGeometrySchlickGGX(NdotV, roughness);
+    float ggx1 = xGeometrySchlickGGX(NdotL, roughness);
+    return ggx1 * ggx2;
+}
+float3 xfresnelSchlick(float cosTheta, float3 F0)
+{
+    return F0 + (1.0f - F0) * pow(1.0f - cosTheta, 5.0f);
+}
+// ----------------------------------------------------------------------------
+float3 xfresnelSchlickRoughness(float cosTheta, float3 F0, float roughness)
+{
+    return F0 + (max((float3(1.0f, 1.0f, 1.0f) - roughness), F0) - F0) * pow(1.0f - cosTheta, 5.0f);
 }

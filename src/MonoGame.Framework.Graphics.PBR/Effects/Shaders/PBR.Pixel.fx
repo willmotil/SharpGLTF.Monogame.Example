@@ -53,9 +53,11 @@ float3 GetPunctualLightsContrib(float3 positionW, NormalInfo normalInfo, Materia
     float3 t = normalInfo.t;
     float3 b = normalInfo.b;
 
+    /*
     float NdotV = clampedDot(n, v);
     float TdotV = clampedDot(t, v);
     float BdotV = clampedDot(b, v);    
+    */
 
     // lighting
     
@@ -65,8 +67,8 @@ float3 GetPunctualLightsContrib(float3 positionW, NormalInfo normalInfo, Materia
 
     for (int i = 0; i < 3; ++i)
     {
-        PunctualLight lightSource = GetPunctualLight(i);
-        LightContrib lightContrib = AggregateLight(lightSource, positionW, n, v, materialInfo);
+        PunctualLight lightSource = GetPunctualLight(i);  // PunctualLight.fx
+        LightContrib lightContrib = AggregateLight(lightSource, positionW, n, v, materialInfo); // PunctualContrib.fx
 
         result.Add(lightContrib);
     }

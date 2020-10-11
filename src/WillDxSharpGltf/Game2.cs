@@ -202,6 +202,11 @@ namespace WillDxSharpGltf
             LoadStandardTestingModels();
 
             SetupCamera();
+
+            msg =
+           " cube size " + _textureCubeMap.Size +
+           " \n mip Level: " + TestValue1 + "  /  " + _textureCubeMap.LevelCount +
+           " \n mip CallType: texCubeLod ";
         }
 
         public void SetupCamera()
@@ -524,25 +529,23 @@ namespace WillDxSharpGltf
 
             _camera.Update(_testTarget, _useDemoWaypoints, gameTime);
 
-            UpdateTestingUiShaderVariables(gameTime);
+            // test mip maps press the 1 key.
+            if (Keyboard.GetState().IsKeyDown(Keys.D1) && Pause(gameTime))
+                UpdateTestingUiShaderVariables(gameTime);
 
             base.Update(gameTime);
         }
 
         public void UpdateTestingUiShaderVariables(GameTime gameTime)
         {
-            // test mip maps press the 1 key.
-            if (Keyboard.GetState().IsKeyDown(Keys.D1) && Pause(gameTime))
-            {
                 TestValue1++;
                 if (TestValue1 > _textureCubeMap.LevelCount)
                     TestValue1 = 0;
 
                 msg =
                     " cube size " + _textureCubeMap.Size +
-                    " \n mip Level: " + TestValue1 + "  /  " + _textureCubeMap.LevelCount;
-                    msg += " \n mip CallType: texCubeLod ";
-            }
+                    " \n mip Level: " + TestValue1 + "  /  " + _textureCubeMap.LevelCount +
+                    " \n mip CallType: texCubeLod ";
         }
 
         protected override void Draw(GameTime gameTime)
@@ -587,7 +590,7 @@ namespace WillDxSharpGltf
             _spriteBatch.Begin();
 
             _spriteBatch.Draw(_ldrTexture, new Rectangle(0, 0, 300, 150), Color.White);
-            _spriteBatch.Draw(_generatedTexture, new Rectangle(300, 0, 300, 150), Color.White);
+            _spriteBatch.Draw(_generatedTexture, new Rectangle(350, 0, 300, 150), Color.White);
 
             int x = 0; int y = 150;
             _spriteBatch.Draw(_cmLeft, new Rectangle(x, y, 100, 100), Color.White); x += 100;

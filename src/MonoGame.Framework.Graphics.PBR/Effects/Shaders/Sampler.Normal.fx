@@ -37,8 +37,6 @@ NormalInfo GetGeometricNormalSample(VsOutTexNorm input)
     return info;
 }
 
-
-
 // https://github.com/KhronosGroup/glTF-Sample-Viewer/blob/master/src/shaders/pbr.frag#L136
 NormalInfo GetPerturbedNormalSample(VsOutTexNorm input)
 {

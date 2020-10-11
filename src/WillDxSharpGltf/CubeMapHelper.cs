@@ -54,45 +54,8 @@ namespace WillDxSharpGltf
             }
         }
 
-        ///// <summary>
-        ///// Ok so this is a destination pixel version this version attempts to include mip levels.    testing Fails.
-        ///// However lots of dimensional variables to account for here.
-        ///// </summary>
-        //public static TextureCube GetCubeMapFromEquaRectangularMap(GraphicsDevice gd, Texture2D equaRectangularMap, int faceSize)
-        //{
-        //    TextureCube cubeMap = new TextureCube(gd, faceSize, true, SurfaceFormat.Color);
-        //    var eqLevelCount = equaRectangularMap.LevelCount;
-        //    for (int level = 0; level < eqLevelCount; level += 1)
-        //    {
-        //        int eqw = equaRectangularMap.Width >> level;
-        //        int eqh = equaRectangularMap.Height >> level;
-        //        var mapColorData = new Color[(equaRectangularMap.Width >> level) * (equaRectangularMap.Height >> level)];
-        //        equaRectangularMap.GetData(level, null, mapColorData, 0, mapColorData.Length);
-        //        for (int faceIndex = 0; faceIndex < 6; faceIndex++)
-        //        {
-        //            var adjFaceSize = faceSize >> level;
-        //            var wh = new Vector2(adjFaceSize - 1, adjFaceSize - 1);
-        //            var faceData = new Color[adjFaceSize * adjFaceSize];
-        //            for (int y = 0; y < adjFaceSize; y++)
-        //            {
-        //                for (int x = 0; x < adjFaceSize; x++)
-        //                {
-        //                    var fuv = new Vector2(x, y) / wh;
-        //                    var v = UvFaceToCubeMapVector(fuv, faceIndex);
-        //                    var uv = CubeMapNormalTo2dEquaRectangularMapUvCoordinates(v);
-        //                    var eqIndex = (int)(uv.X * eqw) + ((int)(uv.Y * eqh) * eqw);
-        //                    faceData[x + (y * adjFaceSize)] = mapColorData[eqIndex];
-        //                }
-        //            }
-        //            var cubeMapFace = GetFaceFromInt(faceIndex);
-        //            cubeMap.SetData(cubeMapFace, level, null, faceData, 0, faceData.Length);
-        //        }
-        //    }
-        //    return cubeMap;
-        //}
-
-        /// <summary>  v2
-        /// Ok so this is a destination pixel version this version attempts to include mip levels.    testing Fails.
+        /// <summary>  
+        /// v2 this is a destination pixel version this version attempts to include mip levels. test passes
         /// However lots of dimensional variables to account for here.
         /// </summary>
         public static TextureCube GetCubeMapFromEquaRectangularMap(GraphicsDevice gd, Texture2D equaRectangularMap, int faceSize)
@@ -105,16 +68,10 @@ namespace WillDxSharpGltf
             equaRectangularMap.GetData(0, null, eqColorData, 0, eqColorData.Length);
             for (int level = 0; level < cmLevelCount; level += 1)
             {
-                //int eqw = equaRectangularMap.Width >> level;
-                //int eqh = equaRectangularMap.Height >> level;
-                //var mapColorData = new Color[(equaRectangularMap.Width >> level) * (equaRectangularMap.Height >> level)];
-                //equaRectangularMap.GetData(level, null, mapColorData, 0, mapColorData.Length);
                 for (int faceIndex = 0; faceIndex < 6; faceIndex++)
                 {
                     var adjFaceSize = faceSize >> level;
-                    var faceWh = new Vector2(adjFaceSize, adjFaceSize);//new Vector2(adjFaceSize , adjFaceSize );//new Vector2(adjFaceSize - 1, adjFaceSize - 1);
-                    //if (faceWh.X < 1) faceWh.X = 1;
-                    //if (faceWh.Y < 1) faceWh.Y = 1;
+                    var faceWh = new Vector2(adjFaceSize, adjFaceSize);
                     var faceData = new Color[adjFaceSize * adjFaceSize];
                     for (int y = 0; y < adjFaceSize; y++)
                     {
@@ -220,7 +177,7 @@ namespace WillDxSharpGltf
                         var fuv = new Vector2(x, y) / wh;
                         var v = UvFaceToCubeMapVector(fuv, index);
                         var uv = CubeMapNormalTo2dEquaRectangularMapUvCoordinates(v);
-                        //var uv = CubeMapNormalTo2dEquaRectangularMapUvCoordinatesAlt(v);
+                        //var uv = CubeMapNormalTo2dEquaRectangularMapUvCoordinatesAlt(v); // works too same.
                         var eqIndex = (int)(uv.X * eqw) + ((int)(uv.Y * eqh) * eqw);
                         faceColorData[x + (y * faceSize)] = mapColorData[eqIndex];
                     }
@@ -340,23 +297,23 @@ namespace WillDxSharpGltf
             Vector3 dir = new Vector3(0f, 0f, 1f);
             switch (faceIndex)
             {
-                case FACE_BACK: // FACE_LEFT:
-                    dir = new Vector3(-1f, v, -u); // back
+                case FACE_BACK: 
+                    dir = new Vector3(-1f, v, -u); 
                     break;
-                case FACE_TOP: // FACE_BOTTOM:
-                    dir = new Vector3(v, -1f, u); // top
+                case FACE_TOP: 
+                    dir = new Vector3(v, -1f, u); 
                     break;
-                case FACE_LEFT: // FACE_BACK:
-                    dir = new Vector3(u, v, -1f); // left
+                case FACE_LEFT: 
+                    dir = new Vector3(u, v, -1f); 
                     break;
-                case FACE_FRONT: // FACE_RIGHT:
-                    dir = new Vector3(1f, v, u); // front
+                case FACE_FRONT: 
+                    dir = new Vector3(1f, v, u);
                     break;
-                case FACE_BOTTOM: // FACE_TOP:
-                    dir = new Vector3(-v, 1f, u); // bottom
+                case FACE_BOTTOM:
+                    dir = new Vector3(-v, 1f, u); 
                     break;
-                case FACE_RIGHT: // FACE_FRONT:
-                    dir = new Vector3(-u, v, 1f); // right
+                case FACE_RIGHT:
+                    dir = new Vector3(-u, v, 1f); 
                     break;
                 default:
                     dir = new Vector3(-1f, -1f, -1f); // na
@@ -365,42 +322,6 @@ namespace WillDxSharpGltf
             dir.Normalize();
             return dir;
         }
-
-        //private static Vector3 UvFaceToCubeMapVector(Vector2 uv, int faceIndex)
-        //{
-        //    var u = uv.X * 2f - 1.0f;
-        //    var v = uv.Y * 2f - 1.0f;
-        //    //var u = uv.X - .5f;
-        //    //var v = uv.Y - .5f;
-        //    Vector3 dir = new Vector3(0f, 0f, 1f);
-
-        //    switch (faceIndex)
-        //    {
-        //        case FACE_LEFT:
-        //            dir = new Vector3(-1f, v, u);
-        //            break;
-        //        case FACE_BOTTOM:
-        //            dir = new Vector3(-u, -1f, v);
-        //            break;
-        //        case FACE_BACK:
-        //            dir = new Vector3(u, v, -1f);
-        //            break;
-        //        case FACE_RIGHT:
-        //            dir = new Vector3(1f, v, -u);
-        //            break;
-        //        case FACE_TOP:
-        //            dir = new Vector3(u, 1f, -v);
-        //            break;
-        //        case FACE_FRONT:
-        //            dir = new Vector3(-u, v, 1f);
-        //            break;
-        //        default:
-        //            dir = new Vector3(-1f, v, u);
-        //            break;
-        //    }
-        //    dir.Normalize();
-        //    return dir;
-        //}
 
         private static Vector3 Abs(Vector3 v)
         {
@@ -429,6 +350,7 @@ namespace WillDxSharpGltf
         {
             return new RenderTargetCube(graphicsDevice, size, mipmaps, SurfaceFormat.Color, DepthFormat.Depth24);
         }
+
         /// <summary>
         /// This returns a perspective projection matrix suitable for a rendertarget cube
         /// </summary>
@@ -441,6 +363,7 @@ namespace WillDxSharpGltf
         {
             return CreateLhLookAt(position, forward + position, up);
         }
+
         /// <summary>
         /// Creates a opposite monogame createlookat version or a left handed matrix.
         /// This returns a matrix suitable for a render target cube.
@@ -495,6 +418,9 @@ namespace WillDxSharpGltf
             return new Ray(nearWorldPoint, worldRaysNormal);
         }
 
+        /// <summary>
+        /// Shortcut.
+        /// </summary>
         public static void SaveTexture2D(string path, Texture2D t)
         {
             using (System.IO.Stream fs = System.IO.File.OpenWrite(path))
