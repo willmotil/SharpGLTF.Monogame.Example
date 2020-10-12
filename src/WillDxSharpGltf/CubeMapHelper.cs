@@ -16,18 +16,20 @@ namespace WillDxSharpGltf
         public const int FACE_TOP = 4; // PositiveY
         public const int FACE_FRONT = 5; // PositiveZ
 
+        public const float PI = (float)Math.PI;
+
         /// <summary>
         /// Set faces to cubemap by name, neg xyz,  pos  xyz.  tested passes.
         /// </summary>
-        public static TextureCube SetIndividualFacesToCubeMap(GraphicsDevice gd, int size, TextureCube map, Texture2D textureLeft, Texture2D textureBottom, Texture2D textureBack, Texture2D textureRight, Texture2D textureTop, Texture2D textureFront)
+        public static TextureCube GetCubeMapFromIndividualFaces(GraphicsDevice gd, int size, TextureCube map, Texture2D textureLeft, Texture2D textureBottom, Texture2D textureBack, Texture2D textureRight, Texture2D textureTop, Texture2D textureFront)
         {
-            return SetIndividualCubeFacesToCubeMap(gd, size, map, textureLeft, textureBottom, textureBack, textureRight, textureTop, textureFront);
+            return GetCubeMapFromIndividualDirectionFaces(gd, size, map, textureLeft, textureBottom, textureBack, textureRight, textureTop, textureFront);
         }
 
         /// <summary>
         /// Set faces to cubemap, neg xyz,  pos  xyz. tested passes
         /// </summary>
-        public static TextureCube SetIndividualCubeFacesToCubeMap(GraphicsDevice gd, int size, TextureCube map, Texture2D textureNegativeX, Texture2D textureNegativeY, Texture2D textureNegativeZ, Texture2D texturePositiveX, Texture2D texturePositiveY, Texture2D texturePositiveZ)
+        public static TextureCube GetCubeMapFromIndividualDirectionFaces(GraphicsDevice gd, int size, TextureCube map, Texture2D textureNegativeX, Texture2D textureNegativeY, Texture2D textureNegativeZ, Texture2D texturePositiveX, Texture2D texturePositiveY, Texture2D texturePositiveZ)
         {
             if (map == null)
                 map = new TextureCube(gd, size, true, SurfaceFormat.Color);
@@ -41,7 +43,7 @@ namespace WillDxSharpGltf
         }
 
         /// <summary>
-        /// This sets a individual texture and its mipmaps to a cubemap.   tested passes
+        /// This sets a individual texture that represents a face and its mipmaps to a cubemap face at level.   tested passes
         /// </summary>
         public static void SetTextureToCubeMapFace(TextureCube cubeMap, Texture2D textureFace, CubeMapFace faceId)
         {
@@ -55,8 +57,7 @@ namespace WillDxSharpGltf
         }
 
         /// <summary>  
-        /// v2 this is a destination pixel version this version attempts to include mip levels. test passes
-        /// However lots of dimensional variables to account for here.
+        /// This is a destination pixel version this version attempts to include mip levels. test passes  v2 
         /// </summary>
         public static TextureCube GetCubeMapFromEquaRectangularMap(GraphicsDevice gd, Texture2D equaRectangularMap, int faceSize)
         {
@@ -80,8 +81,9 @@ namespace WillDxSharpGltf
                             var fuv = new Vector2(x, y) / faceWh;
                             var v = UvFaceToCubeMapVector(fuv, faceIndex);
                             var uv = CubeMapNormalTo2dEquaRectangularMapUvCoordinates(v);
-                            var eqIndex = (int)(uv.X * eqw) + ((int)(uv.Y * eqh) * eqw);
-                            faceData[x + (y * adjFaceSize)] = eqColorData[eqIndex];
+                            var eqPixelIndex = (int)(uv.X * eqw) + ((int)(uv.Y * eqh) * eqw);
+                            var facePixelIndex = x + (y * adjFaceSize);
+                            faceData[facePixelIndex] = eqColorData[eqPixelIndex];
                         }
                     }
                     var cubeMapFace = GetFaceFromInt(faceIndex);
@@ -89,6 +91,230 @@ namespace WillDxSharpGltf
                 }
             }
             return cubeMap;
+        }
+
+        /// <summary>  
+        /// This is a destination pixel version this version attempts to include mip levels and use them for convolution in diffuse and specular. test passes  v2 
+        /// Reference here. Cubemap convolution  https://learnopengl.com/PBR/IBL/Diffuse-irradiance  
+        /// Lo(p,ωo)=kdcπ∫ΩLi(p,ωi)n⋅ωidωi and  Epics... specular  Lo(p,ωo)=∫ΩLi(p,ωi)dωi∗∫Ωfr(p,ωi,ωo)n⋅ωidωi
+        /// The convoluted irradiance diffuse map is fairly simple and in earnest i really only need one i think however the specular lobe map varys with roughness.
+        /// </summary>
+        public static void GetCubeMapsPreFilteredDiffuseAndSpecularFromEquaRectangularMap(GraphicsDevice gd, Texture2D equaRectangularMap, int faceSize, out TextureCube cubeMapPreFilteredDiffuse, out TextureCube cubeMapPreFilteredSpecular)
+        {
+            TextureCube cubeMapSpecular = new TextureCube(gd, faceSize, true, SurfaceFormat.Color);
+            TextureCube cubeMapDiffuse = new TextureCube(gd, faceSize, true, SurfaceFormat.Color);
+            var cmLevelCount = cubeMapSpecular.LevelCount;
+            int eqw = equaRectangularMap.Width;
+            int eqh = equaRectangularMap.Height;
+            var eqColorData = new Color[(equaRectangularMap.Width) * (equaRectangularMap.Height)];
+            equaRectangularMap.GetData(0, null, eqColorData, 0, eqColorData.Length);
+            // first reflection level.
+            for (int level = 0; level < 1; level += 1)
+            {
+                for (int faceIndex = 0; faceIndex < 6; faceIndex++)
+                {
+                    var adjFaceSize = faceSize >> level;
+                    var faceWh = new Vector2(adjFaceSize, adjFaceSize);
+                    var faceColorDataSpecular = new Color[adjFaceSize * adjFaceSize];
+                    var faceColorDataDiffuse = new Color[adjFaceSize * adjFaceSize];
+                    Console.WriteLine($"1  level: {level}   faceIndex: {faceIndex}"); //  Line: {y} of {adjFaceSize}");
+                    for (int y = 0; y < adjFaceSize; y++)
+                    {
+                        for (int x = 0; x < adjFaceSize; x++)
+                        {
+                            var facePixelIndex = x + (y * adjFaceSize);
+                            var fuv = new Vector2(x, y) / faceWh;
+                            var v = UvFaceToCubeMapVector(fuv, faceIndex);
+                            var uv = CubeMapNormalTo2dEquaRectangularMapUvCoordinates(v);
+                            var eqPixelIndex = (int)(uv.X * eqw) + ((int)(uv.Y * eqh) * eqw);
+                            faceColorDataSpecular[facePixelIndex] = eqColorData[eqPixelIndex];
+                            // ...
+                            SpecularLobeVectorChange(v, 30, .90f, faceColorDataDiffuse, facePixelIndex, eqColorData, eqw, eqh);
+                        }
+                    }
+                    var cubeMapFace = GetFaceFromInt(faceIndex);
+                    cubeMapSpecular.SetData(cubeMapFace, level, null, faceColorDataSpecular, 0, faceColorDataSpecular.Length);
+                    cubeMapDiffuse.SetData(cubeMapFace, level, null, faceColorDataDiffuse, 0, faceColorDataDiffuse.Length);
+                }
+            }
+            // rest of the specular lobe reflection levels.
+            for (int level = 1; level < cmLevelCount; level += 1)
+            {
+                for (int faceIndex = 0; faceIndex < 6; faceIndex++)
+                {
+                    var adjFaceSize = faceSize >> level;
+                    var faceWh = new Vector2(adjFaceSize, adjFaceSize);
+                    var faceColorData = new Color[adjFaceSize * adjFaceSize];
+
+                    Console.WriteLine($"2  level: {level}   faceIndex: {faceIndex}");
+                    for (int y = 0; y < adjFaceSize; y++)
+                    {
+                        for (int x = 0; x < adjFaceSize; x++)
+                        {
+                            var facePixelIndex = x + (y * adjFaceSize);
+                            var fuv = new Vector2(x, y) / faceWh;
+                            var v = UvFaceToCubeMapVector(fuv, faceIndex);
+                            float roughness = level / (cmLevelCount - 1);
+                            SpecularLobeVectorChange(v, 10, level / (cmLevelCount -1), faceColorData, facePixelIndex, eqColorData, eqw, eqh);
+                        }
+                    }
+                    var cubeMapFace = GetFaceFromInt(faceIndex);
+                    cubeMapSpecular.SetData(cubeMapFace, level, null, faceColorData, 0, faceColorData.Length);
+                }
+            }
+            cubeMapPreFilteredSpecular = cubeMapSpecular;
+            cubeMapPreFilteredDiffuse = cubeMapDiffuse;
+        }
+
+        public static void SpecularLobeVectorChange(Vector3 n, int numOfSamples, float roughness, Color[] faceColorData, int facePixelIndex, Color[] eqColorData, int equaRectangularMapWidth, int equaRectangularMapHeght)
+        {
+            float radiansRange = roughness * PI;
+            float sampleCount = numOfSamples* roughness;
+            float outwardStepCount = sampleCount / 4f;
+            var uv = CubeMapNormalTo2dEquaRectangularMapUvCoordinates(n);
+            var eqPixelIndex = (int)(uv.X * equaRectangularMapWidth) + ((int)(uv.Y * equaRectangularMapHeght) * equaRectangularMapWidth);
+            Color c = eqColorData[eqPixelIndex];
+            Vector3 cumulative = new Vector3(c.R, c.G, c.B);
+            float cwsum = 1.0f;
+            // calculate a pixel of radians this isn't going to be exact.
+            var pixRad = 1f / equaRectangularMapHeght * (PI / 2f);
+            float rotation = 0;
+            //
+            for (int currentSc = 0; currentSc < sampleCount; currentSc++)
+            {
+                float a = (currentSc / sampleCount);
+                a *= a;
+                float inv = 1.0f - a;
+                float outwardRadians = a * radiansRange;
+                rotation += PI / 3.0f;
+                Matrix moffset = Matrix.CreateRotationY(outwardRadians);
+                Matrix rot = Matrix.CreateRotationZ(rotation);
+                Matrix multip = moffset * rot;
+                var v = Vector3.Transform(n, multip);
+                uv = CubeMapNormalTo2dEquaRectangularMapUvCoordinates(v);
+                eqPixelIndex = (int)(uv.X * equaRectangularMapWidth) + ((int)(uv.Y * equaRectangularMapHeght) * equaRectangularMapWidth);
+                c = eqColorData[eqPixelIndex];
+                cumulative += new Vector3(c.R * inv, c.G * inv, c.B * inv);
+                cwsum += inv;
+                //Console.WriteLine($" ,                      cumulative: {cumulative}   cwsum: {cwsum}");
+            }
+            cumulative = cumulative / cwsum;
+            //Console.WriteLine($" cumulative: {cumulative}   cwsum: {cwsum}");
+            faceColorData[facePixelIndex] = new Color(cumulative.X *255, cumulative.Y *255, cumulative.Z * 255, 255);
+        }
+
+        //public static void SpecularLobeVectorChange(Vector3 v, int numOfSamples, float roughness, Color[] faceColorData, int facePixelIndex, Color[] eqColorData, int equaRectangularMapWidth, int equaRectangularMapHeght)
+        //{
+        //    BuildSpecularPreFilterPixelByTheBook(v, roughness, faceColorData, facePixelIndex, eqColorData, equaRectangularMapWidth, equaRectangularMapHeght);
+        //}
+
+        /// <summary>
+        /// this seems a bit overly complicated but i can move this to a pixel shader simply so.
+        /// </summary>
+        private static void BuildSpecularPreFilterPixelByTheBook(Vector3 N, float roughness, Color[] faceColorData, int facePixelIndex, Color[] eqColorData, int equaRectangularMapWidth, int equaRectangularMapHeght)
+        {
+            Vector3 R = N;
+            Vector3 V = R;
+            const uint SAMPLE_COUNT = 4u;
+            float totalWeight = 0.0f;
+            Vector3 prefilteredColor = Vector3.Zero;
+            for (uint i = 0u; i < SAMPLE_COUNT; ++i)
+            {
+                Vector2 Xi = HammersleyNoBitOps(i, SAMPLE_COUNT);
+                Vector3 H = ImportanceSampleGGX(Xi, N, roughness);
+                Vector3 L = Vector3.Normalize(2.0f * Vector3.Dot(V, H) * H - V);
+                float NdotL = Math.Max( Vector3.Dot(N, L) , 0.0f );
+                if (NdotL > 0.0)
+                {
+                    var uv = CubeMapNormalTo2dEquaRectangularMapUvCoordinates(L);
+                    var eqPixelIndex = (int)(uv.X * equaRectangularMapWidth) + ((int)(uv.Y * equaRectangularMapHeght) * equaRectangularMapWidth);
+                    Color c = eqColorData[eqPixelIndex];
+                    prefilteredColor.X = (byte)((float)(c.R) * NdotL);
+                    prefilteredColor.Y = (byte)((float)(c.G) * NdotL);
+                    prefilteredColor.Z = (byte)((float)(c.B) * NdotL);
+                    totalWeight += NdotL;
+                }
+            }
+            prefilteredColor = prefilteredColor / totalWeight;
+            faceColorData[facePixelIndex] = new Color(prefilteredColor.X, prefilteredColor.Y, prefilteredColor.Z, 1.0f);
+        }
+
+        // GGX Importance sampling
+        private static Vector3 ImportanceSampleGGX(Vector2 Xi, Vector3 N, float roughness)
+        {
+            float a = roughness * roughness;
+            float phi = 2.0f * PI * Xi.X;
+            float cosTheta = (float)Math.Sqrt((1.0f - Xi.Y) / (1.0f + (a * a - 1.0f) * Xi.Y));
+            float sinTheta = (float)Math.Sqrt(1.0f - cosTheta * cosTheta);
+            // from spherical coordinates to cartesian coordinates
+            Vector3 H;
+            H.X = (float)Math.Cos(phi) * sinTheta;
+            H.Y = (float)Math.Sin(phi) * sinTheta;
+            H.Z = cosTheta;
+            // from tangent-space vector to world-space sample vector
+            Vector3 up = Abs(N.Z) < 0.999f ? new Vector3(0.0f, 0.0f, 1.0f) : new Vector3(1.0f, 0.0f, 0.0f);
+            Vector3 tangent = Vector3.Normalize( Vector3.Cross(up, N));
+            Vector3 bitangent = Vector3.Cross(N, tangent);
+            Vector3 sampleVec = tangent * H.X + bitangent * H.Y + N * H.Z;
+            return Vector3.Normalize(sampleVec);
+        }
+
+        /// <summary>
+        /// The GLSL Hammersley function gives us the low-discrepancy sample x of the total sample set of size N. 
+        /// https://learnopengl.com/PBR/IBL/Specular-IBL
+        /// </summary>
+        private static Vector2 HammersleyNoBitOps(uint x, uint N)
+        {
+            uint baseVal = 2u;
+            uint x2 = x;
+            float invBase = 1.0f / (float)(baseVal);
+            float denom = 1.0f;
+            float vanDerResult = 0.0f;
+            for (uint i = 0u; i < 32u; ++i)
+            {
+                if (x > 0u)
+                {
+                    denom = Mod((float)(x), 2.0f);
+                    vanDerResult += denom * invBase;
+                    invBase = invBase / 2.0f;
+                    x = (uint)((float)(x) / 2.0f);
+                }
+            }
+            return new Vector2((float)(x2) / (float)(N), vanDerResult);
+        }
+
+        /// <summary>
+        /// Ok so this is a destination pixel version this doesn't handle mipmaps.
+        /// </summary>
+        public static Texture2D[] GetMapFacesTextureArrayFromEquaRectangularMap(GraphicsDevice gd, Texture2D equaRectangularMap, int faceSize)
+        {
+            Color[] mapColorData = new Color[equaRectangularMap.Width * equaRectangularMap.Height];
+            equaRectangularMap.GetData<Color>(mapColorData);
+            int eqw = equaRectangularMap.Width;
+            int eqh = equaRectangularMap.Height;
+            Texture2D[] textureFaces = new Texture2D[6];
+            var faceWh = new Vector2(faceSize , faceSize );  // var faceWh = new Vector2(faceSize - 1, faceSize - 1);
+            for (int index = 0; index < 6; index++)
+            {
+                Color[] faceColorData = new Color[faceSize * faceSize];
+                textureFaces[index] = new Texture2D(gd, faceSize, faceSize);
+                // for each face set its pixels from the equarectangularmap.
+                for (int y = 0; y < faceSize; y++)
+                {
+                    for (int x = 0; x < faceSize; x++)
+                    {
+                        var fuv = new Vector2(x, y) / faceWh;
+                        var v = UvFaceToCubeMapVector(fuv, index);
+                        var uv = CubeMapNormalTo2dEquaRectangularMapUvCoordinates(v);
+                        //var uv = CubeMapNormalTo2dEquaRectangularMapUvCoordinatesAlt(v); // works too same.
+                        var eqIndex = (int)(uv.X * eqw) + ((int)(uv.Y * eqh) * eqw);
+                        var facePixelIndex = x + (y * faceSize);
+                        faceColorData[facePixelIndex] = mapColorData[eqIndex];
+                    }
+                }
+                textureFaces[index].SetData<Color>(faceColorData);
+            }
+            return textureFaces;
         }
 
         /// <summary>
@@ -152,39 +378,6 @@ namespace WillDxSharpGltf
             }
             equaRectangularMap.SetData<Color>(mapColorData);
             return equaRectangularMap;
-        }
-
-        /// <summary>
-        /// Ok so this is a destination pixel version this doesn't handle mipmaps.
-        /// </summary>
-        public static Texture2D[] GetMapFacesTextureArrayFromEquaRectangularMap(GraphicsDevice gd, Texture2D equaRectangularMap, int faceSize)
-        {
-            Color[] mapColorData = new Color[equaRectangularMap.Width * equaRectangularMap.Height];
-            equaRectangularMap.GetData<Color>(mapColorData);
-            int eqw = equaRectangularMap.Width;
-            int eqh = equaRectangularMap.Height;
-            Texture2D[] textureFaces = new Texture2D[6];
-            var wh = new Vector2(faceSize - 1, faceSize - 1);
-            for (int index = 0; index < 6; index++)
-            {
-                Color[] faceColorData = new Color[faceSize * faceSize];
-                textureFaces[index] = new Texture2D(gd, faceSize, faceSize);
-                // for each face set its pixels from the equarectangularmap.
-                for (int y = 0; y < faceSize; y++)
-                {
-                    for (int x = 0; x < faceSize; x++)
-                    {
-                        var fuv = new Vector2(x, y) / wh;
-                        var v = UvFaceToCubeMapVector(fuv, index);
-                        var uv = CubeMapNormalTo2dEquaRectangularMapUvCoordinates(v);
-                        //var uv = CubeMapNormalTo2dEquaRectangularMapUvCoordinatesAlt(v); // works too same.
-                        var eqIndex = (int)(uv.X * eqw) + ((int)(uv.Y * eqh) * eqw);
-                        faceColorData[x + (y * faceSize)] = mapColorData[eqIndex];
-                    }
-                }
-                textureFaces[index].SetData<Color>(faceColorData);
-            }
-            return textureFaces;
         }
 
         /// <summary>
@@ -427,6 +620,19 @@ namespace WillDxSharpGltf
             {
                 t.SaveAsPng(fs, t.Width, t.Height);
             }
+        }
+
+        private static float Mod(float x, float y)
+        {
+            return x - y * (float)((int)(x / y));
+        }
+        private static float Floor(float n)
+        {
+            return (float)(int)(n);
+        }
+        private static float Abs(float n)
+        {
+            if (n < 0) return -n; else return n;
         }
     }
 }

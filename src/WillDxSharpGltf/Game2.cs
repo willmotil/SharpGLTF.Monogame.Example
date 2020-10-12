@@ -29,7 +29,8 @@ namespace WillDxSharpGltf
 
         private Texture2D _ldrTexture;
         private Texture2D _premadeLut;
-        private TextureCube _textureCubeMap;
+        private TextureCube _textureCubeMapSpecular;
+        private TextureCube _textureCubeMapDiffuse;
         private Texture2D[] _ldrTextureFaces;
         private Texture2D _cmLeft;
         private Texture2D _cmRight;
@@ -204,8 +205,8 @@ namespace WillDxSharpGltf
             SetupCamera();
 
             msg =
-           " cube size " + _textureCubeMap.Size +
-           " \n mip Level: " + TestValue1 + "  /  " + _textureCubeMap.LevelCount +
+           " cube size " + _textureCubeMapSpecular.Size +
+           " \n mip Level: " + TestValue1 + "  /  " + _textureCubeMapSpecular.LevelCount +
            " \n mip CallType: texCubeLod ";
         }
 
@@ -225,8 +226,8 @@ namespace WillDxSharpGltf
             // This creates a new equaRectangularMap.
             //_generatedTexture = CubeMapHelper.GetEquaRectangularMapFromSixImageFaces(GraphicsDevice, 800, 400, _cmLeft, _cmBottom, _cmBack, _cmRight, _cmTop, _cmFront);
             _generatedTexture = CubeMapHelper.GetEquaRectangularMapFromSixImageFaces(GraphicsDevice, 2048, 1024, _cmLeft, _cmBottom, _cmBack, _cmRight, _cmTop, _cmFront);
-            //_textureCubeMap = CubeMapHelper.SetIndividualFacesToCubeMap(GraphicsDevice, 256, _textureCubeMap, _cmLeft, _cmBottom, _cmBack, _cmRight, _cmTop, _cmFront);
-            //_textureCubeMap = CubeMapHelper.SetIndividualFacesToCubeMap(GraphicsDevice, 2048, _textureCubeMap, _cmLeft, _cmBottom, _cmBack, _cmRight, _cmTop, _cmFront);
+            //_textureCubeMapSpecular = CubeMapHelper.SetIndividualFacesToCubeMap(GraphicsDevice, 256, _textureCubeMap, _cmLeft, _cmBottom, _cmBack, _cmRight, _cmTop, _cmFront);
+            //_textureCubeMapSpecular = CubeMapHelper.SetIndividualFacesToCubeMap(GraphicsDevice, 2048, _textureCubeMap, _cmLeft, _cmBottom, _cmBack, _cmRight, _cmTop, _cmFront);
 
             _premadeLut = Content.Load<Texture2D>("ibl_brdf_lut"); // need to probably generate this instead of just loading a premade one.
             _ldrTexture = Content.Load<Texture2D>("ibl_ldr_generatedWater");
@@ -235,11 +236,13 @@ namespace WillDxSharpGltf
             //_ldrTexture = Content.Load<Texture2D>("ibl_ldr_radiance");
 
             _ldrTextureFaces = CubeMapHelper.GetMapFacesTextureArrayFromEquaRectangularMap(GraphicsDevice, _ldrTexture, 256); // this is sphereical map to a texture array.
-            //_textureCubeMap = CubeMapHelper.GetCubeMapFromEquaRectangularMap(GraphicsDevice, _ldrTexture, 256);
-            _textureCubeMap = CubeMapHelper.GetCubeMapFromEquaRectangularMap(GraphicsDevice, _ldrTexture, 2048);
+            //_textureCubeMapSpecular = CubeMapHelper.GetCubeMapFromEquaRectangularMap(GraphicsDevice, _ldrTexture, 256);
+            //_textureCubeMapSpecular = CubeMapHelper.GetCubeMapFromEquaRectangularMap(GraphicsDevice, _ldrTexture, 2048);
+
+            CubeMapHelper.GetCubeMapsPreFilteredDiffuseAndSpecularFromEquaRectangularMap(GraphicsDevice, _ldrTexture, 2048, out _textureCubeMapDiffuse, out _textureCubeMapSpecular);
 
             // need to generate the irradiance maps and mips and all that also.
-            _LightsAndFog.SetEnviromentalCubeMap(_textureCubeMap);
+            _LightsAndFog.SetEnviromentalCubeMap(_textureCubeMapSpecular);
             _LightsAndFog.SetEnviromentalLUTMap(_premadeLut);
 
             // save the created spherical map to disk.
@@ -253,7 +256,7 @@ namespace WillDxSharpGltf
             sky = new SpherePNTT(true, false, false, 10, 1000f, true, false);  // since i ussally map this using a left cross texture, i need the extra flip normal option on this time.
             cube = new SpherePNTT(false, false, false, 2, 1f);
             cube2 = new SpherePNTT(false, false, false, 5, 2f);
-            primitivesEffect.Parameters["CubeMap"].SetValue(_textureCubeMap);
+            primitivesEffect.Parameters["CubeMap"].SetValue(_textureCubeMapSpecular);
         }
 
         public void LoadIndivdualFaces()
@@ -539,12 +542,12 @@ namespace WillDxSharpGltf
         public void UpdateTestingUiShaderVariables(GameTime gameTime)
         {
                 TestValue1++;
-                if (TestValue1 > _textureCubeMap.LevelCount)
+                if (TestValue1 > _textureCubeMapSpecular.LevelCount)
                     TestValue1 = 0;
 
                 msg =
-                    " cube size " + _textureCubeMap.Size +
-                    " \n mip Level: " + TestValue1 + "  /  " + _textureCubeMap.LevelCount +
+                    " cube size " + _textureCubeMapSpecular.Size +
+                    " \n mip Level: " + TestValue1 + "  /  " + _textureCubeMapSpecular.LevelCount +
                     " \n mip CallType: texCubeLod ";
         }
 
@@ -628,11 +631,13 @@ namespace WillDxSharpGltf
             primitivesEffect.Parameters["testValue1"].SetValue((int)TestValue1);
 
             primitivesEffect.Parameters["World"].SetValue(Matrix.Identity);
-            sky.Draw(GraphicsDevice, primitivesEffect, _textureCubeMap);
+            sky.Draw(GraphicsDevice, primitivesEffect, _textureCubeMapSpecular);
 
-            //primitivesEffect.Parameters["World"].SetValue(Matrix.Identity);
-            //cube.Draw(GraphicsDevice, primitivesEffect, _textureCubeMap);
-            //cube2.Draw(GraphicsDevice, primitivesEffect, _textureCubeMap);
+            primitivesEffect.Parameters["World"].SetValue(Matrix.Identity);
+            cube.Draw(GraphicsDevice, primitivesEffect, _textureCubeMapSpecular);
+
+            primitivesEffect.Parameters["World"].SetValue(Matrix.CreateWorld(new Vector3(10,10,0), Vector3.Forward, Vector3.Up) );
+            cube2.Draw(GraphicsDevice, primitivesEffect, _textureCubeMapDiffuse);
 
             //primitivesEffect.Parameters["testValue2"].SetValue((int)TestValue2);
             //effect.Parameters["TextureA"].SetValue(front);
