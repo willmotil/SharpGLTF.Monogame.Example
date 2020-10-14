@@ -7,6 +7,33 @@ using Microsoft.Xna.Framework.Input;
 namespace WillDxSharpGltf
 {
 
+    /*
+    Implemented...
+    load the hdr map and gpu render capture it to a enviromental cubemap.
+
+
+     TODO 
+    Verify the enviroment is correctly set to the cubemap thru the rendertarget cube.  
+    (For this i need a new primitive cube or to redo the old one just for this but id rather just have something simple for now id be nice to upgrade my old class but not right now).
+    Depending on if i can create variable sized mip levels (doubtful).
+    Create the whole thing either at once or step wise to a single rendertarget cube 
+    
+    otherwise do them seperately (this will probably be necesssary).
+    
+    (The below is the hard part it will also require i get the hammersly formula and a couple others, working on the shader and i may need the alternate non bit math version of which will probably need to be reworked).
+    Create and set the mip levels to a Specular  pre-filter roughness reflection map.
+    Create and set the mip levels to a Diffuse pre-filter global illumination map.
+    
+    The Lut To be honest ill need to do more research on the lut i really can't see much need for it as far as i can tell its a lot extra for little gain and its hacky but i need to read a bit more on it.
+    Need to modify the shaders to handle the linear srgb conversion and tone mapping.
+    Need to then test it against the primitive cube and add in the add hock material data to a appy basic texture to ensure the gltf algorithm looks right as the backface or lighting on the current shader is hosed.
+    Once im fairly confident i have them lined up then i need to go into the pbr shader add this stuff and then find that bug.
+    (might be better to just test a good chunk of this against a primitive once i get this far)
+    Then i need to add the extra optional stuff which i can probably just do as i go as its pretty trivial and most of it just option stuff that can go in the enviromental class or a helper.
+    Ill need a aligned view matrix to the current facing though for dynamic captures that's pretty trivial, though im not 100% these algorithms are properly aligned so that could be a bit tricky.
+    arrrggg lots of stuff but a pbr shader is basically crippled without enviromental lighting.
+     */
+
     /// <summary>
     /// This is the main type for your game.
     /// </summary>
@@ -33,6 +60,9 @@ namespace WillDxSharpGltf
 
         private Texture2D _texture;
         private Texture2D _generatedTexture;
+
+        RenderTargetCube renderTargetCubeEnviroment;
+        TextureCube textureCubeEnviroment;
 
         DemoCamera _camera;
         bool _useDemoWaypoints = true;
@@ -69,6 +99,8 @@ namespace WillDxSharpGltf
             _texture = Content.Load<Texture2D>("hdr_01");
             Console.WriteLine($" hdri info  \n Format {_texture.Format} \n Bounds {_texture.Bounds}");
 
+            renderTargetCubeEnviroment = new RenderTargetCube(GraphicsDevice, 256, true, SurfaceFormat.Vector4, DepthFormat.None);
+
             _LightsAndFog = new PBREnvironment();
 
             _mts.LoadStandardTestingModels(GraphicsDevice);
@@ -76,6 +108,8 @@ namespace WillDxSharpGltf
             LoadPrimitives();
 
             SetupCamera();
+
+            CreateEnviromentalCubeMap();
         }
 
         #endregion
@@ -96,6 +130,9 @@ namespace WillDxSharpGltf
             if (Keyboard.GetState().IsKeyDown(Keys.D4) && Pause(gameTime))
                 wireframe = !wireframe;
 
+            if (Keyboard.GetState().IsKeyDown(Keys.D5) && Pause(gameTime))
+                CreateEnviromentalCubeMap();
+
             // test mip maps press the 1 key.
             if (Keyboard.GetState().IsKeyDown(Keys.D1) && Pause(gameTime))
                 UpdateTestingUiShaderVariables(gameTime);
@@ -105,6 +142,11 @@ namespace WillDxSharpGltf
             _mts.UpdateModels(gameTime);
 
             base.Update(gameTime);
+        }
+
+        public void CreateEnviromentalCubeMap()
+        {
+            RenderToSceneFaces(_hdrIblEffect, renderTargetCubeEnviroment);
         }
 
         protected override void Draw(GameTime gameTime)
@@ -129,6 +171,53 @@ namespace WillDxSharpGltf
             base.Draw(gameTime);
         }
 
+        void RenderToSceneFaces(Effect effect, RenderTargetCube renderTargetCube)
+        {
+            GraphicsDevice.RasterizerState = RasterizerState.CullNone;
+
+            for (int i = 0; i < 6; i++) 
+            {
+                switch (i)
+                {
+                    case 2: // FACE_BACK:
+                        GraphicsDevice.SetRenderTarget(renderTargetCube, CubeMapFace.NegativeX);
+                        break;
+                    case 4: //FACE_TOP:
+                        GraphicsDevice.SetRenderTarget(renderTargetCube, CubeMapFace.NegativeY);
+                        break;
+                    case 0: //FACE_LEFT:
+                        GraphicsDevice.SetRenderTarget(renderTargetCube, CubeMapFace.NegativeZ);
+                        break;
+                    case 5: //FACE_FRONT:
+                        GraphicsDevice.SetRenderTarget(renderTargetCube, CubeMapFace.PositiveX);
+                        break;
+                    case 1: //FACE_BOTTOM:
+                        GraphicsDevice.SetRenderTarget(renderTargetCube, CubeMapFace.PositiveY);
+                        break;
+                    case 3: //FACE_RIGHT:
+                        GraphicsDevice.SetRenderTarget(renderTargetCube, CubeMapFace.PositiveZ);
+                        break;
+                    default:
+                        GraphicsDevice.SetRenderTarget(renderTargetCube, CubeMapFace.NegativeX);
+                        break;
+                }
+                // render screenquad to face.
+                _hdrIblEffect.Parameters["Texture"].SetValue(_texture);
+                _hdrIblEffect.Parameters["FaceToMap"].SetValue(i);
+                foreach (EffectPass pass in effect.CurrentTechnique.Passes)
+                {
+                    pass.Apply();
+                    this.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleList, screenQuad, 0, 2);
+                }
+            }
+            textureCubeEnviroment = (TextureCube)renderTargetCube;
+
+            GraphicsDevice.SetRenderTarget(null);
+
+            Console.WriteLine($" Rendered to scene.  textureCubeEnviroment.Format {textureCubeEnviroment.Format}  textureCubeEnviroment.LevelCount {textureCubeEnviroment.LevelCount}" );
+        }
+
+        // K now i need a new primitive cube to verify that the env is set up right.
         protected void DrawPrimitives(GameTime gameTime)
         {
             var projectionMatrix = Matrix.CreatePerspectiveFieldOfView(90 * (float)((3.14159265358f) / 180f), GraphicsDevice.Viewport.Width / GraphicsDevice.Viewport.Height, 0.01f, 1000f);
@@ -137,49 +226,7 @@ namespace WillDxSharpGltf
             //primitivesEffect.Parameters["Projection"].SetValue(projectionMatrix);
             //primitivesEffect.Parameters["testValue1"].SetValue((int)TestValue1);
             //primitivesEffect.Parameters["World"].SetValue(Matrix.Identity);
-
-            //hdrIblEffect
-
         }
-
-        public void RenderScreenQuad(Effect effect)
-        {
-            foreach (EffectPass pass in effect.CurrentTechnique.Passes)
-            {
-                pass.Apply();
-                this.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleList, screenQuad, 0, 2);
-            }
-        }
-
-        void ReflectionRenderToSceneFaces(Vector3 reflectionCameraPosition, RenderTargetCube renderTargetReflectionCube)
-        {
-            Matrix view = new Matrix();
-            GraphicsDevice.SetRenderTarget(renderTargetReflectionCube, CubeMapFace.NegativeX);
-            view = CubeMapHelper.CreateAndSetCubeFaceView(reflectionCameraPosition, Vector3.Left, Vector3.Up);
-            // ReflectionRenderScene();
-
-            GraphicsDevice.SetRenderTarget(renderTargetReflectionCube, CubeMapFace.NegativeY);
-            view = CubeMapHelper.CreateAndSetCubeFaceView(reflectionCameraPosition, Vector3.Down, Vector3.Backward);
-            // ReflectionRenderScene();
-
-            GraphicsDevice.SetRenderTarget(renderTargetReflectionCube, CubeMapFace.NegativeZ);
-            view = CubeMapHelper.CreateAndSetCubeFaceView(reflectionCameraPosition, Vector3.Forward, Vector3.Up);
-            // ReflectionRenderScene();
-
-            GraphicsDevice.SetRenderTarget(renderTargetReflectionCube, CubeMapFace.PositiveX);
-            view = CubeMapHelper.CreateAndSetCubeFaceView(reflectionCameraPosition, Vector3.Right, Vector3.Up);
-            //  ReflectionRenderScene();
-
-            GraphicsDevice.SetRenderTarget(renderTargetReflectionCube, CubeMapFace.PositiveY);
-            view = CubeMapHelper.CreateAndSetCubeFaceView(reflectionCameraPosition, Vector3.Up, Vector3.Forward);
-            // ReflectionRenderScene();
-
-            GraphicsDevice.SetRenderTarget(renderTargetReflectionCube, CubeMapFace.PositiveZ);
-            view = CubeMapHelper.CreateAndSetCubeFaceView(reflectionCameraPosition, Vector3.Backward, Vector3.Up);
-            // ReflectionRenderScene();
-        }
-
-
 
 
 
@@ -260,7 +307,7 @@ namespace WillDxSharpGltf
 
         public void LoadPrimitives()
         {
-            CreateScreenQuad(GraphicsDevice.Viewport.Bounds);
+            CreateScreenQuad();
         }
 
         public void SetupCamera()
@@ -273,29 +320,30 @@ namespace WillDxSharpGltf
             _camera.SetWayPoints(_mts._wayPoints, true, 200);
         }
 
-        public void CreateScreenQuad(Rectangle ViewBounds)
+        public void CreateScreenQuad()
         {
+            var r = new Rectangle(-1, -1, 2, 2);
             screenQuad = new VertexPositionTexture[6];
             //
             if (GraphicsDevice.RasterizerState == RasterizerState.CullClockwise)
             {
-                screenQuad[0] = new VertexPositionTexture(new Vector3(ViewBounds.Left, ViewBounds.Top, 0f), new Vector2(0f, 0f));  // p1
-                screenQuad[1] = new VertexPositionTexture(new Vector3(ViewBounds.Left, ViewBounds.Bottom, 0f), new Vector2(0f, 1f)); // p0
-                screenQuad[2] = new VertexPositionTexture(new Vector3(ViewBounds.Right, ViewBounds.Bottom, 0f), new Vector2(1f, 1f));// p3
+                screenQuad[0] = new VertexPositionTexture(new Vector3(r.Left, r.Top, 0f), new Vector2(0f, 0f));  // p1
+                screenQuad[1] = new VertexPositionTexture(new Vector3(r.Left, r.Bottom, 0f), new Vector2(0f, 1f)); // p0
+                screenQuad[2] = new VertexPositionTexture(new Vector3(r.Right, r.Bottom, 0f), new Vector2(1f, 1f));// p3
 
-                screenQuad[3] = new VertexPositionTexture(new Vector3(ViewBounds.Right, ViewBounds.Bottom, 0f), new Vector2(1f, 1f));// p3
-                screenQuad[4] = new VertexPositionTexture(new Vector3(ViewBounds.Right, ViewBounds.Top, 0f), new Vector2(1f, 0f));// p2
-                screenQuad[5] = new VertexPositionTexture(new Vector3(ViewBounds.Left, ViewBounds.Top, 0f), new Vector2(0f, 0f)); // p1
+                screenQuad[3] = new VertexPositionTexture(new Vector3(r.Right, r.Bottom, 0f), new Vector2(1f, 1f));// p3
+                screenQuad[4] = new VertexPositionTexture(new Vector3(r.Right, r.Top, 0f), new Vector2(1f, 0f));// p2
+                screenQuad[5] = new VertexPositionTexture(new Vector3(r.Left, r.Top, 0f), new Vector2(0f, 0f)); // p1
             }
             else
             {
-                screenQuad[0] = new VertexPositionTexture(new Vector3(ViewBounds.Left, ViewBounds.Top, 0f), new Vector2(0f, 0f));  // p1
-                screenQuad[2] = new VertexPositionTexture(new Vector3(ViewBounds.Left, ViewBounds.Bottom, 0f), new Vector2(0f, 1f)); // p0
-                screenQuad[1] = new VertexPositionTexture(new Vector3(ViewBounds.Right, ViewBounds.Bottom, 0f), new Vector2(1f, 1f));// p3
+                screenQuad[0] = new VertexPositionTexture(new Vector3(r.Left, r.Top, 0f), new Vector2(0f, 0f));  // p1
+                screenQuad[2] = new VertexPositionTexture(new Vector3(r.Left, r.Bottom, 0f), new Vector2(0f, 1f)); // p0
+                screenQuad[1] = new VertexPositionTexture(new Vector3(r.Right, r.Bottom, 0f), new Vector2(1f, 1f));// p3
 
-                screenQuad[4] = new VertexPositionTexture(new Vector3(ViewBounds.Right, ViewBounds.Bottom, 0f), new Vector2(1f, 1f));// p3
-                screenQuad[3] = new VertexPositionTexture(new Vector3(ViewBounds.Right, ViewBounds.Top, 0f), new Vector2(1f, 0f));// p2
-                screenQuad[5] = new VertexPositionTexture(new Vector3(ViewBounds.Left, ViewBounds.Top, 0f), new Vector2(0f, 0f)); // p1
+                screenQuad[4] = new VertexPositionTexture(new Vector3(r.Right, r.Bottom, 0f), new Vector2(1f, 1f));// p3
+                screenQuad[3] = new VertexPositionTexture(new Vector3(r.Right, r.Top, 0f), new Vector2(1f, 0f));// p2
+                screenQuad[5] = new VertexPositionTexture(new Vector3(r.Left, r.Top, 0f), new Vector2(0f, 0f)); // p1
             }
         }
 
