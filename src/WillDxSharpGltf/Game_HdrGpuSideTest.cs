@@ -87,14 +87,8 @@ namespace WillDxSharpGltf
                 Exit();
             }
 
-            _mts.UpdateModels(gameTime);
-
-            if (Keyboard.GetState().IsKeyDown(Keys.Space))
-                _useDemoWaypoints = false;
-            if (Keyboard.GetState().IsKeyDown(Keys.Tab))
-                _useDemoWaypoints = true;
-
-            _camera.Update(ModelTestSuiteExecution._testTarget, _useDemoWaypoints, gameTime);
+            if (Keyboard.GetState().IsKeyDown(Keys.Space) && Pause(gameTime))
+                _useDemoWaypoints = ! _useDemoWaypoints;
 
             if (Keyboard.GetState().IsKeyDown(Keys.D3) && Pause(gameTime))
                 _camera.TransformCamera(new Vector3(0, 0, 0), _camera.Forward, Vector3.Up);
@@ -106,14 +100,11 @@ namespace WillDxSharpGltf
             if (Keyboard.GetState().IsKeyDown(Keys.D1) && Pause(gameTime))
                 UpdateTestingUiShaderVariables(gameTime);
 
-            base.Update(gameTime);
-        }
+            _camera.Update(ModelTestSuiteExecution._testTarget, _useDemoWaypoints, gameTime);
 
-        public void UpdateTestingUiShaderVariables(GameTime gameTime)
-        {
-            //TestValue1++;
-            //if (TestValue1 > _textureCubeMapSpecular.LevelCount)
-            //    TestValue1 = 0;
+            _mts.UpdateModels(gameTime);
+
+            base.Update(gameTime);
         }
 
         protected override void Draw(GameTime gameTime)
@@ -199,7 +190,7 @@ namespace WillDxSharpGltf
         //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         // .
-        // . Move all this crap out of the way, this stuff isn't going to change much for this test.
+        // . Move all this junk out of the way so i can see what im doing, this stuff isn't going to change much for this test.
         // .
         // .
         // .
@@ -211,13 +202,18 @@ namespace WillDxSharpGltf
 
 
 
-
+        public void UpdateTestingUiShaderVariables(GameTime gameTime)
+        {
+            //TestValue1++;
+            //if (TestValue1 > _textureCubeMapSpecular.LevelCount)
+            //    TestValue1 = 0;
+        }
 
         public void DrawSpriteBatches(GameTime gameTime)
         {
             _spriteBatch.Begin();
 
-            _spriteBatch.Draw(_texture, new Rectangle(0, 0, 300, 300), Color.White);
+            _spriteBatch.Draw(_texture, new Rectangle(0, 0, 200, 100), Color.White);
 
             _camera.DrawCurveThruWayPointsWithSpriteBatch(2f, new Vector3(300, 100, 100), 1, gameTime);
 
