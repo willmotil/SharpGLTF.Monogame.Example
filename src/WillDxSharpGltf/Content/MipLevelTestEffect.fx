@@ -53,11 +53,11 @@ VertexShaderOutput MainVS(in VertexShaderInput input)
 {
     VertexShaderOutput output;
     float4 pos = mul(input.Position, World);
-    output.TexureCoordinate = input.TexureCoordinate;
     output.Position3D = pos.xyz;
-    output.Normal3D = normalize(mul(input.Normal, World));
+    output.Normal3D = mul(input.Normal, World);
     float4x4 vp = mul(View, Projection);
     output.Position = mul(pos, vp);
+    output.TexureCoordinate = input.TexureCoordinate;
     return output;
 }
 
@@ -68,9 +68,10 @@ float4 MainPS(VertexShaderOutput input) : COLOR
     float3 P = input.Position3D;
     float3 N = normalize(input.Normal3D.xyz);
     float3 V = normalize(CameraPosition - input.Position3D);
-    float NdotV = max(0.0, dot(N, V));
+    /*float NdotV = max(0.0, dot(N, V));
     float3 R = 2.0 * NdotV * N - V; 
-    float4 envMapColor = texCUBElod(CubeMapSampler, float4(R, testValue1));
+    float4 envMapColor = texCUBElod(CubeMapSampler, float4(R, testValue1));*/
+    float4 envMapColor = texCUBElod(CubeMapSampler, float4(N, testValue1));
     return float4(envMapColor.rgb, 1.0f);
 }
 

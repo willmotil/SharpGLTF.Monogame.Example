@@ -4,335 +4,6 @@ using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework
 {
-    //// Todo.       
-    //// I should later fix this up later to just take a set of waypoints and allow for the camera to generate a new uniformed set from them. 
-    //// To allow for the motion to be proportioned smoothly, that may not always be desired though.
-
-    //public class DemoCamera
-    //{
-    //    Vector3 _lookAt = Vector3.One;
-    //    Vector3 _camPos = Vector3.Zero;
-    //    Vector3 _forward = Vector3.Zero;
-    //    Vector3 _lastForward = Vector3.Zero;
-    //    Vector3 _camUp = Vector3.Zero;
-    //    Matrix _camera = Matrix.Identity;
-    //    float _near = 1f;
-    //    float _far = 1000f;
-    //    float inv = 1f;
-    //    Matrix _projection = Matrix.Identity;
-    //    float _durationElapsed = 0f;
-    //    float _durationInSeconds = 1f;
-
-    //    public Vector3[] wayPointReference;
-
-    //    public Matrix World { get { return _camera; } }
-    //    public Vector3 Position { get { return _camera.Translation; } }
-    //    public Vector3 Forward { get { return _camera.Forward; } }
-    //    public Vector3 Up { get { return _camera.Up; } }
-    //    public Vector3 Right { get { return _camera.Right; } }
-    //    public float WayPointCycleDurationInTotalSeconds { get { return _durationInSeconds; } set { _durationInSeconds = value; } }
-    //    public float LookAtSpeedPerSecond { get; set; } = 1f;
-    //    public float MovementSpeedPerSecond { get; set; } = 1f;
-
-    //    /// <summary>
-    //    /// This is a cinematic styled fixed camera it uses way points to traverse thru the world.
-    //    /// </summary>
-    //    public DemoCamera(GraphicsDevice device, Vector3 pos, Vector3 target, Vector3 up, float nearClipPlane, float farClipPlane, float fieldOfView, bool perspective, bool inverseProjection)
-    //    {
-    //        TransformCamera(pos, target, up);
-    //        SetProjection(device, nearClipPlane, farClipPlane, fieldOfView, perspective, inverseProjection);
-    //    }
-
-    //    /// <summary>
-    //    /// If waypoints are present then and automatedCameraMotion is set to true the cinematic camera will execute.
-    //    /// </summary>
-    //    public void Update(Vector3 targetPosition, bool automatedCameraMotion, GameTime gameTime)
-    //    {
-    //        if (automatedCameraMotion && wayPointReference != null)
-    //            CurveThruWayPoints(targetPosition, wayPointReference, gameTime);
-    //        else
-    //            UpdateCameraUsingDefaultKeyboardCommands(gameTime);
-    //    }
-
-    //    public void TransformCamera(Vector3 pos, Vector3 target, Vector3 up)
-    //    {
-    //        _lookAt = target;
-    //        _camPos = pos;
-    //        _camUp = up;
-    //        _forward = _lookAt - _camPos;
-
-    //        if (_forward.X == 0 && _forward.Y == 0 && _forward.Z == 0)
-    //            _forward = _lastForward;
-    //        else
-    //            _lastForward = _forward;
-
-    //        // TODO handle up down vector gimble lock astetic under fixed camera.
-    //        // ...
-
-    //        // ...
-
-    //        _camera = Matrix.CreateWorld(_camPos, _forward, _camUp);
-    //    }
-
-    //    public void SetProjection(GraphicsDevice device, float nearClipPlane, float farClipPlane, float fieldOfView, bool perspective, bool inverseProjection)
-    //    {
-    //        _near = nearClipPlane;
-    //        _far = farClipPlane;
-
-    //        // Allows a change to a spritebatch style orthagraphic or inverse styled persepective, e.g. a viewer imagining a forward z positive depth going into the screen.
-    //        inv = 1f;
-    //        if (inverseProjection)
-    //            inv *= -1f;
-
-    //        if (perspective)
-    //            _projection = Matrix.CreatePerspectiveFieldOfView(fieldOfView, device.Viewport.AspectRatio, _near, inv * _far);
-    //        else
-    //            _projection = Matrix.CreateOrthographicOffCenter(0, device.Viewport.Width, device.Viewport.Height, 0, _near, inv * _far);
-    //    }
-
-    //    public void UpdateCameraUsingDefaultKeyboardCommands(GameTime gameTime)
-    //    {
-    //        var elapsed = (float)gameTime.ElapsedGameTime.TotalSeconds;
-
-    //        // look
-    //        if (Keyboard.GetState().IsKeyDown(Keys.A))
-    //            LookLeftLocally(LookAtSpeedPerSecond * elapsed);
-    //        if (Keyboard.GetState().IsKeyDown(Keys.D))
-    //            LookRightLocally(LookAtSpeedPerSecond * elapsed);
-
-    //        if (Keyboard.GetState().IsKeyDown(Keys.W))
-    //            LookUpLocally(LookAtSpeedPerSecond * elapsed);
-    //        if (Keyboard.GetState().IsKeyDown(Keys.S))
-    //            LookDownLocally(LookAtSpeedPerSecond * elapsed);
-
-    //        // move
-    //        if (Keyboard.GetState().IsKeyDown(Keys.E))
-    //            MoveForwardLocally(MovementSpeedPerSecond * elapsed);
-    //        if (Keyboard.GetState().IsKeyDown(Keys.Q))
-    //            MoveBackLocally(MovementSpeedPerSecond * elapsed);
-
-    //        if (Keyboard.GetState().IsKeyDown(Keys.Up))
-    //            MoveUpLocally(MovementSpeedPerSecond * elapsed);
-    //        if (Keyboard.GetState().IsKeyDown(Keys.Down))
-    //            MoveDownLocally(MovementSpeedPerSecond * elapsed);
-    //        if (Keyboard.GetState().IsKeyDown(Keys.Left))
-    //            MoveLeftLocally(MovementSpeedPerSecond * elapsed);
-    //        if (Keyboard.GetState().IsKeyDown(Keys.Right))
-    //            MoveRightLocally(MovementSpeedPerSecond * elapsed);
-
-    //        // roll
-    //        if (Keyboard.GetState().IsKeyDown(Keys.C))
-    //            RollClockwise(MovementSpeedPerSecond * elapsed);
-    //        if (Keyboard.GetState().IsKeyDown(Keys.Z))
-    //            RollCounterClockwise(MovementSpeedPerSecond * elapsed);
-
-    //        // transform
-    //        TransformCamera(_camera.Translation, _camera.Forward + _camera.Translation, _camera.Up);
-    //    }
-
-    //    /// <summary>
-    //    /// Moves the camera thru paths in straight lines from point to point.
-    //    /// </summary>
-    //    public void InterpolateThruWayPoints(Vector3 targetPosition, Vector3[] waypoints, bool useSmoothStep, GameTime gameTime)
-    //    {
-    //        _durationElapsed += (float)gameTime.ElapsedGameTime.TotalSeconds;
-    //        if (_durationElapsed >= WayPointCycleDurationInTotalSeconds)
-    //            _durationElapsed -= WayPointCycleDurationInTotalSeconds;
-
-    //        var interpolation = _durationElapsed / WayPointCycleDurationInTotalSeconds;
-    //        float coeff = 1f / (float)waypoints.Length;
-    //        int index = (int)(interpolation / coeff);
-    //        int index2 = index + 1;
-    //        if (index2 >= waypoints.Length)
-    //        {
-    //            index2 = 0;
-    //        }
-    //        float adjustedInterpolator = (interpolation - (coeff * index)) / coeff;
-    //        if (useSmoothStep)
-    //            TransformCamera(Vector3.SmoothStep(waypoints[index], waypoints[index2], adjustedInterpolator), targetPosition, _camUp);
-    //        else
-    //            TransformCamera(Vector3.Lerp(waypoints[index], waypoints[index2], adjustedInterpolator), targetPosition, _camUp);
-    //    }
-
-    //    /// <summary>
-    //    /// Uses a second degree polynominal to curve thru a abitrary number of control points that serve as splines.
-    //    /// This is a bit cheaper then anything really deep.
-    //    /// </summary>
-    //    public void CurveThruWayPoints(Vector3 targetPosition, Vector3[] waypoints, GameTime gameTime)
-    //    {
-    //        _durationElapsed += (float)gameTime.ElapsedGameTime.TotalSeconds;
-    //        if (_durationElapsed >= WayPointCycleDurationInTotalSeconds)
-    //            _durationElapsed -= WayPointCycleDurationInTotalSeconds;
-
-    //        var interpolation = _durationElapsed / WayPointCycleDurationInTotalSeconds;
-    //        float coeff = 1f / (float)waypoints.Length;
-    //        int index1 = (int)(interpolation / coeff);
-    //        int index2 = index1 + 1;
-    //        int index3 = index2 + 1;
-    //        int index0 = index1 - 1;
-    //        if (index3 >= waypoints.Length)
-    //            index3 = 0;
-    //        if (index2 >= waypoints.Length)
-    //        {
-    //            index2 = 0;
-    //            index3 = 1;
-    //        }
-    //        if (index0 < 0)
-    //            index0 = waypoints.Length - 1;
-
-    //        float adjustedInterpolator1to2 = ((interpolation - (coeff * index1)) / coeff);
-
-    //        var v0 = waypoints[index0];
-    //        var v1 = waypoints[index1];
-    //        var v2 = waypoints[index2];
-    //        var v3 = waypoints[index3];
-
-    //        var n1 = (v1 - (v0 + v2) * .5f) + v1;
-    //        var n2 = (v2 - (v1 + v3) * .5f) + v2;
-    //        var c = (n1 + n2) * .5f;
-
-    //        var p = PolynominalSecondDegreeCurve(v1, c, v2, adjustedInterpolator1to2);
-
-    //        TransformCamera(p, targetPosition, _camUp);
-    //    }
-
-    //    /// <summary>
-    //    /// Made this one up may not be textbook but it works. 
-    //    /// </summary>
-    //    private Vector3 PolynominalSecondDegreeCurve(Vector3 A, Vector3 B, Vector3 C, float t)
-    //    {
-    //        float i = 1.0f - t;
-    //        var t0 = i * i *1f;
-    //        var t1 = i * t *2f;
-    //        var t2 = t * t *1f;
-    //        return new Vector3
-    //            (
-    //            (float)(A.X * t0 + B.X * t1 + C.X * t2), 
-    //            (float)(A.Y * t0 + B.Y * t1 + C.Y * t2), 
-    //            (float)(A.Z * t0 + B.Z * t1 + C.Z * t2)
-    //            );
-    //    }
-
-    //    /// <summary>
-    //    /// Set the weight to 1 for the standard expected behavior of a second degree polynominal curve.
-    //    /// Set the weight to 2 to have the curve intersect the B vector.
-    //    /// </summary>
-    //    private Vector3 PolynominalWeightedSecondDegreeCurve(Vector3 A, Vector3 B, Vector3 C, float t, float weight)
-    //    {
-    //        Vector3 b = (A + C) * .5f;
-    //        B = (B - b) * weight + b;
-    //        float i = 1.0f - t;
-    //        var t0 = i * i * 1f;
-    //        var t1 = i * t * 2f;
-    //        var t2 = t * t * 1f;
-    //        return new Vector3
-    //            (
-    //            (float)(A.X * t0 + B.X * t1 + C.X * t2),
-    //            (float)(A.Y * t0 + B.Y * t1 + C.Y * t2),
-    //            (float)(A.Z * t0 + B.Z * t1 + C.Z * t2)
-    //            );
-    //    }
-
-    //    public void MoveForwardLocally(float amount)
-    //    {
-    //        _camera.Translation += _camera.Forward * amount;
-    //    }
-    //    public void MoveBackLocally(float amount)
-    //    {
-    //        _camera.Translation += _camera.Backward * amount;
-    //    }
-    //    public void MoveLeftLocally(float amount)
-    //    {
-    //        _camera.Translation += _camera.Left * amount;
-    //    }
-    //    public void MoveRightLocally(float amount)
-    //    {
-    //        _camera.Translation += _camera.Right * amount;
-    //    }
-    //    public void MoveUpLocally(float amount)
-    //    {
-    //        _camera.Translation += _camera.Up * amount;
-    //    }
-    //    public void MoveDownLocally(float amount)
-    //    {
-    //        _camera.Translation += _camera.Down * amount;
-    //    }
-
-    //    public void LookLeftLocally(float amountInRadians)
-    //    {
-    //        var m = Matrix.CreateFromAxisAngle(_camera.Up, amountInRadians);
-    //        var t = _camera.Translation;
-    //        _camera *= m;
-    //        _camera.Translation = t;
-    //    }
-    //    public void LookRightLocally(float amountInRadians)
-    //    {
-    //        var m = Matrix.CreateFromAxisAngle(_camera.Up, -amountInRadians);
-    //        var t = _camera.Translation;
-    //        _camera *= m;
-    //        _camera.Translation = t;
-    //    }
-    //    public void LookUpLocally(float amountInRadians)
-    //    {
-    //        var m = Matrix.CreateFromAxisAngle(_camera.Right, amountInRadians);
-    //        var t = _camera.Translation;
-    //        _camera *= m;
-    //        _camera.Translation = t;
-    //    }
-    //    public void LookDownLocally(float amountInRadians)
-    //    {
-    //        var m = Matrix.CreateFromAxisAngle(_camera.Right, -amountInRadians);
-    //        var t = _camera.Translation;
-    //        _camera *= m;
-    //        _camera.Translation = t;
-    //    }
-
-    //    public void RollClockwise(float amountInRadians)
-    //    {
-    //        var m = Matrix.CreateFromAxisAngle(_camera.Forward, amountInRadians);
-    //        var t = _camera.Translation;
-    //        _camera *= m;
-    //        _camera.Translation = t;
-    //    }
-    //    public void RollCounterClockwise(float amountInRadians)
-    //    {
-    //        var m = Matrix.CreateFromAxisAngle(_camera.Forward, -amountInRadians);
-    //        var t = _camera.Translation;
-    //        _camera *= m;
-    //        _camera.Translation = t;
-    //    }
-
-    //    public void LookLeftSystem(float amountInRadians)
-    //    {
-    //        var m = Matrix.CreateRotationY(amountInRadians);
-    //        var t = _camera.Translation;
-    //        _camera *= m;
-    //        _camera.Translation = t;
-    //    }
-    //    public void LookRightSystem(float amountInRadians)
-    //    {
-    //        var m = Matrix.CreateRotationY(-amountInRadians);
-    //        var t = _camera.Translation;
-    //        _camera *= m;
-    //        _camera.Translation = t;
-    //    }
-    //    public void LookUpSystem(float amountInRadians)
-    //    {
-    //        var m = Matrix.CreateRotationX(amountInRadians);
-    //        var t = _camera.Translation;
-    //        _camera *= m;
-    //        _camera.Translation = t;
-    //    }
-    //    public void LookDownSystem(float amountInRadians)
-    //    {
-    //        var m = Matrix.CreateRotationX(-amountInRadians);
-    //        var t = _camera.Translation;
-    //        _camera *= m;
-    //        _camera.Translation = t;
-    //    }
-
-    //}
-
     // Todo.       
     // I should later fix this up later to just take a set of waypoints and allow for the camera to generate a new uniformed set from them. 
     // To allow for the motion to be proportioned smoothly, that may not always be desired though.
@@ -692,7 +363,6 @@ namespace Microsoft.Xna.Framework
             _camera *= m;
             _camera.Translation = t;
         }
-
     }
 
     public static class DrawHelpers
@@ -726,6 +396,7 @@ namespace Microsoft.Xna.Framework
         {
             DrawSquareBorder(r, lineThickness, c);
         }
+
         public static void DrawSquareBorder(Rectangle r, int lineThickness, Color c)
         {
             Rectangle TLtoR = new Rectangle(r.Left, r.Top, r.Width, lineThickness);
@@ -737,12 +408,24 @@ namespace Microsoft.Xna.Framework
             spriteBatch.Draw(dot, LTtoB, c);
             spriteBatch.Draw(dot, RTtoB, c);
         }
+
+        public static void DrawCrossHair(Vector2 position, float radius, Color color)
+        {
+            var left = new Vector2(-radius, 0) + position;
+            var right = new Vector2(0 + radius, 0) + position;
+            var up = new Vector2(0, 0 - radius) + position;
+            var down = new Vector2(0, radius) + position;
+            DrawHelpers.DrawBasicLine(left, right, 1, color);
+            DrawHelpers.DrawBasicLine(up, down, 1, color);
+        }
+
         public static void DrawBasicLine(Vector2 s, Vector2 e, int thickness, Color linecolor)
         {
             Rectangle screendrawrect = new Rectangle((int)s.X, (int)s.Y, thickness, (int)Vector2.Distance(e, s));
             float rot = (float)Atan2Xna(e.X - s.X, e.Y - s.Y);
             spriteBatch.Draw(dot, screendrawrect, new Rectangle(0, 0, 1, 1), linecolor, rot, Vector2.Zero, SpriteEffects.None, 0);
         }
+
         public static void DrawBasicPoint(Vector2 p, Color c)
         {
             Rectangle screendrawrect = new Rectangle((int)p.X, (int)p.Y, 2, 2);

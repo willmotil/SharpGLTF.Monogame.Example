@@ -21,6 +21,14 @@ namespace WillDxSharpGltf
         /// <summary>
         /// Set faces to cubemap by name, neg xyz,  pos  xyz.  tested passes.
         /// </summary>
+        public static TextureCube GetCubeMapFromIndividualFaces(GraphicsDevice gd, int size, TextureCube map, Texture2D[] textureList)
+        {
+            return GetCubeMapFromIndividualDirectionFaces(gd, size, map, textureList[0], textureList[1], textureList[2], textureList[3], textureList[4], textureList[5]);
+        }
+
+        /// <summary>
+        /// Set faces to cubemap by name, neg xyz,  pos  xyz.  tested passes.
+        /// </summary>
         public static TextureCube GetCubeMapFromIndividualFaces(GraphicsDevice gd, int size, TextureCube map, Texture2D textureLeft, Texture2D textureBottom, Texture2D textureBack, Texture2D textureRight, Texture2D textureTop, Texture2D textureFront)
         {
             return GetCubeMapFromIndividualDirectionFaces(gd, size, map, textureLeft, textureBottom, textureBack, textureRight, textureTop, textureFront);
@@ -106,6 +114,7 @@ namespace WillDxSharpGltf
             var cmLevelCount = cubeMapSpecular.LevelCount;
             int eqw = equaRectangularMap.Width;
             int eqh = equaRectangularMap.Height;
+            var rawFaceDataList = new List<Color[]>();
             var eqColorData = new Color[(equaRectangularMap.Width) * (equaRectangularMap.Height)];
             equaRectangularMap.GetData(0, null, eqColorData, 0, eqColorData.Length);
             // first reflection level.
@@ -128,11 +137,12 @@ namespace WillDxSharpGltf
                             var uv = CubeMapNormalTo2dEquaRectangularMapUvCoordinates(v);
                             var eqPixelIndex = (int)(uv.X * eqw) + ((int)(uv.Y * eqh) * eqw);
                             faceColorDataSpecular[facePixelIndex] = eqColorData[eqPixelIndex];
-                            // ...
+                            // ... 
                             SpecularLobeVectorChange(v, 30, .90f, faceColorDataDiffuse, facePixelIndex, eqColorData, eqw, eqh);
                         }
                     }
                     var cubeMapFace = GetFaceFromInt(faceIndex);
+                    rawFaceDataList.Add(faceColorDataSpecular); // save the data to the list.
                     cubeMapSpecular.SetData(cubeMapFace, level, null, faceColorDataSpecular, 0, faceColorDataSpecular.Length);
                     cubeMapDiffuse.SetData(cubeMapFace, level, null, faceColorDataDiffuse, 0, faceColorDataDiffuse.Length);
                 }
@@ -144,8 +154,8 @@ namespace WillDxSharpGltf
                 {
                     var adjFaceSize = faceSize >> level;
                     var faceWh = new Vector2(adjFaceSize, adjFaceSize);
-                    var faceColorData = new Color[adjFaceSize * adjFaceSize];
-
+                    var faceColorDataSpecular = new Color[adjFaceSize * adjFaceSize];
+                    var faceColorDataDiffuse = new Color[adjFaceSize * adjFaceSize];
                     Console.WriteLine($"2  level: {level}   faceIndex: {faceIndex}");
                     for (int y = 0; y < adjFaceSize; y++)
                     {
@@ -155,11 +165,13 @@ namespace WillDxSharpGltf
                             var fuv = new Vector2(x, y) / faceWh;
                             var v = UvFaceToCubeMapVector(fuv, faceIndex);
                             float roughness = level / (cmLevelCount - 1);
-                            SpecularLobeVectorChange(v, 10, level / (cmLevelCount -1), faceColorData, facePixelIndex, eqColorData, eqw, eqh);
+                            SpecularLobeVectorChange(v, 10, level / (cmLevelCount -1), faceColorDataSpecular, facePixelIndex, eqColorData, eqw, eqh);
+                            SpecularLobeVectorChange(v, 10, .90f, faceColorDataDiffuse, facePixelIndex, eqColorData, eqw, eqh);
                         }
                     }
                     var cubeMapFace = GetFaceFromInt(faceIndex);
-                    cubeMapSpecular.SetData(cubeMapFace, level, null, faceColorData, 0, faceColorData.Length);
+                    cubeMapSpecular.SetData(cubeMapFace, level, null, faceColorDataSpecular, 0, faceColorDataSpecular.Length);
+                    cubeMapDiffuse.SetData(cubeMapFace, level, null, faceColorDataDiffuse, 0, faceColorDataDiffuse.Length);
                 }
             }
             cubeMapPreFilteredSpecular = cubeMapSpecular;
@@ -320,6 +332,13 @@ namespace WillDxSharpGltf
         /// <summary>
         /// This doesn't handle mip maps it wouldn't make much sense for it to.   Mapping is correct in this one.
         /// </summary>
+        public static Texture2D GetEquaRectangularMapFromSixImageFaces(GraphicsDevice gd, int outputWidth, int outputHeight, Texture2D[] textureList)
+        {
+            return GetEquaRectangularMapFromSixImageFaces(gd, outputWidth, outputHeight, textureList[0], textureList[1], textureList[2], textureList[3], textureList[4], textureList[5]);
+        }
+        /// <summary>
+        /// This doesn't handle mip maps it wouldn't make much sense for it to.   Mapping is correct in this one.
+        /// </summary>
         public static Texture2D GetEquaRectangularMapFromSixImageFaces(GraphicsDevice gd, int outputWidth, int outputHeight, Texture2D textureLeft, Texture2D textureBottom, Texture2D textureBack, Texture2D textureRight, Texture2D textureTop, Texture2D textureFront)
         {
             Color[] mapColorData = new Color[outputWidth * outputHeight];
@@ -381,9 +400,9 @@ namespace WillDxSharpGltf
         }
 
         /// <summary>
-        /// thanks to pumkin pudding for this function.
+        /// thanks to pumkin pudding for this function.  Modifyed to flip y sign and x z cpu side.
         /// </summary>
-        private static Vector3 EquaRectangularMapUvCoordinatesTo3dCubeMapNormal(Vector2 uvCoords)
+        public static Vector3 EquaRectangularMapUvCoordinatesTo3dCubeMapNormal(Vector2 uvCoords)
         {
             float pi = 3.14159265358f;
             Vector3 v = new Vector3(0.0f, 0.0f, 0.0f);
@@ -393,22 +412,11 @@ namespace WillDxSharpGltf
             v.X = -(float)Math.Sin(uv.X) * siny;
             v.Y = (float)Math.Cos(uv.Y);
             v.Z = -(float)Math.Cos(uv.X) * siny;
+            //v = new Vector3(v.Z, -v.Y, v.X);
             return v;
         }
 
-        /// <summary>
-        /// Gets cube uv from normal.   Ok at this point im not 100% convinced this is actually aligned properly to a dx cubemap normal.
-        /// </summary>
-        private static Vector2 CubeMapNormalTo2dEquaRectangularMapUvCoordinates(Vector3 normal)
-        {
-            Vector2 INVERT_ATAN = new Vector2(0.1591f, 0.3183f);
-            Vector2 uv = new Vector2((float)Math.Atan2(normal.Z, normal.X), (float)Math.Asin(normal.Y));
-            uv *= INVERT_ATAN;
-            uv += new Vector2(0.5f, 0.5f);
-            return uv;
-        }
-
-        private static Vector2 CubeMapNormalTo2dEquaRectangularMapUvCoordinatesAlt(Vector3 a_coords)
+        public static Vector2 CubeMapNormalTo2dEquaRectangularMapUvCoordinatesAlt(Vector3 a_coords)
         {
             float PI = 3.141592653589793f;
             Vector3 a_coords_n = Vector3.Normalize(a_coords);
@@ -419,9 +427,21 @@ namespace WillDxSharpGltf
         }
 
         /// <summary>
+        /// Gets cube uv from normal.   Ok at this point im not 100% convinced this is actually aligned properly to a dx cubemap normal.
+        /// </summary>
+        public static Vector2 CubeMapNormalTo2dEquaRectangularMapUvCoordinates(Vector3 normal)
+        {
+            Vector2 INVERT_ATAN = new Vector2(0.1591f, 0.3183f);
+            Vector2 uv = new Vector2((float)Math.Atan2(normal.Z, normal.X), (float)Math.Asin(normal.Y));
+            uv *= INVERT_ATAN;
+            uv += new Vector2(0.5f, 0.5f);
+            return uv;
+        }
+
+        /// <summary>
         /// https://www.gamedev.net/forums/topic/687535-implementing-a-cube-map-lookup-function/ // oh so nice i found it i really didn't want to figure out how to write this myself.
         /// </summary>
-        private static Vector2 CubeMapVectorToUvFace(Vector3 v, out int faceIndex)
+        public static Vector2 CubeMapVectorToUvFace(Vector3 v, out int faceIndex)
         {
             Vector3 vAbs = Abs(v);
             float ma;
@@ -448,9 +468,46 @@ namespace WillDxSharpGltf
         }
 
         /// <summary>
+        /// This is the reverse of the cubemapVectorToUvFace. Modifyed to flip y sign and x z cpu side.
+        /// </summary>
+        public static Vector3 UvFaceToCubeMapVector(Vector2 uv, int faceIndex)
+        {
+            var u = uv.X * 2f - 1.0f;
+            var v = uv.Y * 2f - 1.0f;
+            Vector3 dir = new Vector3(0f, 0f, 1f);
+            switch (faceIndex)
+            {
+                case FACE_BACK: 
+                    dir = new Vector3(-1f, v, -u); 
+                    break;
+                case FACE_TOP: 
+                    dir = new Vector3(v, -1f, u); 
+                    break;
+                case FACE_LEFT: 
+                    dir = new Vector3(u, v, -1f); 
+                    break;
+                case FACE_FRONT: 
+                    dir = new Vector3(1f, v, u);
+                    break;
+                case FACE_BOTTOM:
+                    dir = new Vector3(-v, 1f, u); 
+                    break;
+                case FACE_RIGHT:
+                    dir = new Vector3(-u, v, 1f); 
+                    break;
+                default:
+                    dir = new Vector3(-1f, -1f, -1f); // na
+                    break;
+            }
+            //dir = new Vector3(dir.Z, -dir.Y, dir.X);
+            dir.Normalize();
+            return dir;
+        }
+
+        /// <summary>
         /// Gets the Cube Face enum from the corresponding integer used in a switch case.
         /// </summary>
-        private static CubeMapFace GetFaceFromInt(int face)
+        public static CubeMapFace GetFaceFromInt(int face)
         {
             CubeMapFace f;
             switch (face)
@@ -480,51 +537,7 @@ namespace WillDxSharpGltf
             return f;
         }
 
-        /// <summary>
-        /// This is the reverse of the cubemapVectorToUvFace.
-        /// </summary>
-        private static Vector3 UvFaceToCubeMapVector(Vector2 uv, int faceIndex)
-        {
-            var u = uv.X * 2f - 1.0f;
-            var v = uv.Y * 2f - 1.0f;
-            Vector3 dir = new Vector3(0f, 0f, 1f);
-            switch (faceIndex)
-            {
-                case FACE_BACK: 
-                    dir = new Vector3(-1f, v, -u); 
-                    break;
-                case FACE_TOP: 
-                    dir = new Vector3(v, -1f, u); 
-                    break;
-                case FACE_LEFT: 
-                    dir = new Vector3(u, v, -1f); 
-                    break;
-                case FACE_FRONT: 
-                    dir = new Vector3(1f, v, u);
-                    break;
-                case FACE_BOTTOM:
-                    dir = new Vector3(-v, 1f, u); 
-                    break;
-                case FACE_RIGHT:
-                    dir = new Vector3(-u, v, 1f); 
-                    break;
-                default:
-                    dir = new Vector3(-1f, -1f, -1f); // na
-                    break;
-            }
-            dir.Normalize();
-            return dir;
-        }
-
-        private static Vector3 Abs(Vector3 v)
-        {
-            if (v.X < 0) v.X = -v.X;
-            if (v.Y < 0) v.Y = -v.Y;
-            if (v.Z < 0) v.Z = -v.Z;
-            return v;
-        }
-
-        private static Vector2 UvFromTexturePixel(Texture2D texture, Vector2 pixel)
+        public static Vector2 UvFromTexturePixel(Texture2D texture, Vector2 pixel)
         {
             return pixel / new Vector2(texture.Width - 1, texture.Height - 1);
         }
@@ -532,7 +545,7 @@ namespace WillDxSharpGltf
         /// <summary>
         /// Required when obtaining a inflected position from a camera thru a plane typically used to place a camera to gain a reflection snapshot for static or dynamic water reflections.
         /// </summary>
-        private static Vector3 InflectionPositionFromPlane(Vector3 theCameraPostion, Vector3 thePlanesSurfaceNormal, Vector3 anyPositionOnThePlane)
+        public static Vector3 InflectionPositionFromPlane(Vector3 theCameraPostion, Vector3 thePlanesSurfaceNormal, Vector3 anyPositionOnThePlane)
         {
             // the dot product gives the length, when placed againsts a unit normal so any unit n * a distance is the distance to that normals plane no matter the normals direction. 
             float camToPlaneDist = Vector3.Dot(thePlanesSurfaceNormal, theCameraPostion - anyPositionOnThePlane);
@@ -622,6 +635,13 @@ namespace WillDxSharpGltf
             }
         }
 
+        private static Vector3 Abs(Vector3 v)
+        {
+            if (v.X < 0) v.X = -v.X;
+            if (v.Y < 0) v.Y = -v.Y;
+            if (v.Z < 0) v.Z = -v.Z;
+            return v;
+        }
         private static float Mod(float x, float y)
         {
             return x - y * (float)((int)(x / y));

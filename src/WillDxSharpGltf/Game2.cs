@@ -19,10 +19,15 @@ namespace WillDxSharpGltf
         SpriteFont font;
         public static Effect primitivesEffect;
 
-        SpherePNTT cube, cube2, sky;
+        SpherePNTT sky;
+        SpherePNTT cube;
+        SpherePNTT sphere2;
+
         float TestValue1 = 0;
         float TestValue2 = 1;
+        bool wireframe = false;
         string msg = "";
+        string msg2 = "";
 
         private Texture2D _texture;
         private Texture2D _generatedTexture;
@@ -222,12 +227,12 @@ namespace WillDxSharpGltf
 
         public void LoadGenerateCpuSideEnvStuff()
         {
-            LoadIndivdualFaces();
-            // This creates a new equaRectangularMap.
-            //_generatedTexture = CubeMapHelper.GetEquaRectangularMapFromSixImageFaces(GraphicsDevice, 800, 400, _cmLeft, _cmBottom, _cmBack, _cmRight, _cmTop, _cmFront);
-            _generatedTexture = CubeMapHelper.GetEquaRectangularMapFromSixImageFaces(GraphicsDevice, 2048, 1024, _cmLeft, _cmBottom, _cmBack, _cmRight, _cmTop, _cmFront);
-            //_textureCubeMapSpecular = CubeMapHelper.SetIndividualFacesToCubeMap(GraphicsDevice, 256, _textureCubeMap, _cmLeft, _cmBottom, _cmBack, _cmRight, _cmTop, _cmFront);
-            //_textureCubeMapSpecular = CubeMapHelper.SetIndividualFacesToCubeMap(GraphicsDevice, 2048, _textureCubeMap, _cmLeft, _cmBottom, _cmBack, _cmRight, _cmTop, _cmFront);
+            //LoadIndivdualFaces();
+            //// This creates a new equaRectangularMap.
+            ////_generatedTexture = CubeMapHelper.GetEquaRectangularMapFromSixImageFaces(GraphicsDevice, 800, 400, _cmLeft, _cmBottom, _cmBack, _cmRight, _cmTop, _cmFront);
+            //_generatedTexture = CubeMapHelper.GetEquaRectangularMapFromSixImageFaces(GraphicsDevice, 2048, 1024, _cmLeft, _cmBottom, _cmBack, _cmRight, _cmTop, _cmFront);
+            ////_textureCubeMapSpecular = CubeMapHelper.SetIndividualFacesToCubeMap(GraphicsDevice, 256, _textureCubeMap, _cmLeft, _cmBottom, _cmBack, _cmRight, _cmTop, _cmFront);
+            ////_textureCubeMapSpecular = CubeMapHelper.SetIndividualFacesToCubeMap(GraphicsDevice, 2048, _textureCubeMap, _cmLeft, _cmBottom, _cmBack, _cmRight, _cmTop, _cmFront);
 
             _premadeLut = Content.Load<Texture2D>("ibl_brdf_lut"); // need to probably generate this instead of just loading a premade one.
             _ldrTexture = Content.Load<Texture2D>("ibl_ldr_generatedWater");
@@ -236,26 +241,31 @@ namespace WillDxSharpGltf
             //_ldrTexture = Content.Load<Texture2D>("ibl_ldr_radiance");
 
             _ldrTextureFaces = CubeMapHelper.GetMapFacesTextureArrayFromEquaRectangularMap(GraphicsDevice, _ldrTexture, 256); // this is sphereical map to a texture array.
-            //_textureCubeMapSpecular = CubeMapHelper.GetCubeMapFromEquaRectangularMap(GraphicsDevice, _ldrTexture, 256);
-            //_textureCubeMapSpecular = CubeMapHelper.GetCubeMapFromEquaRectangularMap(GraphicsDevice, _ldrTexture, 2048);
+            _generatedTexture = CubeMapHelper.GetEquaRectangularMapFromSixImageFaces(GraphicsDevice, 2048, 2048, _ldrTextureFaces);
 
-            CubeMapHelper.GetCubeMapsPreFilteredDiffuseAndSpecularFromEquaRectangularMap(GraphicsDevice, _ldrTexture, 2048, out _textureCubeMapDiffuse, out _textureCubeMapSpecular);
+            //_textureCubeMapSpecular = CubeMapHelper.GetCubeMapFromEquaRectangularMap(GraphicsDevice, _ldrTexture, 256);
+            _textureCubeMapSpecular = CubeMapHelper.GetCubeMapFromEquaRectangularMap(GraphicsDevice, _ldrTexture, 2048);
+
+            // im going to have to make a project just to check the damn function.
+            //CubeMapHelper.GetCubeMapsPreFilteredDiffuseAndSpecularFromEquaRectangularMap(GraphicsDevice, _ldrTexture, 2048, out _textureCubeMapDiffuse, out _textureCubeMapSpecular);
 
             // need to generate the irradiance maps and mips and all that also.
             _LightsAndFog.SetEnviromentalCubeMap(_textureCubeMapSpecular);
             _LightsAndFog.SetEnviromentalLUTMap(_premadeLut);
 
             // save the created spherical map to disk.
-            CubeMapHelper.SaveTexture2D(Path.Combine(Environment.CurrentDirectory, "ibl_ldr_generatedWater.png"), _generatedTexture);
+            //CubeMapHelper.SaveTexture2D(Path.Combine(Environment.CurrentDirectory, "ibl_ldr_generatedWater.png"), _generatedTexture);
         }
 
         public void LoadPrimitives()
         {
             font = new HardCodedSpriteFont().LoadHardCodeSpriteFont(GraphicsDevice);
             primitivesEffect = Content.Load<Effect>("MipLevelTestEffect");
-            sky = new SpherePNTT(true, false, false, 10, 1000f, true, false);  // since i ussally map this using a left cross texture, i need the extra flip normal option on this time.
-            cube = new SpherePNTT(false, false, false, 2, 1f);
-            cube2 = new SpherePNTT(false, false, false, 5, 2f);
+
+            sky = new SpherePNTT(true, false, false, 25, 1000, true, false);  // since i ussally map this using a left cross texture, i need the extra flip normal option on this time.
+            cube = new SpherePNTT(false, false, false, 2, 2);
+            sphere2 = new SpherePNTT(false, false, false, 10, 2, false, false);
+
             primitivesEffect.Parameters["CubeMap"].SetValue(_textureCubeMapSpecular);
         }
 
@@ -532,6 +542,12 @@ namespace WillDxSharpGltf
 
             _camera.Update(_testTarget, _useDemoWaypoints, gameTime);
 
+            if (Keyboard.GetState().IsKeyDown(Keys.D3) && Pause(gameTime))
+                _camera.TransformCamera(new Vector3(0, 0, 0), _camera.Forward, Vector3.Up );
+
+            if (Keyboard.GetState().IsKeyDown(Keys.D4) && Pause(gameTime))
+                wireframe = !wireframe;
+
             // test mip maps press the 1 key.
             if (Keyboard.GetState().IsKeyDown(Keys.D1) && Pause(gameTime))
                 UpdateTestingUiShaderVariables(gameTime);
@@ -551,13 +567,21 @@ namespace WillDxSharpGltf
                     " \n mip CallType: texCubeLod ";
         }
 
+        RasterizerState rs_wireframe = new RasterizerState() { FillMode = FillMode.WireFrame };
+
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.DarkSlateGray);
 
             // draw primitives
 
+            if (wireframe)
+                GraphicsDevice.RasterizerState = rs_wireframe;
+
             DrawPrimitives(gameTime);
+
+            //if (wireframe)
+            //    GraphicsDevice.RasterizerState.FillMode = FillMode.Solid;
 
             // draw all the instances.
 
@@ -595,15 +619,17 @@ namespace WillDxSharpGltf
             _spriteBatch.Draw(_ldrTexture, new Rectangle(0, 0, 300, 150), Color.White);
             _spriteBatch.Draw(_generatedTexture, new Rectangle(350, 0, 300, 150), Color.White);
 
-            int x = 0; int y = 150;
-            _spriteBatch.Draw(_cmLeft, new Rectangle(x, y, 100, 100), Color.White); x += 100;
-            _spriteBatch.Draw(_cmBottom, new Rectangle(x, y, 100, 100), Color.White); x += 100;
-            _spriteBatch.Draw(_cmBack, new Rectangle(x, y, 100, 100), Color.White); x += 100;
-            _spriteBatch.Draw(_cmRight, new Rectangle(x, y, 100, 100), Color.White); x += 100;
-            _spriteBatch.Draw(_cmTop, new Rectangle(x, y, 100, 100), Color.White); x += 100;
-            _spriteBatch.Draw(_cmFront, new Rectangle(x, y, 100, 100), Color.White); x += 100;
+            //int x = 0; int y = 150;
+            //_spriteBatch.Draw(_cmLeft, new Rectangle(x, y, 100, 100), Color.White); x += 100;
+            //_spriteBatch.Draw(_cmBottom, new Rectangle(x, y, 100, 100), Color.White); x += 100;
+            //_spriteBatch.Draw(_cmBack, new Rectangle(x, y, 100, 100), Color.White); x += 100;
+            //_spriteBatch.Draw(_cmRight, new Rectangle(x, y, 100, 100), Color.White); x += 100;
+            //_spriteBatch.Draw(_cmTop, new Rectangle(x, y, 100, 100), Color.White); x += 100;
+            //_spriteBatch.Draw(_cmFront, new Rectangle(x, y, 100, 100), Color.White); x += 100;
 
-            x = 0; y = 250;
+            //x = 0; y = 250;
+
+            int x = 0; int y = 150;
             _spriteBatch.Draw(_ldrTextureFaces[CubeMapHelper.FACE_LEFT], new Rectangle(x, y, 100, 100), Color.White); x += 100;
             _spriteBatch.Draw(_ldrTextureFaces[CubeMapHelper.FACE_BOTTOM], new Rectangle(x, y, 100, 100), Color.White); x += 100;
             _spriteBatch.Draw(_ldrTextureFaces[CubeMapHelper.FACE_BACK], new Rectangle(x, y, 100, 100), Color.White); x += 100;
@@ -611,9 +637,13 @@ namespace WillDxSharpGltf
             _spriteBatch.Draw(_ldrTextureFaces[CubeMapHelper.FACE_TOP], new Rectangle(x, y, 100, 100), Color.White); x += 100;
             _spriteBatch.Draw(_ldrTextureFaces[CubeMapHelper.FACE_FRONT], new Rectangle(x, y, 100, 100), Color.White); x += 100;
 
-            _camera.DrawCurveThruWayPointsWithSpriteBatch(2f, new Vector3(100,100, 100), 1 ,gameTime);
+            _camera.DrawCurveThruWayPointsWithSpriteBatch(2f, new Vector3(300,100, 100), 1 ,gameTime);
 
-            _spriteBatch.DrawString(font, msg, new Vector2(10, 20), Color.Red);
+            DrawOnUvTexture(gameTime);
+
+            _spriteBatch.DrawString(font, msg, new Vector2(10, 0), Color.Red);
+
+            _spriteBatch.DrawString(font, msg2, new Vector2(10, 500), Color.White);
 
             _spriteBatch.End();
 
@@ -633,17 +663,48 @@ namespace WillDxSharpGltf
             primitivesEffect.Parameters["World"].SetValue(Matrix.Identity);
             sky.Draw(GraphicsDevice, primitivesEffect, _textureCubeMapSpecular);
 
-            primitivesEffect.Parameters["World"].SetValue(Matrix.Identity);
-            cube.Draw(GraphicsDevice, primitivesEffect, _textureCubeMapSpecular);
+            primitivesEffect.Parameters["World"].SetValue(Matrix.CreateWorld(new Vector3(10, 10, -30), Vector3.Forward, Vector3.Up));
+            cube.Draw(GraphicsDevice, primitivesEffect, _textureCubeMapDiffuse);
 
-            primitivesEffect.Parameters["World"].SetValue(Matrix.CreateWorld(new Vector3(10,10,0), Vector3.Forward, Vector3.Up) );
-            cube2.Draw(GraphicsDevice, primitivesEffect, _textureCubeMapDiffuse);
+            primitivesEffect.Parameters["World"].SetValue(Matrix.CreateWorld(new Vector3(20, 10, -30), Vector3.Forward, Vector3.Up));
+            sphere2.Draw(GraphicsDevice, primitivesEffect, _textureCubeMapSpecular);
 
             //primitivesEffect.Parameters["testValue2"].SetValue((int)TestValue2);
             //effect.Parameters["TextureA"].SetValue(front);
             //sky.Draw(GraphicsDevice, primitivesEffect, cmFront, cmBack, cmLeft, cmRight, cmTop, cmBottom);
             //cube.Draw(GraphicsDevice, primitivesEffect, cmFront, cmBack, cmLeft, cmRight, cmTop, cmBottom);
             //cube2.Draw(GraphicsDevice, primitivesEffect, cmFront, cmBack, cmLeft, cmRight, cmTop, cmBottom);
+        }
+
+        public void DrawOnUvTexture(GameTime gameTime)
+        {
+            var sphericalUv = CubeMapHelper.CubeMapNormalTo2dEquaRectangularMapUvCoordinates(_camera.Forward);
+            int faceIndex = 0;
+            var faceUv = CubeMapHelper.CubeMapVectorToUvFace(_camera.Forward, out faceIndex);
+            //var faceUv = CubeMapHelper.CubeMapVectorToUvFace(_camera.View.Forward, out faceIndex);
+            var foundNormal = CubeMapHelper.UvFaceToCubeMapVector(faceUv, faceIndex);
+            var foundNormal2 = CubeMapHelper.EquaRectangularMapUvCoordinatesTo3dCubeMapNormal(sphericalUv);
+            var reworkedNormal3 = new Vector3(foundNormal.Z, -foundNormal.Y, foundNormal.X);
+            msg2 =
+                 " \n " + " camera position      " + _camera.Position  +
+                 " \n " + " forward Vector       " +  _camera.Forward +
+                 " \n " + " view forward          " + _camera.View.Forward +
+                 " \n " + " sphericalUv            " + sphericalUv + "                            = CubeMapNormalTo2dEquaRectangularMapUvCoordinates(_camera.Forward) " +
+                 " \n " + " faceUv                  " + faceUv + ", faceIndex " + faceIndex + "         = CubeMapVectorToUvFace(_camera.Forward, out faceIndex) " +
+                 " \n " + " foundNormal2        " + foundNormal2 + "        = EquaRectangularMapUvCoordinatesTo3dCubeMapNormal(sphericalUv) " +
+                 " \n " + " foundNormal         " + foundNormal + "        = UvFaceToCubeMapVector(faceUvAlt, faceIndex) " +
+                 " \n " + " reworkedNormal3  " + reworkedNormal3 
+                 ;
+
+            var positionOnScreen = new Vector2(300 * sphericalUv.X, 150 * (1.0f - sphericalUv.Y));
+            DrawHelpers.DrawCrossHair(positionOnScreen, 10, Color.LightCyan);
+
+            int x = faceIndex * 100; 
+            int y = 150;
+            positionOnScreen = new Vector2(100 * faceUv.X, 100 * (faceUv.Y)) + new Vector2(x, y);
+            DrawHelpers.DrawCrossHair(positionOnScreen, 10, Color.Aqua);
+            // reproduce spherical from the faces we have produceded from the input sphereical to ensure we can convert all around back and forth.
+
         }
 
         void ReflectionRenderToSceneFaces(Vector3 reflectionCameraPosition, RenderTargetCube renderTargetReflectionCube)
