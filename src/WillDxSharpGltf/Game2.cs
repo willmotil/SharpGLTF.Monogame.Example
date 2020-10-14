@@ -235,16 +235,23 @@ namespace WillDxSharpGltf
             ////_textureCubeMapSpecular = CubeMapHelper.SetIndividualFacesToCubeMap(GraphicsDevice, 2048, _textureCubeMap, _cmLeft, _cmBottom, _cmBack, _cmRight, _cmTop, _cmFront);
 
             _premadeLut = Content.Load<Texture2D>("ibl_brdf_lut"); // need to probably generate this instead of just loading a premade one.
-            _ldrTexture = Content.Load<Texture2D>("ibl_ldr_generatedWater");
+            //_ldrTexture = Content.Load<Texture2D>("ibl_ldr_generatedWater");
             //_ldrTexture = Content.Load<Texture2D>("ibl_ldr_gentestWaterLabeledFaces");
             //_ldrTexture = Content.Load<Texture2D>("ibl_ldr_generatedStPeters");
             //_ldrTexture = Content.Load<Texture2D>("ibl_ldr_radiance");
+            _ldrTexture = Content.Load<Texture2D>("hdr_01");
+            Console.WriteLine($" hdri info  \n Format {_ldrTexture.Format} \n Bounds {_ldrTexture.Bounds}");
 
-            _ldrTextureFaces = CubeMapHelper.GetMapFacesTextureArrayFromEquaRectangularMap(GraphicsDevice, _ldrTexture, 256); // this is sphereical map to a texture array.
-            _generatedTexture = CubeMapHelper.GetEquaRectangularMapFromSixImageFaces(GraphicsDevice, 2048, 2048, _ldrTextureFaces);
 
-            //_textureCubeMapSpecular = CubeMapHelper.GetCubeMapFromEquaRectangularMap(GraphicsDevice, _ldrTexture, 256);
-            _textureCubeMapSpecular = CubeMapHelper.GetCubeMapFromEquaRectangularMap(GraphicsDevice, _ldrTexture, 2048);
+            //_ldrTextureFaces = CubeMapHelper.GetMapFacesTextureArrayFromEquaRectangularMap(GraphicsDevice, _ldrTexture, 256); // this is sphereical map to a texture array.
+            ////_generatedTexture = CubeMapHelper.GetEquaRectangularMapFromSixImageFaces(GraphicsDevice, 2048, 2048, _ldrTextureFaces);
+
+            ////_textureCubeMapSpecular = CubeMapHelper.GetCubeMapFromEquaRectangularMap(GraphicsDevice, _ldrTexture, 256);
+            //_textureCubeMapSpecular = CubeMapHelper.GetCubeMapFromEquaRectangularMap(GraphicsDevice, _ldrTexture, 2048);
+
+            _ldrTextureFaces = CubeMapHelper.GetMapFacesTextureArrayFromEquaRectangularVector4Map(GraphicsDevice, _ldrTexture, 256); // this is sphereical map to a texture array.
+            _textureCubeMapSpecular = CubeMapHelper.GetCubeMapFromEquaRectangularVector4Map(GraphicsDevice, _ldrTexture, 1024);
+
 
             // im going to have to make a project just to check the damn function.
             //CubeMapHelper.GetCubeMapsPreFilteredDiffuseAndSpecularFromEquaRectangularMap(GraphicsDevice, _ldrTexture, 2048, out _textureCubeMapDiffuse, out _textureCubeMapSpecular);
@@ -617,7 +624,7 @@ namespace WillDxSharpGltf
             _spriteBatch.Begin();
 
             _spriteBatch.Draw(_ldrTexture, new Rectangle(0, 0, 300, 150), Color.White);
-            _spriteBatch.Draw(_generatedTexture, new Rectangle(350, 0, 300, 150), Color.White);
+            //_spriteBatch.Draw(_generatedTexture, new Rectangle(350, 0, 300, 150), Color.White);
 
             //int x = 0; int y = 150;
             //_spriteBatch.Draw(_cmLeft, new Rectangle(x, y, 100, 100), Color.White); x += 100;

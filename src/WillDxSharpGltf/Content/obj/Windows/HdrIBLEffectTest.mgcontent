@@ -3,7 +3,7 @@
   <SourceFile>C:/Users/will/MainFiles/GitPrjs/SharpGLTF.Monogame.Example/src/WillDxSharpGltf/Content/HdrIBLEffectTest.fx</SourceFile>
   <SourceTime>2020-05-27T15:15:16-04:00</SourceTime>
   <DestFile>C:/Users/will/MainFiles/GitPrjs/SharpGLTF.Monogame.Example/src/WillDxSharpGltf/Content/bin/Windows/HdrIBLEffectTest.xnb</DestFile>
-  <DestTime>2020-10-14T05:21:45.9304919-04:00</DestTime>
+  <DestTime>2020-10-14T05:50:57.1039309-04:00</DestTime>
   <Importer>EffectImporter</Importer>
   <ImporterTime>2020-05-27T15:15:40-04:00</ImporterTime>
   <Processor>EffectProcessor</Processor>

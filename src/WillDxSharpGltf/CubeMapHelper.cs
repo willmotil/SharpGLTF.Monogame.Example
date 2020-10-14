@@ -102,6 +102,43 @@ namespace WillDxSharpGltf
         }
 
         /// <summary>  
+        /// This is a destination pixel version this version attempts to include mip levels. test passes  v2 
+        /// </summary>
+        public static TextureCube GetCubeMapFromEquaRectangularVector4Map(GraphicsDevice gd, Texture2D equaRectangularMap, int faceSize)
+        {
+            TextureCube cubeMap = new TextureCube(gd, faceSize, true, SurfaceFormat.Vector4);
+            var cmLevelCount = cubeMap.LevelCount;
+            int eqw = equaRectangularMap.Width;
+            int eqh = equaRectangularMap.Height;
+            var eqColorData = new Vector4[(equaRectangularMap.Width) * (equaRectangularMap.Height)];
+            equaRectangularMap.GetData(0, null, eqColorData, 0, eqColorData.Length);
+            for (int level = 0; level < cmLevelCount; level += 1)
+            {
+                for (int faceIndex = 0; faceIndex < 6; faceIndex++)
+                {
+                    var adjFaceSize = faceSize >> level;
+                    var faceWh = new Vector2(adjFaceSize, adjFaceSize);
+                    var faceData = new Vector4[adjFaceSize * adjFaceSize];
+                    for (int y = 0; y < adjFaceSize; y++)
+                    {
+                        for (int x = 0; x < adjFaceSize; x++)
+                        {
+                            var fuv = new Vector2(x, y) / faceWh;
+                            var v = UvFaceToCubeMapVector(fuv, faceIndex);
+                            var uv = CubeMapNormalTo2dEquaRectangularMapUvCoordinates(v);
+                            var eqPixelIndex = (int)(uv.X * eqw) + ((int)(uv.Y * eqh) * eqw);
+                            var facePixelIndex = x + (y * adjFaceSize);
+                            faceData[facePixelIndex] = eqColorData[eqPixelIndex];
+                        }
+                    }
+                    var cubeMapFace = GetFaceFromInt(faceIndex);
+                    cubeMap.SetData(cubeMapFace, level, null, faceData, 0, faceData.Length);
+                }
+            }
+            return cubeMap;
+        }
+
+        /// <summary>  
         /// This is a destination pixel version this version attempts to include mip levels and use them for convolution in diffuse and specular. test passes  v2 
         /// Reference here. Cubemap convolution  https://learnopengl.com/PBR/IBL/Diffuse-irradiance  
         /// Lo(p,ωo)=kdcπ∫ΩLi(p,ωi)n⋅ωidωi and  Epics... specular  Lo(p,ωo)=∫ΩLi(p,ωi)dωi∗∫Ωfr(p,ωi,ωo)n⋅ωidωi
@@ -325,6 +362,37 @@ namespace WillDxSharpGltf
                     }
                 }
                 textureFaces[index].SetData<Color>(faceColorData);
+            }
+            return textureFaces;
+        }
+
+        public static Texture2D[] GetMapFacesTextureArrayFromEquaRectangularVector4Map(GraphicsDevice gd, Texture2D equaRectangularMap, int faceSize)
+        {
+            Vector4[] mapColorData = new Vector4[equaRectangularMap.Width * equaRectangularMap.Height];
+            equaRectangularMap.GetData<Vector4>(mapColorData);
+            int eqw = equaRectangularMap.Width;
+            int eqh = equaRectangularMap.Height;
+            Texture2D[] textureFaces = new Texture2D[6];
+            var faceWh = new Vector2(faceSize, faceSize);  // var faceWh = new Vector2(faceSize - 1, faceSize - 1);
+            for (int index = 0; index < 6; index++)
+            {
+                Vector4[] faceColorData = new Vector4[faceSize * faceSize];
+                textureFaces[index] = new Texture2D(gd, faceSize, faceSize, false, SurfaceFormat.Vector4);
+                // for each face set its pixels from the equarectangularmap.
+                for (int y = 0; y < faceSize; y++)
+                {
+                    for (int x = 0; x < faceSize; x++)
+                    {
+                        var fuv = new Vector2(x, y) / faceWh;
+                        var v = UvFaceToCubeMapVector(fuv, index);
+                        var uv = CubeMapNormalTo2dEquaRectangularMapUvCoordinates(v);
+                        //var uv = CubeMapNormalTo2dEquaRectangularMapUvCoordinatesAlt(v); // works too same.
+                        var eqIndex = (int)(uv.X * eqw) + ((int)(uv.Y * eqh) * eqw);
+                        var facePixelIndex = x + (y * faceSize);
+                        faceColorData[facePixelIndex] = mapColorData[eqIndex];
+                    }
+                }
+                textureFaces[index].SetData<Vector4>(faceColorData);
             }
             return textureFaces;
         }

@@ -3,7 +3,7 @@
   <SourceFile>C:/Users/will/MainFiles/GitPrjs/SharpGLTF.Monogame.Example/src/WillDxSharpGltf/Content/hdr_01.hdr</SourceFile>
   <SourceTime>2020-10-10T16:54:20.9578452-04:00</SourceTime>
   <DestFile>C:/Users/will/MainFiles/GitPrjs/SharpGLTF.Monogame.Example/src/WillDxSharpGltf/Content/bin/Windows/hdr_01.xnb</DestFile>
-  <DestTime>2020-10-14T05:21:45.5693462-04:00</DestTime>
+  <DestTime>2020-10-14T05:50:56.711926-04:00</DestTime>
   <Importer>TextureImporter</Importer>
   <ImporterTime>2020-05-27T15:15:40-04:00</ImporterTime>
   <Processor>TextureProcessor</Processor>
@@ -34,7 +34,7 @@
   </Parameters>
   <Parameters>
     <Key>TextureFormat</Key>
-    <Value>Color</Value>
+    <Value>NoChange</Value>
   </Parameters>
   <Dependencies />
   <BuildAsset />
