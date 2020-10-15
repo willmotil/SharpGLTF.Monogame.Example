@@ -33,37 +33,67 @@ struct VertexShaderOutput
 // functions
 //____________________________________
 
+//var fuv = new Vector2(x, y) / faceWh;
+//var v = UvFaceToCubeMapVector(fuv, index);
+//var uv = CubeMapNormalTo2dEquaRectangularMapUvCoordinates(v);
 
 // I only have this shaky method i made up to do this tranform because i couldn't find the code to do it anywere im doubtful this is entirely correct.
 float3 UvFaceToCubeMapVector(float2 uv, int faceIndex)
 {
-    float u = uv.x * 2.0f - 1.0f;
-    float v = uv.y * 2.0f - 1.0f;
+    float u = uv.x ;
+    float v = uv.y ;
     float3 dir = float3(0.0f, 0.0f, 1.0f);
     switch (abs(faceIndex))
     {
-    case 2: // FACE_BACK:
-        dir = float3(-1.0f, v, -u);
+    case 0: // FACE_FORWARD: CubeMapFace.NegativeZ
+        dir = float3(-1.0f, v, u);
         break;
-    case 4: //FACE_TOP:
+    case 2: //FACE_LEFT: CubeMapFace.NegativeX
+        dir = float3(u, v, 1.0f);
+        break;
+    case 3: //FACE_BACK: CubeMapFace.PositiveZ
+        dir = float3(1.0f, v, -u);
+        break;
+    case 5: //FACE_RIGHT: CubeMapFace.PositiveX
+        dir = float3(-u, v, -1.0f);
+        break;
+
+    case 1: //FACE_TOP: CubeMapFace.PositiveY
+        dir = float3(-v, 1.0f, -u);
+        break;
+    case 4: //FACE_BOTTOM : CubeMapFace.NegativeY
         dir = float3(v, -1.0f, u);
         break;
-    case 0: //FACE_LEFT:
-        dir = float3(u, v, -1.0f);
-        break;
-    case 5: //FACE_FRONT:
-        dir = float3(1.0f, v, u);
-        break;
-    case 1: //FACE_BOTTOM:
-        dir = float3(-v, 1.0f, u);
-        break;
-    case 3: //FACE_RIGHT:
-        dir = float3(-u, v, 1.0f);
-        break;
+
     default:
         dir = float3(-1.0f, -1.0f, -1.0f); // na
         break;
     }
+
+    //switch (abs(faceIndex))
+    //{
+    //case 0: //FACE_LEFT:  0
+    //    dir = float3(-u, v, -1.0f);
+    //    break;
+    //case 2: // FACE_BACK: 2
+    //    dir = float3(-1.0f, v, u);
+    //    break;
+    //case 3: //FACE_RIGHT: 3
+    //    dir = float3(u, v, 1.0f);
+    //    break;
+    //case 5: //FACE_FRONT: 5
+    //    dir = float3(1.0f, v, -u);
+    //    break;
+    //case 1: //FACE_BOTTOM:
+    //    dir = float3(-v, 1.0f, u);
+    //    break;
+    //case 4: //FACE_TOP:
+    //    dir = float3(-v, -1.0f, -u);
+    //    break;
+    //default:
+    //    dir = float3(-1.0f, -1.0f, -1.0f); // na
+    //    break;
+    //}
     //dir = new Vector3(dir.Z, -dir.Y, dir.X);
     dir = normalize(dir);
     return dir;

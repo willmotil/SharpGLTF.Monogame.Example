@@ -47,7 +47,7 @@ namespace WillDxSharpGltf
 
         SpriteBatch _spriteBatch;
         SpriteFont _font;
-        public static Effect primitivesEffect;
+        public static Effect _primitivesEffect;
         public static Effect _hdrIblEffect;
 
         VertexPositionTexture[] screenQuad;
@@ -59,14 +59,16 @@ namespace WillDxSharpGltf
         string msg = "";
 
         private Texture2D _texture;
+        private Texture2D _premadeLut;
         private Texture2D _generatedTexture;
 
         RenderTargetCube renderTargetCubeEnviroment;
-        TextureCube textureCubeEnviroment;
+        TextureCube _textureCubeEnviroment;
 
         DemoCamera _camera;
         bool _useDemoWaypoints = true;
 
+        SpherePNTT _skySphere;
 
         public Game_HdrGpuSideTest()
         {
@@ -95,7 +97,9 @@ namespace WillDxSharpGltf
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             _font = new HardCodedSpriteFont().LoadHardCodeSpriteFont(GraphicsDevice);
+            _primitivesEffect = Content.Load<Effect>("MipLevelTestEffect");
             _hdrIblEffect = Content.Load<Effect>("HdrIBLEffectTest");
+            _premadeLut = Content.Load<Texture2D>("ibl_brdf_lut");
             _texture = Content.Load<Texture2D>("hdr_01");
             Console.WriteLine($" hdri info  \n Format {_texture.Format} \n Bounds {_texture.Bounds}");
 
@@ -110,6 +114,9 @@ namespace WillDxSharpGltf
             SetupCamera();
 
             CreateEnviromentalCubeMap();
+
+            _LightsAndFog.SetEnviromentalCubeMap(renderTargetCubeEnviroment);
+            _LightsAndFog.SetEnviromentalLUTMap(_premadeLut);
         }
 
         #endregion
@@ -140,6 +147,8 @@ namespace WillDxSharpGltf
             _camera.Update(ModelTestSuiteExecution._testTarget, _useDemoWaypoints, gameTime);
 
             _mts.UpdateModels(gameTime);
+
+            msg = $" Camera.Forward  { _camera.Forward } ";
 
             base.Update(gameTime);
         }
@@ -179,24 +188,26 @@ namespace WillDxSharpGltf
             {
                 switch (i)
                 {
-                    case 2: // FACE_BACK:
-                        GraphicsDevice.SetRenderTarget(renderTargetCube, CubeMapFace.NegativeX);
-                        break;
-                    case 4: //FACE_TOP:
-                        GraphicsDevice.SetRenderTarget(renderTargetCube, CubeMapFace.NegativeY);
-                        break;
-                    case 0: //FACE_LEFT:
+                    case 0: // FACE_FORWARD
                         GraphicsDevice.SetRenderTarget(renderTargetCube, CubeMapFace.NegativeZ);
                         break;
-                    case 5: //FACE_FRONT:
-                        GraphicsDevice.SetRenderTarget(renderTargetCube, CubeMapFace.PositiveX);
+                    case 2: // FACE_LEFT
+                        GraphicsDevice.SetRenderTarget(renderTargetCube, CubeMapFace.NegativeX);
                         break;
-                    case 1: //FACE_BOTTOM:
-                        GraphicsDevice.SetRenderTarget(renderTargetCube, CubeMapFace.PositiveY);
-                        break;
-                    case 3: //FACE_RIGHT:
+                    case 3: // FACE_BACK
                         GraphicsDevice.SetRenderTarget(renderTargetCube, CubeMapFace.PositiveZ);
                         break;
+                    case 5: // FACE_RIGHT
+                        GraphicsDevice.SetRenderTarget(renderTargetCube, CubeMapFace.PositiveX);
+                        break;
+
+                    case 1: // FACE_TOP
+                        GraphicsDevice.SetRenderTarget(renderTargetCube, CubeMapFace.PositiveY);
+                        break;
+                    case 4: // FACE_BOTTOM
+                        GraphicsDevice.SetRenderTarget(renderTargetCube, CubeMapFace.NegativeY);
+                        break;
+
                     default:
                         GraphicsDevice.SetRenderTarget(renderTargetCube, CubeMapFace.NegativeX);
                         break;
@@ -210,22 +221,23 @@ namespace WillDxSharpGltf
                     this.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleList, screenQuad, 0, 2);
                 }
             }
-            textureCubeEnviroment = (TextureCube)renderTargetCube;
+            _textureCubeEnviroment = (TextureCube)renderTargetCube;
 
             GraphicsDevice.SetRenderTarget(null);
 
-            Console.WriteLine($" Rendered to scene.  textureCubeEnviroment.Format {textureCubeEnviroment.Format}  textureCubeEnviroment.LevelCount {textureCubeEnviroment.LevelCount}" );
+            Console.WriteLine($" Rendered to scene.  textureCubeEnviroment.Format {_textureCubeEnviroment.Format}  textureCubeEnviroment.LevelCount {_textureCubeEnviroment.LevelCount}" );
         }
 
         // K now i need a new primitive cube to verify that the env is set up right.
         protected void DrawPrimitives(GameTime gameTime)
         {
             var projectionMatrix = Matrix.CreatePerspectiveFieldOfView(90 * (float)((3.14159265358f) / 180f), GraphicsDevice.Viewport.Width / GraphicsDevice.Viewport.Height, 0.01f, 1000f);
-            //primitivesEffect.Parameters["View"].SetValue(_camera.View);   // just add defaults here or dont add anything.
-            //primitivesEffect.Parameters["CameraPosition"].SetValue(Vector3.Zero); //_camera.Position);
-            //primitivesEffect.Parameters["Projection"].SetValue(projectionMatrix);
-            //primitivesEffect.Parameters["testValue1"].SetValue((int)TestValue1);
-            //primitivesEffect.Parameters["World"].SetValue(Matrix.Identity);
+            _primitivesEffect.Parameters["View"].SetValue(_camera.View);   // just add defaults here or dont add anything.
+            _primitivesEffect.Parameters["CameraPosition"].SetValue(Vector3.Zero); //_camera.Position);
+            _primitivesEffect.Parameters["Projection"].SetValue(projectionMatrix);
+            _primitivesEffect.Parameters["testValue1"].SetValue((int)TestValue1);
+            _primitivesEffect.Parameters["World"].SetValue(Matrix.Identity);
+            _skySphere.Draw(GraphicsDevice, _primitivesEffect, _textureCubeEnviroment);
         }
 
 
@@ -251,9 +263,9 @@ namespace WillDxSharpGltf
 
         public void UpdateTestingUiShaderVariables(GameTime gameTime)
         {
-            //TestValue1++;
-            //if (TestValue1 > _textureCubeMapSpecular.LevelCount)
-            //    TestValue1 = 0;
+            TestValue1++;
+            if (TestValue1 > _textureCubeEnviroment.LevelCount)
+                TestValue1 = 0;
         }
 
         public void DrawSpriteBatches(GameTime gameTime)
@@ -308,6 +320,8 @@ namespace WillDxSharpGltf
         public void LoadPrimitives()
         {
             CreateScreenQuad();
+
+            _skySphere = new SpherePNTT(true, false, false, 25, 1000, true, false);
         }
 
         public void SetupCamera()

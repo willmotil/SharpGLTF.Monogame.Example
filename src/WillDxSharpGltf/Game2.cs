@@ -156,7 +156,6 @@ namespace WillDxSharpGltf
         private ModelInstance _ClearCoatTest;
         private ModelInstance _SpecGlossVsMetalRough;
 
-
         #endregion
 
         #region lifecycle
@@ -627,22 +626,21 @@ namespace WillDxSharpGltf
             //_spriteBatch.Draw(_generatedTexture, new Rectangle(350, 0, 300, 150), Color.White);
 
             //int x = 0; int y = 150;
-            //_spriteBatch.Draw(_cmLeft, new Rectangle(x, y, 100, 100), Color.White); x += 100;
-            //_spriteBatch.Draw(_cmBottom, new Rectangle(x, y, 100, 100), Color.White); x += 100;
-            //_spriteBatch.Draw(_cmBack, new Rectangle(x, y, 100, 100), Color.White); x += 100;
-            //_spriteBatch.Draw(_cmRight, new Rectangle(x, y, 100, 100), Color.White); x += 100;
-            //_spriteBatch.Draw(_cmTop, new Rectangle(x, y, 100, 100), Color.White); x += 100;
-            //_spriteBatch.Draw(_cmFront, new Rectangle(x, y, 100, 100), Color.White); x += 100;
+            //_spriteBatch.Draw(_ldrTextureFaces[CubeMapHelper.FACE_LEFT], new Rectangle(x, y, 100, 100), Color.White); x += 100;
+            //_spriteBatch.Draw(_ldrTextureFaces[CubeMapHelper.FACE_BOTTOM], new Rectangle(x, y, 100, 100), Color.White); x += 100;
+            //_spriteBatch.Draw(_ldrTextureFaces[CubeMapHelper.FACE_BACK], new Rectangle(x, y, 100, 100), Color.White); x += 100;
+            //_spriteBatch.Draw(_ldrTextureFaces[CubeMapHelper.FACE_RIGHT], new Rectangle(x, y, 100, 100), Color.White); x += 100;
+            //_spriteBatch.Draw(_ldrTextureFaces[CubeMapHelper.FACE_TOP], new Rectangle(x, y, 100, 100), Color.White); x += 100;
+            //_spriteBatch.Draw(_ldrTextureFaces[CubeMapHelper.FACE_FRONT], new Rectangle(x, y, 100, 100), Color.White); x += 100;
 
-            //x = 0; y = 250;
+            int x = 0; int y = 250;
+            _spriteBatch.Draw(_ldrTextureFaces[CubeMapHelper.FACE_LEFT], new Rectangle(x + 0, y, 100, 100), Color.White);
+            _spriteBatch.Draw(_ldrTextureFaces[CubeMapHelper.FACE_FRONT], new Rectangle(x + 100, y, 100, 100), Color.White);
+            _spriteBatch.Draw(_ldrTextureFaces[CubeMapHelper.FACE_RIGHT], new Rectangle(x + 200, y, 100, 100), Color.White);
+            _spriteBatch.Draw(_ldrTextureFaces[CubeMapHelper.FACE_BACK], new Rectangle(x + 300, y, 100, 100), Color.White);
 
-            int x = 0; int y = 150;
-            _spriteBatch.Draw(_ldrTextureFaces[CubeMapHelper.FACE_LEFT], new Rectangle(x, y, 100, 100), Color.White); x += 100;
-            _spriteBatch.Draw(_ldrTextureFaces[CubeMapHelper.FACE_BOTTOM], new Rectangle(x, y, 100, 100), Color.White); x += 100;
-            _spriteBatch.Draw(_ldrTextureFaces[CubeMapHelper.FACE_BACK], new Rectangle(x, y, 100, 100), Color.White); x += 100;
-            _spriteBatch.Draw(_ldrTextureFaces[CubeMapHelper.FACE_RIGHT], new Rectangle(x, y, 100, 100), Color.White); x += 100;
-            _spriteBatch.Draw(_ldrTextureFaces[CubeMapHelper.FACE_TOP], new Rectangle(x, y, 100, 100), Color.White); x += 100;
-            _spriteBatch.Draw(_ldrTextureFaces[CubeMapHelper.FACE_FRONT], new Rectangle(x, y, 100, 100), Color.White); x += 100;
+            _spriteBatch.Draw(_ldrTextureFaces[CubeMapHelper.FACE_TOP], new Rectangle(x +100, y -100, 100, 100), Color.White);
+            _spriteBatch.Draw(_ldrTextureFaces[CubeMapHelper.FACE_BOTTOM], new Rectangle(x +100, y +100, 100, 100), Color.White);
 
             _camera.DrawCurveThruWayPointsWithSpriteBatch(2f, new Vector3(300,100, 100), 1 ,gameTime);
 
