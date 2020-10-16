@@ -605,6 +605,57 @@ namespace WillDxSharpGltf
             return f;
         }
 
+        public static VertexPositionTexture[] CreatePrimitiveCube()
+        {
+            var r = new Rectangle(-1, -1, 2, 2);
+            var cubesFaces = new VertexPositionTexture[36];
+            int i = 0;
+            for (int faceIndex = 0; faceIndex < 6; faceIndex++)
+            {
+                //RasterizerState.CullClockwise
+                //t1
+                cubesFaces[i + 0] = new VertexPositionTexture(FlipFace(new Vector3(r.Left, r.Top, 0f), faceIndex), new Vector2(0f, 0f));  // p1
+                cubesFaces[i + 1] = new VertexPositionTexture(FlipFace(new Vector3(r.Left, r.Bottom, 0f), faceIndex), new Vector2(0f, 1f)); // p0
+                cubesFaces[i + 2] = new VertexPositionTexture(FlipFace(new Vector3(r.Right, r.Bottom, 0f), faceIndex), new Vector2(1f, 1f));// p3
+                //t2
+                cubesFaces[i + 3] = new VertexPositionTexture(FlipFace(new Vector3(r.Right, r.Bottom, 0f), faceIndex), new Vector2(1f, 1f));// p3
+                cubesFaces[i + 4] = new VertexPositionTexture(FlipFace(new Vector3(r.Right, r.Top, 0f), faceIndex), new Vector2(1f, 0f));// p2
+                cubesFaces[i + 5] = new VertexPositionTexture(FlipFace(new Vector3(r.Left, r.Top, 0f), faceIndex), new Vector2(0f, 0f)); // p1
+                i += 6;
+            }
+            return cubesFaces;
+        }
+
+        public static Vector3 FlipFace(Vector3 n, int faceIndex)
+        {
+            var u = n.X;
+            var v = n.Y;
+            var dir = new Vector3(0, 0, -1);
+            switch (faceIndex)
+            {
+                case 0: // FACE_FORWARD: CubeMapFace.NegativeZ
+                    dir = new Vector3(-1.0f, v, u);
+                    break;
+                case 2: //FACE_LEFT: CubeMapFace.NegativeX
+                    dir = new Vector3(u, v, 1.0f);
+                    break;
+                case 3: //FACE_BACK: CubeMapFace.PositiveZ
+                    dir = new Vector3(1.0f, v, -u);
+                    break;
+                case 5: //FACE_RIGHT: CubeMapFace.PositiveX
+                    dir = new Vector3(-u, v, -1.0f);
+                    break;
+
+                case 1: //FACE_TOP: CubeMapFace.PositiveY
+                    dir = new Vector3(-v, 1.0f, -u);
+                    break;
+                case 4: //FACE_BOTTOM : CubeMapFace.NegativeY
+                    dir = new Vector3(v, -1.0f, u);
+                    break;
+            }
+            return dir;
+        }
+
         public static Vector2 UvFromTexturePixel(Texture2D texture, Vector2 pixel)
         {
             return pixel / new Vector2(texture.Width - 1, texture.Height - 1);
