@@ -68,7 +68,6 @@ namespace WillDxSharpGltf
         private Texture2D _premadeLut;
         private Texture2D _generatedTexture;
 
-        //RenderTargetCube renderTargetCube;
         TextureCube _textureCubeEnviroment;
         TextureCube _textureCubeIblDiffuseIllumination;
         TextureCube _textureCubeIblSpecularIllumination;
@@ -152,6 +151,9 @@ namespace WillDxSharpGltf
             // test mip maps press the 1 key.
             if (Keyboard.GetState().IsKeyDown(Keys.D1) && Pause(gameTime))
                 UpdateTestingUiShaderVariables(gameTime);
+
+            if (Keyboard.GetState().IsKeyDown(Keys.F2) && Pause(gameTime))
+                Console.WriteLine("if your reading this F2 is pressed");
 
             _camera.Update(ModelTestSuiteExecution._testTarget, _useDemoWaypoints, gameTime);
 
@@ -247,7 +249,7 @@ namespace WillDxSharpGltf
             var pixelformat = SurfaceFormat.Color;
             if (useHdrFormat)
                 pixelformat = SurfaceFormat.Vector4;
-            var renderTargetCube = new RenderTargetCube(GraphicsDevice, 512, generateMips, pixelformat, DepthFormat.None);
+            var renderTargetCube = new RenderTargetCube(GraphicsDevice, 256, generateMips, pixelformat, DepthFormat.None);
             _hdrIblEffect.CurrentTechnique = _hdrIblEffect.Techniques[Technique];
             _hdrIblEffect.Parameters["CubeMap"].SetValue(sourceHdrLdrEnvMap);
             for (int i = 0; i < 6; i++)

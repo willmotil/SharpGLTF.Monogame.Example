@@ -9,6 +9,8 @@
 
 
 #define PI 3.14159265359f
+#define ToDegrees 57.295779513f;
+#define ToRadians 0.0174532925f;
 
 int FaceToMap;
 
@@ -113,40 +115,39 @@ float4 GetIrradiance(float2 pixelpos, int faceToMap)
 {
     float3 normal = UvFaceToCubeMapVector(pixelpos, faceToMap);
 
-    //float3 normal = normalize(float3(pixelpos.xy, 1));
-    //if (cubeFace == 2)
-    //    normal = normalize(float3(pixelpos.x,  1, -pixelpos.y));
-    //else if (cubeFace == 3)
-    //    normal = normalize(float3(pixelpos.x, -1, pixelpos.y));
-    //else if (cubeFace == 0)
-    //    normal = normalize(float3(1, pixelpos.y,-pixelpos.x));
-    //else if (cubeFace == 1)
-    //    normal = normalize(float3(-1, input.InterpolatedPosition.y, input.InterpolatedPosition.x));
-    //else if (cubeFace == 5)
-    //    normal = normalize(float3(-input.InterpolatedPosition.x, input.InterpolatedPosition.y, -1));
-
     float3 up = float3(0,1,0);
     float3 right = normalize(cross(up,normal));
     up = cross(normal,right);
 
-    float3 sampledColour = float3(0,0,0);
+    float3 sampledColour = float3(0, 0, 0);
     float index = 0;
-    float stepPhi = 0.25f;//0.025f;
-    float stepTheta = 0.1f;//0.1f;
-    float thetaAngle = .4f; // 1.57f
-    for (float phi = 0; phi < 6.283; phi += stepPhi) // z rot
+
+    // to radians from degrees 
+    float numberOfSamplesHemisphere = 24.0f;  // seems to be a ratio that affects quality between the hemisphere and circular sampling direction, maybe i should try to use a spiral like on the golden ratio.
+    float numberOfSamplesAround = 16.0f;
+    float hemisphereMaxAngle = 45.0f;
+    float hemisphereMaxAngleTheta = hemisphereMaxAngle * ToRadians; // 30;  1.57f // hemisphere
+    float stepTheta = (hemisphereMaxAngle / numberOfSamplesHemisphere) * ToRadians;   //2.5f * ToRadians;  // 2.5f     // y dist
+    float stepPhi = (360.0f / numberOfSamplesAround) * ToRadians;    //2.85f * ToRadians; // 2.85f  // z roll
+
+    for (float theta = 0; theta < hemisphereMaxAngleTheta; theta += stepTheta) // y 
     {
-        for (float theta = 0; theta < thetaAngle; theta += 0.1f) // y 
+        for (float phi = 0; phi < 6.283; phi += stepPhi) // z rot
         {
             float3 temp = cos(phi) * right + sin(phi) * up;
             float4 sampleVector = float4(cos(theta) * normal + sin(theta) * temp , 0);
-            sampledColour += texCUBElod(CubeMapSampler, sampleVector).rgb * cos(theta) * sin(theta);
-            index++;
-            stepTheta = stepTheta * 1.2f;
+            //sampledColour += texCUBElod(CubeMapSampler, sampleVector).rgb; // *sin(theta);   // * cos(theta) * sin(theta);  // * sin(theta);  //* cos(theta); // *sin(theta);
+            sampledColour += texCUBElod(CubeMapSampler, sampleVector).rgb * sin(theta);
+            //sampledColour += texCUBElod(CubeMapSampler, sampleVector).rgb * (cos(theta) * sin(theta));
+            index+= 1.0f;
         }
     }
+    //return float4( sampledColour / index, 1.0f);
     return float4(PI * sampledColour / index, 1.0f );
 }
+
+
+
 
 /*
             float falloff = 1.0f - (theta / thetaAngle);
@@ -318,7 +319,33 @@ irradiance = PI * irradiance * (1.0 / float(nrSamples));
 
     // sort of works somewhat.
     // http://www.codinglabs.net/article_physically_based_rendering.aspx
-//float4 GetIrradiance(float2 pixelpos, int faceToMap) : COLOR
+float4 GetIrradiance(float2 pixelpos, int faceToMap)
+{
+    float3 normal = UvFaceToCubeMapVector(pixelpos, faceToMap);
+
+    float3 up = float3(0,1,0);
+    float3 right = normalize(cross(up,normal));
+    up = cross(normal,right);
+
+    float3 sampledColour = float3(0,0,0);
+    float index = 0;
+    float thetaMaxAngle = 0.50f; // 1.57f;
+    float stepTheta = 0.05f;  //0.1f;
+    float stepPhi = 0.050f;  //0.025f;
+
+    for (float theta = 0; theta < thetaMaxAngle; theta += stepTheta) // y
+    {
+        for (float phi = 0; phi < 6.283; phi += stepPhi) // z rot
+        {
+            float3 temp = cos(phi) * right + sin(phi) * up;
+            float4 sampleVector = float4(cos(theta) * normal + sin(theta) * temp , 0);
+            sampledColour += texCUBElod(CubeMapSampler, sampleVector).rgb * sin(theta);  //* cos(theta); // *sin(theta);
+            index+= 1.0f;
+        }
+    }
+    return float4(PI * sampledColour / index, 1.0f ); //  float4(PI * sampledColour / index, 1.0f );
+}
+
 float4 GetIrradiance(float2 pixelpos, int faceToMap)
 {
     float3 normal = UvFaceToCubeMapVector(pixelpos, faceToMap);
@@ -341,18 +368,18 @@ float4 GetIrradiance(float2 pixelpos, int faceToMap)
 
     float3 sampledColour = float3(0,0,0);
     float index = 0;
-    float stepPhi = 0.25f;//0.025f;
-    float stepTheta = 0.1f;//0.1f;
+    float stepPhi = 0.25f; //0.025f;
+    float stepTheta = 0.1f; //0.1f;
     float thetaAngle = .4f; // 1.57f
     for (float phi = 0; phi < 6.283; phi += stepPhi) // z rot
     {
-        for (float theta = 0; theta < thetaAngle; theta += 0.1f) // y
+        for (float theta = 0; theta < thetaAngle; theta += stepTheta) // y
         {
             float3 temp = cos(phi) * right + sin(phi) * up;
             float4 sampleVector = float4(cos(theta) * normal + sin(theta) * temp , 0);
             sampledColour += texCUBElod(CubeMapSampler, sampleVector).rgb * cos(theta) * sin(theta);
             index++;
-            stepTheta = stepTheta * 1.2f;
+            //stepTheta = stepTheta * 1.2f; //this causes banding i wouldn't think it would but it does.
         }
     }
     return float4(PI * sampledColour / index, 1.0f );
