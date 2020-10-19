@@ -62,7 +62,7 @@ namespace WillDxSharpGltf
         RasterizerState rs_wireframe = new RasterizerState() { FillMode = FillMode.WireFrame };
 
         float _mipLevelDiffuseIlluminationTestValue = 0;
-        float TestValue2 = 1;
+        float TestValue2 = 0;
         bool _wireframe = false;
         string msg = "";
 
@@ -70,7 +70,7 @@ namespace WillDxSharpGltf
         private Texture2D _premadeLut;
         private Texture2D _generatedTexture;
 
-        int _envMapToDraw = 0; // env =0,  envdif = 1, 
+        int _envMapToDraw = 0; // env =1,  envdif = 2, 
 
         TextureCube _textureCubeEnviroment;
         TextureCube _textureCubeIblDiffuseIllumination;
@@ -127,8 +127,8 @@ namespace WillDxSharpGltf
         public void CreateIblCubeMaps()
         {
             Console.WriteLine($"\n Rendered to scene.");
-            RenderToSceneFaces(_textureHdrEnvMap, ref _textureCubeEnviroment, "HdrToEnvCubeMap", false, true) ;
-            RenderToSceneFaces(_textureCubeEnviroment, ref _textureCubeIblDiffuseIllumination, "EnvCubemapToDiffuseIlluminationCubeMap", false, true);
+            RenderToSceneFaces(_textureHdrEnvMap, ref _textureCubeEnviroment, "HdrToEnvCubeMap", true, true, 256) ;
+            RenderToSceneFaces(_textureCubeEnviroment, ref _textureCubeIblDiffuseIllumination, "EnvCubemapToDiffuseIlluminationCubeMap", false, true, 256);
         }
 
         #endregion
@@ -145,7 +145,7 @@ namespace WillDxSharpGltf
                 _envMapToDraw = 1;
 
             if (Keyboard.GetState().IsKeyDown(Keys.D2) && Pause(gameTime))
-                _envMapToDraw = 0;
+                _envMapToDraw = 2;
 
             if (Keyboard.GetState().IsKeyDown(Keys.D4) && Pause(gameTime))
                 _wireframe = !_wireframe;
@@ -181,13 +181,21 @@ namespace WillDxSharpGltf
         public int FigureOutSampleSize()
         {
             float ToRadians = 0.0174532925f;
-            float numberOfSamplesHemisphere = 16;//6.0f;  // seems to be a ratio that affects quality between the hemisphere and circular sampling direction, maybe i should try to use a spiral like on the golden ratio.
+            float numberOfSamplesHemisphere = 10;//6.0f;  // seems to be a ratio that affects quality between the hemisphere and circular sampling direction, maybe i should try to use a spiral like on the golden ratio.
             float numberOfSamplesAround = 16;//10.0f;
-            float minimumAdjustment = 3.5f;
             float hemisphereMaxAngle = 45.0f;
+            float minimumAdjustment = 2.1f;
             float hemisphereMaxAngleTheta = hemisphereMaxAngle * ToRadians; // 30;  1.57f // hemisphere
             float stepTheta = (hemisphereMaxAngle / numberOfSamplesHemisphere) * ToRadians;   //2.5f * ToRadians;  // 2.5f     // y dist
             //float stepPhi = (360.0f / numberOfSamplesAround) * ToRadians;    //2.85f * ToRadians; // 2.85f  // z roll
+
+            var normal = new Vector3(0, 0, 1);
+
+            Vector3 up = new Vector3(normal.Z, normal.Z, normal.Z);// float3(0,1,0);
+            Vector3 right = Vector3.Normalize(Vector3.Cross(up, normal));
+            up = Vector3.Cross(normal, right);
+
+            Console.WriteLine($"\n normal: {normal}");
 
             int numbOfSamples = 0;
             for (float theta = 0.01f; theta < hemisphereMaxAngleTheta; theta += stepTheta) // y 
@@ -197,14 +205,21 @@ namespace WillDxSharpGltf
                 if (stepPhi > minimumAdjustment)
                     stepPhi = minimumAdjustment;
                 int numbOfSamplesThisPass = 0;
+
+                Console.WriteLine($"\n  theta:{theta * 57.295779513f} ");
                 for (float phi = 0; phi < 6.283; phi += stepPhi) // z rot
                 {
+                    Vector3 temp = ((float)Math.Cos(phi) * right + (float)Math.Sin(phi) * up);
+                    Vector3 sampleVector = ((float)Math.Cos(theta) * normal + (float)Math.Sin (theta) * temp);
+
                     numbOfSamples++;
                     numbOfSamplesThisPass++;
+
+                    Console.WriteLine($"   phi:{phi * 57.295779513f}   sampleVector: { sampleVector}");
                 }
-                Console.WriteLine($"numbOfSamplesThisPass: {numbOfSamplesThisPass} theta degree span: {theta * 57.295779513f *2f}");
+                Console.WriteLine($"  numbOfSamplesThisPass: {numbOfSamplesThisPass} theta degree span: {theta * 57.295779513f *2f} ");
             }
-            Console.WriteLine($"numbOfSamples: {numbOfSamples}");
+            Console.WriteLine($"  numbOfSamples: {numbOfSamples} ");
             return numbOfSamples;
         }
 
@@ -247,7 +262,7 @@ namespace WillDxSharpGltf
 
 
             _primitivesEffect.Parameters["World"].SetValue(_camera.World);
-            if (_envMapToDraw == 0)
+            if (_envMapToDraw == 1)
                 skyCube.DrawPrimitiveCube(GraphicsDevice, _primitivesEffect, _textureCubeEnviroment);
             else
                 skyCube.DrawPrimitiveCube(GraphicsDevice, _primitivesEffect, _textureCubeIblDiffuseIllumination);
@@ -257,8 +272,8 @@ namespace WillDxSharpGltf
 
             for (int i = 0; i < 5;  i++)
             {
-                _primitivesEffect.Parameters["World"].SetValue(Matrix.CreateTranslation(new Vector3(i *5, 5, -6)));
-                if (_envMapToDraw == 0)
+                _primitivesEffect.Parameters["World"].SetValue(Matrix.CreateTranslation(new Vector3(i *2, i * 2, i * -2.5f)));
+                if (_envMapToDraw == 1)
                     cubes[i].DrawPrimitiveCube(GraphicsDevice, _primitivesEffect, _textureCubeEnviroment);
                 else
                     cubes[i].DrawPrimitiveCube(GraphicsDevice, _primitivesEffect, _textureCubeIblDiffuseIllumination);
@@ -287,7 +302,7 @@ namespace WillDxSharpGltf
 
             _LightsAndFog.SetTestingValue(_mipLevelDiffuseIlluminationTestValue);
 
-            if (_envMapToDraw == 0)
+            if (_envMapToDraw == 1)
                 _LightsAndFog.SetEnviromentalCubeMap(_textureCubeEnviroment);
             else
                 _LightsAndFog.SetEnviromentalCubeMap(_textureCubeIblDiffuseIllumination);
@@ -324,13 +339,13 @@ namespace WillDxSharpGltf
         /// <summary>
         /// The ref was used to pass the ref variable directly thru here not a ref copy i guess.
         /// </summary>
-        void RenderToSceneFaces(Texture2D sourceHdrLdrEquaRectangularMap, ref TextureCube textureCubeDestinationMap, string Technique, bool generateMips, bool useHdrFormat)
+        void RenderToSceneFaces(Texture2D sourceHdrLdrEquaRectangularMap, ref TextureCube textureCubeDestinationMap, string Technique, bool generateMips, bool useHdrFormat, int sizeSquarePerFace)
         {
             GraphicsDevice.RasterizerState = RasterizerState.CullNone;
             var pixelformat = SurfaceFormat.Color;
             if (useHdrFormat)
                 pixelformat = SurfaceFormat.Vector4;
-            var renderTargetCube = new RenderTargetCube(GraphicsDevice, 256, generateMips, pixelformat, DepthFormat.None);
+            var renderTargetCube = new RenderTargetCube(GraphicsDevice, sizeSquarePerFace, generateMips, pixelformat, DepthFormat.None);
             _hdrIblEffect.CurrentTechnique = _hdrIblEffect.Techniques[Technique];
             _hdrIblEffect.Parameters["Texture"].SetValue(sourceHdrLdrEquaRectangularMap);
             for (int i = 0; i < 6; i++)
@@ -367,19 +382,19 @@ namespace WillDxSharpGltf
             textureCubeDestinationMap = renderTargetCube; // set the render to the specified texture cube.
             GraphicsDevice.SetRenderTarget(null);
 
-            Console.WriteLine($" SphericalTex2D source ... Technique {Technique}  resultingTextureCube.Format {textureCubeDestinationMap.Format}  resultingTextureCube.LevelCount {textureCubeDestinationMap.LevelCount}");
+            Console.WriteLine($" SphericalTex2D as source ... Technique: {Technique}  resulting TextureCube.Format: {textureCubeDestinationMap.Format}  Mip LevelCount: {textureCubeDestinationMap.LevelCount}");
         }
 
         /// <summary>
         /// The ref was used to pass the ref variable directly thru here not a ref copy i guess.
         /// </summary>
-        void RenderToSceneFaces(TextureCube sourceHdrLdrEnvMap, ref TextureCube textureCubeDestinationMap, string Technique, bool generateMips, bool useHdrFormat)
+        void RenderToSceneFaces(TextureCube sourceHdrLdrEnvMap, ref TextureCube textureCubeDestinationMap, string Technique, bool generateMips, bool useHdrFormat, int sizeSquarePerFace)
         {
             GraphicsDevice.RasterizerState = RasterizerState.CullNone;
             var pixelformat = SurfaceFormat.Color;
             if (useHdrFormat)
                 pixelformat = SurfaceFormat.Vector4;
-            var renderTargetCube = new RenderTargetCube(GraphicsDevice, 256, generateMips, pixelformat, DepthFormat.None);
+            var renderTargetCube = new RenderTargetCube(GraphicsDevice, sizeSquarePerFace, generateMips, pixelformat, DepthFormat.None);
             _hdrIblEffect.CurrentTechnique = _hdrIblEffect.Techniques[Technique];
             _hdrIblEffect.Parameters["CubeMap"].SetValue(sourceHdrLdrEnvMap);
             for (int i = 0; i < 6; i++)
@@ -420,7 +435,7 @@ namespace WillDxSharpGltf
             textureCubeDestinationMap = renderTargetCube; // set the render to the specified texture cube.
             GraphicsDevice.SetRenderTarget(null);
 
-            Console.WriteLine($" Cubemap source ... Technique {Technique}  resultingTextureCube.Format {textureCubeDestinationMap.Format}  resultingTextureCube.LevelCount {textureCubeDestinationMap.LevelCount}");
+            Console.WriteLine($" Cubemap as source ... Technique: {Technique}  resulting TextureCube.Format: {textureCubeDestinationMap.Format}  Mip LevelCount: {textureCubeDestinationMap.LevelCount}");
         }
 
 

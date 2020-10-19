@@ -170,83 +170,93 @@ float4 CubeToFaceCopy(float3 pixelpos, int face)
 }
 
 
-// http://www.codinglabs.net/article_physically_based_rendering.aspx
+//// http://www.codinglabs.net/article_physically_based_rendering.aspx
+////
+//// E  needs to be tweeked.
+////
+//float4 GetIrradiance(float2 pixelpos, int faceToMap)
+//{
+//    float3 normal = UvFaceToCubeMapVector(pixelpos, faceToMap);
 //
-// E  needs to be tweeked.
+//    float3 up = float3(normal.z, normal.x, normal.y);// float3(0,1,0);
+//    float3 right = normalize(cross(up,normal));
+//    up = cross(normal,right);
 //
-float4 GetIrradiance(float2 pixelpos, int faceToMap)
-{
-    float3 normal = UvFaceToCubeMapVector(pixelpos, faceToMap);
-
-    float3 up = float3(normal.z, normal.x, normal.y);// float3(0,1,0);
-    float3 right = normalize(cross(up,normal));
-    up = cross(normal,right);
-
-    float3 accumulatedColour = float3(0, 0, 0);
-    float totalWeight = 0;
-
-    // to radians from degrees 
-    float numberOfSamplesHemisphere = 8; //16.0f;// 16.0f; //6.0f;  // seems to be a ratio that affects quality between the hemisphere and circular sampling direction, maybe i should try to use a spiral like on the golden ratio.
-    float numberOfSamplesAround = 8; //16.0f; // 32.0f;//12.0f;
-    float hemisphereMaxAngle = 1.0f; // 30.0f; //50.0f;
-    float minimumAdjustment = 2.1f; //3.5f; //2.1f;
-    float hemisphereMaxAngleTheta = hemisphereMaxAngle * ToRadians; // 30;  1.57f // hemisphere
-    float stepTheta = (hemisphereMaxAngle / numberOfSamplesHemisphere) * ToRadians;   //2.5f * ToRadians;  // 2.5f     // y dist
-    //float stepPhi = (360.0f / numberOfSamplesAround) * ToRadians;    //2.85f * ToRadians; // 2.85f  // z roll
-
-    for (float theta = 0.01f; theta < hemisphereMaxAngleTheta; theta += stepTheta) // y 
-    {
-        float earlyOut = (hemisphereMaxAngleTheta / (theta + 0.01f));
-        float stepPhi = min( (360.0f / numberOfSamplesAround) * 0.0174532925f * earlyOut, minimumAdjustment); // we step out of our inner loop fast when theta is low i.e. we are close to the normal.
-        for (float phi = 0; phi < 6.283; phi += stepPhi) // z rot
-        {
-            float3 temp = cos(phi) * right + sin(phi) * up;
-            float4 sampleVector = float4(cos(theta) * normal + sin(theta) * temp , 0);
-
-            float NdotS = saturate( dot(normal, sampleVector.rgb) );
-            float3 sampledColor = texCUBElod(CubeMapSampler, sampleVector).rgb;
-
-            accumulatedColour += sampledColor * NdotS;
-            totalWeight += NdotS;
-
-            //sampledColour = texCUBElod(CubeMapSampler, sampleVector).rgb * sin(theta);
-            //sampledColour = texCUBElod(CubeMapSampler, sampleVector).rgb * (cos(theta) * sin(theta));
-            //accumulatedColour += sampledColor;
-            //totalWeight += 1.0f;
-
-            //float avg = (sampledColor.r + sampledColor.b + sampledColor.g) * 0.33333f;
-            //accumulatedColour += sampledColor * avg;
-            //totalWeight += avg;
-
-            //// this is completely blured in fact its so way way too too smoothly blured.
-            //float avg = (sampledColor.r + sampledColor.b + sampledColor.g) * 0.33333f;
-            //accumulatedColour += sampledColor;
-            //totalWeight += avg;
-
-            //// getting abit closer
-            //NdotS = NdotS * NdotS ;
-            //float avg = (sampledColor.r + sampledColor.b + sampledColor.g) * 0.33333f;
-            //accumulatedColour += sampledColor * NdotS;
-            //totalWeight += avg * NdotS * 3.0f;
-
-
-            //NdotS = NdotS * NdotS * NdotS * NdotS;
-            //float avg = (sampledColor.r + sampledColor.b + sampledColor.g) * NdotS;
-            //accumulatedColour += sampledColor * avg;
-            //totalWeight += avg ;
-
-            //  Ok i believe the reason this is imbalanced is because of the geometry of the samples themselves.
-            //  When we sample close to the normal in a circle around it there are a lot of samples in the same place basically this makes the number of them combined actually too similar and compounded.
-            //  Such that curve of the samples near the normal are actually far higher near the normal then just 1.
-            //  So i need a function to balance close samples towards one or i need less samples near the normal.
-
-
-        }
-    }
-    //return float4(accumulatedColour, 1.0f);
-    return float4( accumulatedColour / totalWeight, 1.0f);
-    //return float4(PI * accumulatedColour / totalWeight, 1.0f );
-}
+//    float3 accumulatedColor = float3(0, 0, 0);
+//    float totalWeight = 0;
+//    float3 averagedColor = float3(0, 0, 0);
+//    float totalSampleCount = 0;
+//
+//    // to radians from degrees 
+//    float numberOfSamplesHemisphere = 20; //16.0f;// 16.0f; //6.0f;  // seems to be a ratio that affects quality between the hemisphere and circular sampling direction, maybe i should try to use a spiral like on the golden ratio.
+//    float numberOfSamplesAround = 26; //16.0f; // 32.0f;//12.0f;
+//    float hemisphereMaxAngle = 35.0f; // 30.0f; //50.0f;
+//    float minimumAdjustment = 2.1f; //3.5f; //2.1f;
+//    float hemisphereMaxAngleTheta = hemisphereMaxAngle * ToRadians; // 30;  1.57f // hemisphere
+//    float stepTheta = (hemisphereMaxAngle / numberOfSamplesHemisphere) * ToRadians;   //2.5f * ToRadians;  // 2.5f     // y dist
+//    //float stepPhi = (360.0f / numberOfSamplesAround) * ToRadians;    //2.85f * ToRadians; // 2.85f  // z roll
+//
+//    for (float theta = 0.01f; theta < hemisphereMaxAngleTheta; theta += stepTheta) // y 
+//    {
+//        float earlyOut = (hemisphereMaxAngleTheta / (theta + 0.01f));
+//        float stepPhi = min( (360.0f / numberOfSamplesAround) * 0.0174532925f * earlyOut, minimumAdjustment); // we step out of our inner loop fast when theta is low i.e. we are close to the normal.
+//        for (float phi = 0.05; phi < 6.283; phi += stepPhi) // z rot
+//        {
+//            float3 temp = cos(phi) * right + sin(phi) * up;
+//            float4 sampleVector = float4(cos(theta) * normal + sin(theta) * temp , 0);
+//            float3 sampledColor = texCUBElod(CubeMapSampler, sampleVector).rgb;
+//            float avg = (sampledColor.r + sampledColor.b + sampledColor.g) * 0.33333f;
+//            float NdotS = saturate( dot(normal, sampleVector.rgb) );
+//            float phiMuliplier =  phi / 6.283f + 1.0f;
+//
+//            //accumulatedColor += sampledColor * NdotS;
+//            //totalWeight += NdotS;
+//
+//            //accumulatedColor += sampledColor sin(theta);
+//            //totalWeight += 1.0f;
+//
+//            //accumulatedColor += sampledColor * (cos(theta) * sin(theta));
+//            //totalWeight += cos(theta) * sin(theta);
+//
+//            //accumulatedColor += sampledColor * (1.0f - NdotS);
+//            //totalWeight += (1.0f - NdotS);
+//
+//
+//            //accumulatedColor += sampledColor * (cos(theta) * sin(theta)) * NdotS;
+//            //totalWeight += cos(theta) * sin(theta) * NdotS;
+//
+//            //// this is completely blured in fact its so way way too too smoothly blured.
+//            //accumulatedColor += sampledColor;
+//            //totalWeight += avg;
+//
+//            //// getting abit closer
+//            NdotS = NdotS * NdotS ;
+//            accumulatedColor += sampledColor * NdotS;
+//            totalWeight += avg * NdotS * 3.0f;
+//
+//
+//            //NdotS = NdotS * NdotS * NdotS * NdotS;
+//            //float avg = (sampledColor.r + sampledColor.b + sampledColor.g) * NdotS;
+//            //accumulatedColor += sampledColor * avg;
+//            //totalWeight += avg ;
+//
+//            //  Ok i believe the reason this is imbalanced is because of the geometry of the samples themselves.
+//            //  When we sample close to the normal in a circle around it there are a lot of samples in the same place basically this makes the number of them combined actually too similar and compounded.
+//            //  Such that curve of the samples near the normal are actually far higher near the normal then just 1.
+//            //  So i need a function to balance close samples towards one or i need less samples near the normal.
+//
+//            //averagedColor += avg;
+//            //totalSampleCount++;
+//        }
+//        //accumulatedColor += averagedColor;
+//        //totalWeight += totalSampleCount;
+//        //averagedColor =0;
+//        //totalSampleCount =0;
+//    }
+//    //return float4(accumulatedColor, 1.0f);
+//    return float4( accumulatedColor / totalWeight, 1.0f);
+//    //return float4(PI * accumulatedColor / totalWeight, 1.0f );
+//}
 
 
 
@@ -292,35 +302,36 @@ float4 GetIrradiance(float2 pixelpos, int faceToMap)
 //    return float4(PI * sampledColour / index, 1.0f);
 //}
 
-//float4 GetIrradiance(float2 pixelpos, int faceToMap)
-//{
-//    float3 normal = UvFaceToCubeMapVector(pixelpos, faceToMap);
-//    //float3 normal = normalize(input.position.xyz);
-//
-//    float3 irradiance = float3(0.0f, 0.0f, 0.0f);
-//
-//    float3 up = float3(0, 1, 0); //g_upVectorVal;
-//    float3 right = cross(up, normal);
-//    up = cross(normal, right);
-//
-//    float sampleDelta = 0.65f; //0.025f;
-//    float nrSamples = 0.0f;
-//    float hpi = 3.14159265359f * 0.5f;
-//    float fpi = 3.14159265359f * 4.0f;
-//    for (float phi = 0; phi < fpi; phi += sampleDelta)
-//    {
-//        for (float theta = 0; theta < hpi; theta += sampleDelta)
-//        {
-//            float3 tangentSample = float3(sin(theta) * cos(phi), sin(theta) * sin(phi), cos(theta));
-//            float3 sampleVec = (tangentSample.x * right) + (tangentSample.y * up) + (tangentSample.z * normal);
-//
-//            irradiance += texCUBElod(CubeMapSampler, float4(sampleVec, 0)).rgb * cos(theta) * sin(theta);
-//            nrSamples++;
-//        }
-//    }
-//    irradiance = PI * irradiance * (1.0f / nrSamples);
-//    return float4(irradiance, 1.0f);
-//}
+float4 GetIrradiance(float2 pixelpos, int faceToMap)
+{
+    float3 normal = UvFaceToCubeMapVector(pixelpos, faceToMap);
+    //float3 normal = normalize(input.position.xyz);
+
+    float3 irradiance = float3(0.0f, 0.0f, 0.0f);
+
+    //float3 up = float3(normal.z, normal.x, normal.y);// float3(0,1,0);
+    float3 up = float3(0, 1, 0); //g_upVectorVal;
+    float3 right = cross(up, normal);
+    up = cross(normal, right);
+
+    float sampleDelta = 0.25f; //0.025f;
+    float nrSamples = 0.0f;
+    float hpi = 3.14159265359f * 0.5f;
+    float fpi = 3.14159265359f * 4.0f;
+    for (float phi = 0; phi < fpi; phi += sampleDelta)
+    {
+        for (float theta = 0; theta < hpi; theta += sampleDelta)
+        {
+            float3 tangentSample = float3(sin(theta) * cos(phi), sin(theta) * sin(phi), cos(theta));
+            float3 sampleVec = (tangentSample.x * right) + (tangentSample.y * up) + (tangentSample.z * normal);
+
+            irradiance += texCUBElod(CubeMapSampler, float4(sampleVec, 0)).rgb * cos(theta) * sin(theta);
+            nrSamples++;
+        }
+    }
+    irradiance = PI * irradiance * (1.0f / nrSamples);
+    return float4(irradiance, 1.0f);
+}
 
 
 
