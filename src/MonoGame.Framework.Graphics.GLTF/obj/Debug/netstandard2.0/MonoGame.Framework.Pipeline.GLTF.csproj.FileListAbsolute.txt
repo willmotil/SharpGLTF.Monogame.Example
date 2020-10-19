@@ -1,10 +1,12 @@
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\MonoGame.Framework.Graphics.GLTF\bin\Debug\netstandard2.0\MonoGame.Framework.Pipeline.GLTF.deps.json
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\MonoGame.Framework.Graphics.GLTF\bin\Debug\netstandard2.0\MonoGame.Framework.Pipeline.GLTF.dll
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\MonoGame.Framework.Graphics.GLTF\bin\Debug\netstandard2.0\MonoGame.Framework.Pipeline.GLTF.pdb
+C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\MonoGame.Framework.Graphics.GLTF\bin\Debug\netstandard2.0\MonoGame.Framework.Graphics.Content3D.dll
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\MonoGame.Framework.Graphics.GLTF\bin\Debug\netstandard2.0\MonoGame.Framework.Graphics.EffectsPBR.dll
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\MonoGame.Framework.Graphics.GLTF\bin\Debug\netstandard2.0\MonoGame.Framework.Graphics.Model3D.dll
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\MonoGame.Framework.Graphics.GLTF\bin\Debug\netstandard2.0\MonoGame.Framework.Graphics.EffectsPBR.pdb
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\MonoGame.Framework.Graphics.GLTF\bin\Debug\netstandard2.0\MonoGame.Framework.Graphics.Model3D.pdb
+C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\MonoGame.Framework.Graphics.GLTF\bin\Debug\netstandard2.0\MonoGame.Framework.Graphics.Content3D.pdb
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\MonoGame.Framework.Graphics.GLTF\obj\Debug\netstandard2.0\MonoGame.Framework.Pipeline.GLTF.csprojAssemblyReference.cache
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\MonoGame.Framework.Graphics.GLTF\obj\Debug\netstandard2.0\MonoGame.Framework.Pipeline.GLTF.AssemblyInfoInputs.cache
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\MonoGame.Framework.Graphics.GLTF\obj\Debug\netstandard2.0\MonoGame.Framework.Pipeline.GLTF.AssemblyInfo.cs
@@ -12,5 +14,3 @@ C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\MonoGame.Framewor
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\MonoGame.Framework.Graphics.GLTF\obj\Debug\netstandard2.0\MonoGame.Framework.Pipeline.GLTF.csproj.CopyComplete
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\MonoGame.Framework.Graphics.GLTF\obj\Debug\netstandard2.0\MonoGame.Framework.Pipeline.GLTF.dll
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\MonoGame.Framework.Graphics.GLTF\obj\Debug\netstandard2.0\MonoGame.Framework.Pipeline.GLTF.pdb
-C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\MonoGame.Framework.Graphics.GLTF\bin\Debug\netstandard2.0\MonoGame.Framework.Graphics.Content3D.dll
-C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\MonoGame.Framework.Graphics.GLTF\bin\Debug\netstandard2.0\MonoGame.Framework.Graphics.Content3D.pdb

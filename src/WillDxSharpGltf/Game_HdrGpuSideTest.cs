@@ -61,7 +61,7 @@ namespace WillDxSharpGltf
         VertexPositionTexture[] screenQuad;
         RasterizerState rs_wireframe = new RasterizerState() { FillMode = FillMode.WireFrame };
 
-        float _mipLevelDiffuseIlluminationTestValue = 0;
+        float _mipLevelTestValue = 0;
         float TestValue2 = 0;
         bool _wireframe = false;
         string msg = "";
@@ -99,15 +99,23 @@ namespace WillDxSharpGltf
 
         #region content loading
 
+        public void CreateIblCubeMaps()
+        {
+            Console.WriteLine($"\n Rendered to scene.");
+            RenderToSceneFaces(_textureHdrEnvMap, ref _textureCubeEnviroment, "HdrToEnvCubeMap", true, true, 512);
+            RenderToSceneFaces(_textureCubeEnviroment, ref _textureCubeIblDiffuseIllumination, "EnvCubemapToDiffuseIlluminationCubeMap", false, true, 128);
+        }
+
         protected override void LoadContent()
         {
+            // https://hdrihaven.com    https://texturehaven.com
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             _font = new HardCodedSpriteFont().LoadHardCodeSpriteFont(GraphicsDevice);
             _primitivesEffect = Content.Load<Effect>("MipLevelTestEffect");
             _hdrIblEffect = Content.Load<Effect>("HdrIBLEffectTest");
 
             _premadeLut = Content.Load<Texture2D>("ibl_brdf_lut");
-            _textureHdrEnvMap = Content.Load<Texture2D>("hdr_01");
+            _textureHdrEnvMap = Content.Load<Texture2D>("colorful_studio_2k");   //("hdr_01");
 
             Console.WriteLine($" hdri info  \n Format {_textureHdrEnvMap.Format} \n Bounds {_textureHdrEnvMap.Bounds}   IlluminationMapSampleSize {FigureOutSampleSize()} ");
 
@@ -122,13 +130,6 @@ namespace WillDxSharpGltf
             _LightsAndFog = new PBREnvironment();
             _LightsAndFog.SetEnviromentalCubeMap(_textureCubeIblDiffuseIllumination); //_textureCubeEnviroment _textureCubeIblDiffuseIllumination _textureCubeIblSpecularIllumination
             _LightsAndFog.SetEnviromentalLUTMap(_premadeLut);
-        }
-
-        public void CreateIblCubeMaps()
-        {
-            Console.WriteLine($"\n Rendered to scene.");
-            RenderToSceneFaces(_textureHdrEnvMap, ref _textureCubeEnviroment, "HdrToEnvCubeMap", true, true, 256) ;
-            RenderToSceneFaces(_textureCubeEnviroment, ref _textureCubeIblDiffuseIllumination, "EnvCubemapToDiffuseIlluminationCubeMap", false, true, 256);
         }
 
         #endregion
@@ -173,7 +174,7 @@ namespace WillDxSharpGltf
 
             _mts.UpdateModels(gameTime);
 
-            msg = $"Cullmode {GraphicsDevice.RasterizerState.CullMode}  \n Camera.Forward  { _camera.Forward }  \n _mipLevelTestValue {_mipLevelDiffuseIlluminationTestValue} ";
+            msg = $"Cullmode {GraphicsDevice.RasterizerState.CullMode}  \n Camera.Forward  { _camera.Forward }  \n _mipLevelTestValue {_mipLevelTestValue} ";
 
             base.Update(gameTime);
         }
@@ -256,7 +257,7 @@ namespace WillDxSharpGltf
             _primitivesEffect.Parameters["Projection"].SetValue(projectionMatrix);
             _primitivesEffect.Parameters["View"].SetValue(_camera.View);   // just add defaults here or dont add anything.
             _primitivesEffect.Parameters["CameraPosition"].SetValue(Vector3.Zero); //_camera.Position);
-            _primitivesEffect.Parameters["testValue1"].SetValue((int)_mipLevelDiffuseIlluminationTestValue);
+            _primitivesEffect.Parameters["testValue1"].SetValue((int)_mipLevelTestValue);
             //_primitivesEffect.Parameters["World"].SetValue(Matrix.Identity);
 
 
@@ -272,7 +273,7 @@ namespace WillDxSharpGltf
 
             for (int i = 0; i < 5;  i++)
             {
-                _primitivesEffect.Parameters["World"].SetValue(Matrix.CreateTranslation(new Vector3(i *2, i * 2, i * -2.5f)));
+                _primitivesEffect.Parameters["World"].SetValue(Matrix.CreateTranslation(new Vector3(i *2 + 70, i * 2, i * -2.5f + -8)));
                 if (_envMapToDraw == 1)
                     cubes[i].DrawPrimitiveCube(GraphicsDevice, _primitivesEffect, _textureCubeEnviroment);
                 else
@@ -300,7 +301,7 @@ namespace WillDxSharpGltf
             dir = Vector3.Normalize(new Vector3(1, 1, -25));
             _LightsAndFog.SetDirectLight(2, -dir, Color.White, 1.0f);
 
-            _LightsAndFog.SetTestingValue(_mipLevelDiffuseIlluminationTestValue);
+            _LightsAndFog.SetTestingValue(_mipLevelTestValue);
 
             if (_envMapToDraw == 1)
                 _LightsAndFog.SetEnviromentalCubeMap(_textureCubeEnviroment);
@@ -319,7 +320,18 @@ namespace WillDxSharpGltf
                 // environment lights and fog
                 _LightsAndFog,
                 // all model instances
-                _mts._Test, _mts._VertexColorTest, _mts._TextureCoordinateTest, _mts._TextureSettingsTest, _mts._MultiUvTest, _mts._TextureTransformMultiTest, _mts._TextureTransformTest, _mts._AlphaBlendModeTest, _mts._NormalTangentMirrorTest, _mts._UnlitTest, _mts._InterpolationTest, _mts._ClearCoatTest, _mts._SpecGlossVsMetalRough  /* , _AnimatedMorphCube */
+                _mts._Test, 
+                _mts._VertexColorTest, 
+                _mts._TextureCoordinateTest, 
+                _mts._TextureSettingsTest, 
+                _mts._MultiUvTest, 
+                _mts._TextureTransformTest, 
+                _mts._AlphaBlendModeTest, 
+                _mts._NormalTangentMirrorTest, 
+                _mts._UnlitTest, 
+                _mts._InterpolationTest, 
+                _mts._SpecGlossVsMetalRough
+             /*                 _mts._ClearCoatTest , _mts._TextureTransformMultiTest , _AnimatedMorphCube , _mts._ClearCoatTest */
              );
         }
 
@@ -457,27 +469,24 @@ namespace WillDxSharpGltf
         // .
 
 
-
-
-
         public void UpdateTestingUiShaderVariables(GameTime gameTime)
         {
-            _mipLevelDiffuseIlluminationTestValue++;
-            if (_mipLevelDiffuseIlluminationTestValue > _textureCubeIblDiffuseIllumination.LevelCount)
-                _mipLevelDiffuseIlluminationTestValue = 0;
-        }
-
-        protected override void UnloadContent()
-        {
-            _mts.UnloadContent();
+            _mipLevelTestValue++;
+            if (_mipLevelTestValue > _textureCubeEnviroment.LevelCount)
+                _mipLevelTestValue = 0;
         }
 
         public void LoadPrimitives()
         {
             CreateScreenQuad();
-            for(int i = 0; i < 5;i ++)
+            for (int i = 0; i < 5; i++)
                 cubes[i] = new CubePrimitive(1, true, false, true);
             //_skySphere = new SpherePNTT(true, false, false, 25, 1000, true, false);
+        }
+
+        protected override void UnloadContent()
+        {
+            _mts.UnloadContent();
         }
 
         public void SetupCamera()
@@ -522,7 +531,7 @@ namespace WillDxSharpGltf
         {
             if (pause < 0)
             {
-                pause = .5f;
+                pause = .2f;
                 return true;
             }
             else

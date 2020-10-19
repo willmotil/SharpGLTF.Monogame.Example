@@ -4,6 +4,7 @@
   <Platform>Windows</Platform>
   <Config />
   <SourceFiles>
+    <File>C:/Users/will/MainFiles/GitPrjs/SharpGLTF.Monogame.Example/src/WillDxSharpGltf/Content/colorful_studio_2k.hdr</File>
     <File>C:/Users/will/MainFiles/GitPrjs/SharpGLTF.Monogame.Example/src/WillDxSharpGltf/Content/CubeFaces/_back256.png</File>
     <File>C:/Users/will/MainFiles/GitPrjs/SharpGLTF.Monogame.Example/src/WillDxSharpGltf/Content/CubeFaces/_bottom256.png</File>
     <File>C:/Users/will/MainFiles/GitPrjs/SharpGLTF.Monogame.Example/src/WillDxSharpGltf/Content/CubeFaces/_front256.png</File>
@@ -33,6 +34,7 @@
     <File>C:/Users/will/MainFiles/GitPrjs/SharpGLTF.Monogame.Example/src/WillDxSharpGltf/Content/MipLevelTestEffect.fx</File>
   </SourceFiles>
   <DestFiles>
+    <File xsi:nil="true" />
     <File xsi:nil="true" />
     <File xsi:nil="true" />
     <File xsi:nil="true" />

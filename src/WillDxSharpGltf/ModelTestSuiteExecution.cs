@@ -81,14 +81,14 @@ namespace WillDxSharpGltf
         ModelCollectionContent _TextureCoordinateTestTemplate;
         ModelCollectionContent _TextureSettingsTestTemplate;
         ModelCollectionContent _MultiUvTestTemplate;
-        ModelCollectionContent _TextureTransformMultiTestTemplate;
+        //ModelCollectionContent _TextureTransformMultiTestTemplate;
         ModelCollectionContent _TextureTransformTestTemplate;
         ModelCollectionContent _AlphaBlendModeTestTemplate;
         ModelCollectionContent _NormalTangentMirrorTestTemplate;
         ModelCollectionContent _UnlitTestTemplate;
         ModelCollectionContent _InterpolationTestTemplate;
         //ModelCollectionContent _AnimatedMorphCubeTemplate;
-        ModelCollectionContent _ClearCoatTestTemplate;
+        //ModelCollectionContent _ClearCoatTestTemplate;
         ModelCollectionContent _SpecGlossVsMetalRoughTemplate;
 
         // these are the scene instances we create for every glTF model we want to render on screen.
@@ -104,9 +104,9 @@ namespace WillDxSharpGltf
         public ModelInstance _UnlitTest;
         public ModelInstance _InterpolationTest;
         //private ModelInstance _AnimatedMorphCube;
-        public ModelInstance _TextureTransformMultiTest;
+        //public ModelInstance _TextureTransformMultiTest;
         public ModelInstance _TextureTransformTest;
-        public ModelInstance _ClearCoatTest;
+        //public ModelInstance _ClearCoatTest;
         public ModelInstance _SpecGlossVsMetalRough;
 
 
@@ -132,14 +132,14 @@ namespace WillDxSharpGltf
             _TextureCoordinateTestTemplate = _load("Models\\TextureCoordinateTest.glb");
             _TextureSettingsTestTemplate = _load("Models\\TextureSettingsTest.glb");
             _MultiUvTestTemplate = _load("Models\\MultiUvTest.glb");
-            _TextureTransformMultiTestTemplate = _load("Models\\TextureTransformMultiTest.glb");
+            //_TextureTransformMultiTestTemplate = _load("Models\\TextureTransformMultiTest.glb");
             _TextureTransformTestTemplate = _load("Models\\TextureTransformTest.glb");
             _AlphaBlendModeTestTemplate = _load("Models\\AlphaBlendModeTest.glb");
             _NormalTangentMirrorTestTemplate = _load("Models\\NormalTangentMirrorTest.glb");
             _UnlitTestTemplate = _load("Models\\UnlitTest.glb");
             _InterpolationTestTemplate = _load("Models\\InterpolationTest.glb");
             //_AnimatedMorphCubeTemplate = _load("Models\\AnimatedMorphCube.glb");
-            _ClearCoatTestTemplate = _load("Models\\ClearCoatTest.glb");
+            //_ClearCoatTestTemplate = _load("Models\\ClearCoatTest.glb");
             _SpecGlossVsMetalRoughTemplate = _load("Models\\SpecGlossVsMetalRough.glb");
         }
         public void SelectTestModel(GraphicsDevice graphicsDevice)
@@ -267,14 +267,14 @@ namespace WillDxSharpGltf
             if (_TextureCoordinateTest == null) _TextureCoordinateTest = _TextureCoordinateTestTemplate.DefaultModel.CreateInstance();
             if (_TextureSettingsTest == null) _TextureSettingsTest = _TextureSettingsTestTemplate.DefaultModel.CreateInstance();
             if (_MultiUvTest == null) _MultiUvTest = _MultiUvTestTemplate.DefaultModel.CreateInstance();
-            if (_TextureTransformMultiTest == null) _TextureTransformMultiTest = _TextureTransformMultiTestTemplate.DefaultModel.CreateInstance();
+            //if (_TextureTransformMultiTest == null) _TextureTransformMultiTest = _TextureTransformMultiTestTemplate.DefaultModel.CreateInstance();
             if (_TextureTransformTest == null) _TextureTransformTest = _TextureTransformTestTemplate.DefaultModel.CreateInstance();
             if (_AlphaBlendModeTest == null) _AlphaBlendModeTest = _AlphaBlendModeTestTemplate.DefaultModel.CreateInstance();
             if (_NormalTangentMirrorTest == null) _NormalTangentMirrorTest = _NormalTangentMirrorTestTemplate.DefaultModel.CreateInstance();
             if (_UnlitTest == null) _UnlitTest = _UnlitTestTemplate.DefaultModel.CreateInstance();
             if (_InterpolationTest == null) _InterpolationTest = _InterpolationTestTemplate.DefaultModel.CreateInstance();
             //if (_AnimatedMorphCube == null) _AnimatedMorphCube = _AnimatedMorphCubeTemplate.DefaultModel.CreateInstance();
-            if (_ClearCoatTest == null) _ClearCoatTest = _ClearCoatTestTemplate.DefaultModel.CreateInstance();
+            //if (_ClearCoatTest == null) _ClearCoatTest = _ClearCoatTestTemplate.DefaultModel.CreateInstance();
             if (_SpecGlossVsMetalRough == null) _SpecGlossVsMetalRough = _SpecGlossVsMetalRoughTemplate.DefaultModel.CreateInstance();
 
             // animate each instance individually.
@@ -286,14 +286,14 @@ namespace WillDxSharpGltf
             _TextureCoordinateTest.WorldMatrix = Matrix.CreateScale(2.0f) * Matrix.CreateTranslation(_TextureCoordinateTestPos);
             _TextureSettingsTest.WorldMatrix = Matrix.CreateScale(.5f) * Matrix.CreateTranslation(_TextureSettingsTestPos);
             _MultiUvTest.WorldMatrix = Matrix.CreateScale(1f) * Matrix.CreateTranslation(_MultiUvTestPos);
-            _TextureTransformMultiTest.WorldMatrix = Matrix.CreateScale(2f) * Matrix.CreateTranslation(_TextureTransformMultiTestPos);
+            //_TextureTransformMultiTest.WorldMatrix = Matrix.CreateScale(2f) * Matrix.CreateTranslation(_TextureTransformMultiTestPos);
             _TextureTransformTest.WorldMatrix = Matrix.CreateScale(2f) * Matrix.CreateTranslation(_TextureTransformTestPos);
             _AlphaBlendModeTest.WorldMatrix = Matrix.CreateScale(1.0f) * Matrix.CreateTranslation(_AlphaBlendModeTestPos);
             _NormalTangentMirrorTest.WorldMatrix = Matrix.CreateScale(2f) * Matrix.CreateTranslation(_NormalTangentMirrorTestPos);
             _UnlitTest.WorldMatrix = Matrix.CreateScale(1f) * Matrix.CreateTranslation(_UnlitTestPos);
             _InterpolationTest.WorldMatrix = Matrix.CreateScale(.5f) * Matrix.CreateTranslation(_InterpolationTestPos);// https://github.com/KhronosGroup/glTF/tree/master/specification/2.0/#animation-sampler
             //_AnimatedMorphCube.WorldMatrix = Matrix.CreateScale(.5f) * Matrix.CreateTranslation(_AnimatedMorphCubePos);
-            _ClearCoatTest.WorldMatrix = Matrix.CreateScale(.4f) * Matrix.CreateTranslation(_ClearCoatTestPos);
+            //_ClearCoatTest.WorldMatrix = Matrix.CreateScale(.4f) * Matrix.CreateTranslation(_ClearCoatTestPos);
             _SpecGlossVsMetalRough.WorldMatrix = Matrix.CreateScale(15f) * Matrix.CreateTranslation(_SpecGlossVsMetalRoughPos);
 
             _Test.Armature.SetAnimationFrame(0, 0.5f * animTime);
@@ -338,14 +338,14 @@ namespace WillDxSharpGltf
             //_AnimatedMorphCubeTemplate?.Dispose();
             //_AnimatedMorphCubeTemplate = null;
 
-            _TextureTransformMultiTestTemplate?.Dispose();
-            _TextureTransformMultiTestTemplate = null;
+            //_TextureTransformMultiTestTemplate?.Dispose();
+            //_TextureTransformMultiTestTemplate = null;
 
             _TextureTransformTestTemplate?.Dispose();
             _TextureTransformTestTemplate = null;
 
-            _ClearCoatTestTemplate?.Dispose();
-            _ClearCoatTestTemplate = null;
+            //_ClearCoatTestTemplate?.Dispose();
+            //_ClearCoatTestTemplate = null;
 
             _SpecGlossVsMetalRoughTemplate?.Dispose();
             _SpecGlossVsMetalRoughTemplate = null;

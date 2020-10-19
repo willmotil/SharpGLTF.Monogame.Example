@@ -7,7 +7,7 @@
 	#define PS_SHADERMODEL ps_4_0 //_level_9_1
 #endif
 
-//matrix WorldViewProjection;
+//matrix WorldViewProjection;  Anisotropic
 
 matrix World;
 matrix View;
