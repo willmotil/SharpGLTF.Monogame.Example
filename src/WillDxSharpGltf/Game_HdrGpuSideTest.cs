@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -50,23 +51,26 @@ namespace WillDxSharpGltf
         public static Effect _primitivesEffect;
         public static Effect _hdrIblEffect;
 
-        VertexPositionTexture[] screenQuad;
-        VertexPositionTexture[] cube;
-        RasterizerState rs_wireframe = new RasterizerState() { FillMode = FillMode.WireFrame };
-
         DemoCamera _camera;
         bool _useDemoWaypoints = true;
 
-        SpherePNTT _skySphere;
+        //SpherePNTT _skySphere;
+        CubePrimitive skyCube = new CubePrimitive(100, false, false, true);
+        CubePrimitive[] cubes = new CubePrimitive[5];
+
+        VertexPositionTexture[] screenQuad;
+        RasterizerState rs_wireframe = new RasterizerState() { FillMode = FillMode.WireFrame };
 
         float _mipLevelDiffuseIlluminationTestValue = 0;
         float TestValue2 = 1;
-        bool wireframe = false;
+        bool _wireframe = false;
         string msg = "";
 
         private Texture2D _textureHdrEnvMap;
         private Texture2D _premadeLut;
         private Texture2D _generatedTexture;
+
+        int _envMapToDraw = 0; // env =0,  envdif = 1, 
 
         TextureCube _textureCubeEnviroment;
         TextureCube _textureCubeIblDiffuseIllumination;
@@ -105,7 +109,7 @@ namespace WillDxSharpGltf
             _premadeLut = Content.Load<Texture2D>("ibl_brdf_lut");
             _textureHdrEnvMap = Content.Load<Texture2D>("hdr_01");
 
-            Console.WriteLine($" hdri info  \n Format {_textureHdrEnvMap.Format} \n Bounds {_textureHdrEnvMap.Bounds}");
+            Console.WriteLine($" hdri info  \n Format {_textureHdrEnvMap.Format} \n Bounds {_textureHdrEnvMap.Bounds}   IlluminationMapSampleSize {FigureOutSampleSize()} ");
 
             _mts.LoadStandardTestingModels(GraphicsDevice);
 
@@ -124,7 +128,7 @@ namespace WillDxSharpGltf
         {
             Console.WriteLine($"\n Rendered to scene.");
             RenderToSceneFaces(_textureHdrEnvMap, ref _textureCubeEnviroment, "HdrToEnvCubeMap", false, true) ;
-            RenderToSceneFaces(_textureCubeEnviroment, ref _textureCubeIblDiffuseIllumination, "EnvCubemapToDiffuseIlluminationCubeMap", true, true);
+            RenderToSceneFaces(_textureCubeEnviroment, ref _textureCubeIblDiffuseIllumination, "EnvCubemapToDiffuseIlluminationCubeMap", false, true);
         }
 
         #endregion
@@ -132,36 +136,76 @@ namespace WillDxSharpGltf
         protected override void Update(GameTime gameTime)
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-            {
                 Exit();
-            }
 
             if (Keyboard.GetState().IsKeyDown(Keys.Space) && Pause(gameTime))
                 _useDemoWaypoints = ! _useDemoWaypoints;
 
-            if (Keyboard.GetState().IsKeyDown(Keys.D3) && Pause(gameTime))
-                _camera.TransformCamera(new Vector3(0, 0, 0), _camera.Forward, Vector3.Up);
+            if (Keyboard.GetState().IsKeyDown(Keys.D1) && Pause(gameTime))
+                _envMapToDraw = 1;
+
+            if (Keyboard.GetState().IsKeyDown(Keys.D2) && Pause(gameTime))
+                _envMapToDraw = 0;
 
             if (Keyboard.GetState().IsKeyDown(Keys.D4) && Pause(gameTime))
-                wireframe = !wireframe;
+                _wireframe = !_wireframe;
 
             if (Keyboard.GetState().IsKeyDown(Keys.D5) && Pause(gameTime))
+            {
+                Stopwatch stopwatch = new Stopwatch();
+                stopwatch.Start();
                 CreateIblCubeMaps();
+                stopwatch.Stop();
+                Console.WriteLine($" Time elapsed: { stopwatch.Elapsed.TotalMilliseconds}ms   {stopwatch.Elapsed.TotalSeconds}sec ");
+            }
 
             // test mip maps press the 1 key.
-            if (Keyboard.GetState().IsKeyDown(Keys.D1) && Pause(gameTime))
+            if (Keyboard.GetState().IsKeyDown(Keys.F1) && Pause(gameTime))
                 UpdateTestingUiShaderVariables(gameTime);
 
             if (Keyboard.GetState().IsKeyDown(Keys.F2) && Pause(gameTime))
-                Console.WriteLine("if your reading this F2 is pressed");
+                Console.WriteLine("numbOfSamples: " + FigureOutSampleSize() );
+
+            if (Keyboard.GetState().IsKeyDown(Keys.F3) && Pause(gameTime))
+                _camera.TransformCamera(new Vector3(0, 0, 0), _camera.Forward, Vector3.Up);
 
             _camera.Update(ModelTestSuiteExecution._testTarget, _useDemoWaypoints, gameTime);
 
             _mts.UpdateModels(gameTime);
 
-            msg = $" Camera.Forward  { _camera.Forward }  \n _mipLevelTestValue {_mipLevelDiffuseIlluminationTestValue} ";
+            msg = $"Cullmode {GraphicsDevice.RasterizerState.CullMode}  \n Camera.Forward  { _camera.Forward }  \n _mipLevelTestValue {_mipLevelDiffuseIlluminationTestValue} ";
 
             base.Update(gameTime);
+        }
+
+        public int FigureOutSampleSize()
+        {
+            float ToRadians = 0.0174532925f;
+            float numberOfSamplesHemisphere = 16;//6.0f;  // seems to be a ratio that affects quality between the hemisphere and circular sampling direction, maybe i should try to use a spiral like on the golden ratio.
+            float numberOfSamplesAround = 16;//10.0f;
+            float minimumAdjustment = 3.5f;
+            float hemisphereMaxAngle = 45.0f;
+            float hemisphereMaxAngleTheta = hemisphereMaxAngle * ToRadians; // 30;  1.57f // hemisphere
+            float stepTheta = (hemisphereMaxAngle / numberOfSamplesHemisphere) * ToRadians;   //2.5f * ToRadians;  // 2.5f     // y dist
+            //float stepPhi = (360.0f / numberOfSamplesAround) * ToRadians;    //2.85f * ToRadians; // 2.85f  // z roll
+
+            int numbOfSamples = 0;
+            for (float theta = 0.01f; theta < hemisphereMaxAngleTheta; theta += stepTheta) // y 
+            {
+                float earlyOut = (hemisphereMaxAngleTheta / (theta + 0.01f));
+                float stepPhi = (360.0f / numberOfSamplesAround) * 0.0174532925f * earlyOut; // we step out of our inner loop fast when theta is low i.e. we are close to the normal.
+                if (stepPhi > minimumAdjustment)
+                    stepPhi = minimumAdjustment;
+                int numbOfSamplesThisPass = 0;
+                for (float phi = 0; phi < 6.283; phi += stepPhi) // z rot
+                {
+                    numbOfSamples++;
+                    numbOfSamplesThisPass++;
+                }
+                Console.WriteLine($"numbOfSamplesThisPass: {numbOfSamplesThisPass} theta degree span: {theta * 57.295779513f *2f}");
+            }
+            Console.WriteLine($"numbOfSamples: {numbOfSamples}");
+            return numbOfSamples;
         }
 
 
@@ -171,7 +215,7 @@ namespace WillDxSharpGltf
 
             // draw primitives
 
-            if (wireframe)
+            if (_wireframe)
                 GraphicsDevice.RasterizerState = rs_wireframe;
 
             DrawPrimitives(gameTime);
@@ -187,6 +231,96 @@ namespace WillDxSharpGltf
             base.Draw(gameTime);
         }
 
+        // K now i need a new primitive cube to verify that the env is set up right.
+        protected void DrawPrimitives(GameTime gameTime)
+        {
+            //GraphicsDevice.RasterizerState = RasterizerState.CullClockwise;
+            GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+
+            var projectionMatrix = Matrix.CreatePerspectiveFieldOfView(90 * (float)((3.14159265358f) / 180f), GraphicsDevice.Viewport.Width / GraphicsDevice.Viewport.Height, 0.01f, 1000f);
+            _primitivesEffect.Parameters["Projection"].SetValue(projectionMatrix);
+            _primitivesEffect.Parameters["View"].SetValue(_camera.View);   // just add defaults here or dont add anything.
+            _primitivesEffect.Parameters["CameraPosition"].SetValue(Vector3.Zero); //_camera.Position);
+            _primitivesEffect.Parameters["testValue1"].SetValue((int)_mipLevelDiffuseIlluminationTestValue);
+            //_primitivesEffect.Parameters["World"].SetValue(Matrix.Identity);
+
+
+
+            _primitivesEffect.Parameters["World"].SetValue(_camera.World);
+            if (_envMapToDraw == 0)
+                skyCube.DrawPrimitiveCube(GraphicsDevice, _primitivesEffect, _textureCubeEnviroment);
+            else
+                skyCube.DrawPrimitiveCube(GraphicsDevice, _primitivesEffect, _textureCubeIblDiffuseIllumination);
+
+
+            _primitivesEffect.Parameters["Projection"].SetValue(_camera.Projection);
+
+            for (int i = 0; i < 5;  i++)
+            {
+                _primitivesEffect.Parameters["World"].SetValue(Matrix.CreateTranslation(new Vector3(i *5, 5, -6)));
+                if (_envMapToDraw == 0)
+                    cubes[i].DrawPrimitiveCube(GraphicsDevice, _primitivesEffect, _textureCubeEnviroment);
+                else
+                    cubes[i].DrawPrimitiveCube(GraphicsDevice, _primitivesEffect, _textureCubeIblDiffuseIllumination);
+            }
+
+
+            //if (_envMapToDraw == 0)
+            //   _skySphere.Draw(GraphicsDevice, _primitivesEffect, _textureCubeEnviroment);
+            //else
+            //   _skySphere.Draw(GraphicsDevice, _primitivesEffect, _textureCubeIblDiffuseIllumination);
+        }
+
+        public void DrawModelInstances(GameTime gameTime)
+        {
+
+            var animTime = (float)gameTime.TotalGameTime.TotalSeconds;
+
+            var dir = new Vector3((float)Math.Cos(animTime), 0, -(float)Math.Sin(animTime));
+            _LightsAndFog.SetDirectLight(0, -dir, Color.White, 1.0f);
+
+            dir = Matrix.CreateFromAxisAngle(Vector3.Normalize(new Vector3(1, 10, 5)), animTime).Right;
+            _LightsAndFog.SetDirectLight(1, -dir, Color.White, 1.0f);
+
+            dir = Vector3.Normalize(new Vector3(1, 1, -25));
+            _LightsAndFog.SetDirectLight(2, -dir, Color.White, 1.0f);
+
+            _LightsAndFog.SetTestingValue(_mipLevelDiffuseIlluminationTestValue);
+
+            if (_envMapToDraw == 0)
+                _LightsAndFog.SetEnviromentalCubeMap(_textureCubeEnviroment);
+            else
+                _LightsAndFog.SetEnviromentalCubeMap(_textureCubeIblDiffuseIllumination);
+
+            var ctx = new ModelDrawingContext(_Graphics.GraphicsDevice);
+
+            ctx.SetCamera(_camera.World);
+            ctx.SetProjectionMatrix(_camera.Projection);
+
+            // draw all the instances.            
+
+            ctx.DrawSceneInstances
+            (
+                // environment lights and fog
+                _LightsAndFog,
+                // all model instances
+                _mts._Test, _mts._VertexColorTest, _mts._TextureCoordinateTest, _mts._TextureSettingsTest, _mts._MultiUvTest, _mts._TextureTransformMultiTest, _mts._TextureTransformTest, _mts._AlphaBlendModeTest, _mts._NormalTangentMirrorTest, _mts._UnlitTest, _mts._InterpolationTest, _mts._ClearCoatTest, _mts._SpecGlossVsMetalRough  /* , _AnimatedMorphCube */
+             );
+        }
+
+        public void DrawSpriteBatches(GameTime gameTime)
+        {
+            _spriteBatch.Begin();
+
+            _spriteBatch.Draw(_textureHdrEnvMap, new Rectangle(0, 0, 200, 100), Color.White);
+
+            _camera.DrawCurveThruWayPointsWithSpriteBatch(2f, new Vector3(300, 100, 100), 1, gameTime);
+
+            _spriteBatch.DrawString(_font, msg, new Vector2(10, 0), Color.Red);
+
+            _spriteBatch.End();
+        }
+
         /// <summary>
         /// The ref was used to pass the ref variable directly thru here not a ref copy i guess.
         /// </summary>
@@ -197,34 +331,30 @@ namespace WillDxSharpGltf
             if (useHdrFormat)
                 pixelformat = SurfaceFormat.Vector4;
             var renderTargetCube = new RenderTargetCube(GraphicsDevice, 256, generateMips, pixelformat, DepthFormat.None);
-            _hdrIblEffect.CurrentTechnique = _hdrIblEffect.Techniques[Technique]; 
+            _hdrIblEffect.CurrentTechnique = _hdrIblEffect.Techniques[Technique];
             _hdrIblEffect.Parameters["Texture"].SetValue(sourceHdrLdrEquaRectangularMap);
-            for (int i = 0; i < 6; i++) 
+            for (int i = 0; i < 6; i++)
             {
                 switch (i)
                 {
-                    case 0: // FACE_FORWARD
+                    case (int)CubeMapFace.NegativeX: // FACE_LEFT
+                        GraphicsDevice.SetRenderTarget(renderTargetCube, CubeMapFace.NegativeX);
+                        break;
+                    case (int)CubeMapFace.NegativeZ: // FACE_FORWARD
                         GraphicsDevice.SetRenderTarget(renderTargetCube, CubeMapFace.NegativeZ);
                         break;
-                    case 2: // FACE_LEFT
-                        GraphicsDevice.SetRenderTarget(renderTargetCube, CubeMapFace.NegativeX);
-                        break;
-                    case 3: // FACE_BACK
-                        GraphicsDevice.SetRenderTarget(renderTargetCube, CubeMapFace.PositiveZ);
-                        break;
-                    case 5: // FACE_RIGHT
+                    case (int)CubeMapFace.PositiveX: // FACE_RIGHT
                         GraphicsDevice.SetRenderTarget(renderTargetCube, CubeMapFace.PositiveX);
                         break;
+                    case (int)CubeMapFace.PositiveZ: // FACE_BACK
+                        GraphicsDevice.SetRenderTarget(renderTargetCube, CubeMapFace.PositiveZ);
+                        break;
 
-                    case 1: // FACE_TOP
+                    case (int)CubeMapFace.PositiveY: // FACE_TOP
                         GraphicsDevice.SetRenderTarget(renderTargetCube, CubeMapFace.PositiveY);
                         break;
-                    case 4: // FACE_BOTTOM
+                    case (int)CubeMapFace.NegativeY: // FACE_BOTTOM
                         GraphicsDevice.SetRenderTarget(renderTargetCube, CubeMapFace.NegativeY);
-                        break;
-
-                    default:
-                        GraphicsDevice.SetRenderTarget(renderTargetCube, CubeMapFace.NegativeX);
                         break;
                 }
                 _hdrIblEffect.Parameters["FaceToMap"].SetValue(i); // render screenquad to face.
@@ -256,29 +386,29 @@ namespace WillDxSharpGltf
             {
                 switch (i)
                 {
-                    case 0: // FACE_FORWARD
-                        GraphicsDevice.SetRenderTarget(renderTargetCube, CubeMapFace.NegativeZ);
-                        break;
-                    case 2: // FACE_LEFT
+                    case (int)CubeMapFace.NegativeX: // FACE_LEFT
                         GraphicsDevice.SetRenderTarget(renderTargetCube, CubeMapFace.NegativeX);
                         break;
-                    case 3: // FACE_BACK
-                        GraphicsDevice.SetRenderTarget(renderTargetCube, CubeMapFace.PositiveZ);
+                    case (int)CubeMapFace.NegativeZ: // FACE_FORWARD
+                        GraphicsDevice.SetRenderTarget(renderTargetCube, CubeMapFace.NegativeZ);
                         break;
-                    case 5: // FACE_RIGHT
+                    case (int)CubeMapFace.PositiveX: // FACE_RIGHT
                         GraphicsDevice.SetRenderTarget(renderTargetCube, CubeMapFace.PositiveX);
                         break;
-
-                    case 1: // FACE_TOP
-                        GraphicsDevice.SetRenderTarget(renderTargetCube, CubeMapFace.PositiveY);
+                    case (int)CubeMapFace.PositiveZ: // FACE_BACK
+                        GraphicsDevice.SetRenderTarget(renderTargetCube, CubeMapFace.PositiveZ);
                         break;
-                    case 4: // FACE_BOTTOM
+
+                    case (int)CubeMapFace.PositiveY: // FACE_TOP
+                        GraphicsDevice.SetRenderTarget(renderTargetCube, CubeMapFace.PositiveY);
+                        break; 
+                    case (int)CubeMapFace.NegativeY: // FACE_BOTTOM
                         GraphicsDevice.SetRenderTarget(renderTargetCube, CubeMapFace.NegativeY);
                         break;
 
-                    default:
-                        GraphicsDevice.SetRenderTarget(renderTargetCube, CubeMapFace.NegativeX);
-                        break;
+                        //default:
+                        //    GraphicsDevice.SetRenderTarget(renderTargetCube, CubeMapFace.NegativeX);
+                        //    break;
                 }
                 _hdrIblEffect.Parameters["FaceToMap"].SetValue(i); // render screenquad to face.
                 foreach (EffectPass pass in _hdrIblEffect.CurrentTechnique.Passes)
@@ -293,19 +423,6 @@ namespace WillDxSharpGltf
             Console.WriteLine($" Cubemap source ... Technique {Technique}  resultingTextureCube.Format {textureCubeDestinationMap.Format}  resultingTextureCube.LevelCount {textureCubeDestinationMap.LevelCount}");
         }
 
-        // K now i need a new primitive cube to verify that the env is set up right.
-        protected void DrawPrimitives(GameTime gameTime)
-        {
-            var projectionMatrix = Matrix.CreatePerspectiveFieldOfView(90 * (float)((3.14159265358f) / 180f), GraphicsDevice.Viewport.Width / GraphicsDevice.Viewport.Height, 0.01f, 1000f);
-            _primitivesEffect.Parameters["View"].SetValue(_camera.View);   // just add defaults here or dont add anything.
-            _primitivesEffect.Parameters["CameraPosition"].SetValue(Vector3.Zero); //_camera.Position);
-            _primitivesEffect.Parameters["Projection"].SetValue(projectionMatrix);
-            _primitivesEffect.Parameters["testValue1"].SetValue((int)_mipLevelDiffuseIlluminationTestValue);
-            _primitivesEffect.Parameters["World"].SetValue(Matrix.Identity);
-
-            //_skySphere.Draw(GraphicsDevice, _primitivesEffect, _textureCubeEnviroment);
-            _skySphere.Draw(GraphicsDevice, _primitivesEffect, _textureCubeIblDiffuseIllumination);
-        }
 
 
 
@@ -335,50 +452,6 @@ namespace WillDxSharpGltf
                 _mipLevelDiffuseIlluminationTestValue = 0;
         }
 
-        public void DrawSpriteBatches(GameTime gameTime)
-        {
-            _spriteBatch.Begin();
-
-            _spriteBatch.Draw(_textureHdrEnvMap, new Rectangle(0, 0, 200, 100), Color.White);
-
-            _camera.DrawCurveThruWayPointsWithSpriteBatch(2f, new Vector3(300, 100, 100), 1, gameTime);
-
-            _spriteBatch.DrawString(_font, msg, new Vector2(10, 0), Color.Red);
-
-            _spriteBatch.End();
-        }
-
-        public void DrawModelInstances(GameTime gameTime)
-        {
-
-            var animTime = (float)gameTime.TotalGameTime.TotalSeconds;
-
-            var dir = new Vector3((float)Math.Cos(animTime), 0, -(float)Math.Sin(animTime));
-            _LightsAndFog.SetDirectLight(0, dir, Color.White, 1.0f);
-
-            dir = Matrix.CreateFromAxisAngle(Vector3.Normalize(new Vector3(1, 10, 5)), animTime).Right;
-            _LightsAndFog.SetDirectLight(1, dir, Color.White, 1.0f);
-
-            dir = Vector3.Normalize(new Vector3(1, 1, -25));
-            _LightsAndFog.SetDirectLight(2, dir, Color.White, 1.0f);
-
-            _LightsAndFog.SetTestingValue(_mipLevelDiffuseIlluminationTestValue);
-
-            var ctx = new ModelDrawingContext(_Graphics.GraphicsDevice);
-
-            ctx.SetCamera(_camera.World);
-
-            // draw all the instances.            
-
-            ctx.DrawSceneInstances
-            (
-                // environment lights and fog
-                _LightsAndFog,
-                // all model instances
-                _mts._Test, _mts._VertexColorTest, _mts._TextureCoordinateTest, _mts._TextureSettingsTest, _mts._MultiUvTest, _mts._TextureTransformMultiTest, _mts._TextureTransformTest, _mts._AlphaBlendModeTest, _mts._NormalTangentMirrorTest, _mts._UnlitTest, _mts._InterpolationTest, _mts._ClearCoatTest, _mts._SpecGlossVsMetalRough  /* , _AnimatedMorphCube */
-             );
-        }
-
         protected override void UnloadContent()
         {
             _mts.UnloadContent();
@@ -387,8 +460,9 @@ namespace WillDxSharpGltf
         public void LoadPrimitives()
         {
             CreateScreenQuad();
-            cube = CubeMapHelper.CreatePrimitiveCube();
-            _skySphere = new SpherePNTT(true, false, false, 25, 1000, true, false);
+            for(int i = 0; i < 5;i ++)
+                cubes[i] = new CubePrimitive(1, true, false, true);
+            //_skySphere = new SpherePNTT(true, false, false, 25, 1000, true, false);
         }
 
         public void SetupCamera()
@@ -445,4 +519,46 @@ namespace WillDxSharpGltf
 
     }
 
+    public class BasicFps
+    {
+        private double frames = 0;
+        private double updates = 0;
+        private double elapsed = 0;
+        private double last = 0;
+        private double now = 0;
+        public double msgFrequency = 1.0f;
+        public string msg = "";
+
+        /// <summary>
+        /// The msgFrequency here is the reporting time to update the message.
+        /// </summary>
+        public void Update(GameTime gameTime)
+        {
+            // Short Answer can do it like this time elapsed per frame. 
+            // This is delta time to keep things straight for movement.
+            // elapsedThisFrame = (double)(gameTime.ElapsedGameTime.TotalSeconds); 
+
+            // You can do this if your adding up elapsed time to do something like a timer or countdown or up till you display a msg.
+            // elapsedTimeCumulative += (double)(gameTime.ElapsedGameTime.TotalSeconds); 
+
+            // I do this just because i usually want to get the time now as well.
+            now = gameTime.TotalGameTime.TotalSeconds;
+            elapsed = (double)(now - last);
+            if (elapsed > msgFrequency)
+            {
+                msg = " Fps: " + (frames / elapsed).ToString() + "\n Elapsed time: " + elapsed.ToString() + "\n Updates: " + updates.ToString() + "\n Frames: " + frames.ToString();
+                elapsed = 0;
+                frames = 0;
+                updates = 0;
+                last = now;
+            }
+            updates++;
+        }
+
+        public void DrawFps(SpriteBatch spriteBatch, SpriteFont font, Vector2 fpsDisplayPosition, Color fpsTextColor)
+        {
+            spriteBatch.DrawString(font, msg, fpsDisplayPosition, fpsTextColor);
+            frames++;
+        }
+    }
 }

@@ -1,8 +1,9 @@
+C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillDxSharpGltf\bin\Debug\netcoreapp3.1\Content\CubeFaces\negx.xnb
+C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillDxSharpGltf\bin\Debug\netcoreapp3.1\MonoGame.Framework.Graphics.EffectsPBR.dll
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillDxSharpGltf\bin\Debug\netcoreapp3.1\Content\CubeFaces\back.xnb
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillDxSharpGltf\bin\Debug\netcoreapp3.1\Content\CubeFaces\bottom.xnb
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillDxSharpGltf\bin\Debug\netcoreapp3.1\Content\CubeFaces\front.xnb
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillDxSharpGltf\bin\Debug\netcoreapp3.1\Content\CubeFaces\left.xnb
-C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillDxSharpGltf\bin\Debug\netcoreapp3.1\Content\CubeFaces\negx.xnb
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillDxSharpGltf\bin\Debug\netcoreapp3.1\Content\CubeFaces\negy.xnb
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillDxSharpGltf\bin\Debug\netcoreapp3.1\Content\CubeFaces\negz.xnb
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillDxSharpGltf\bin\Debug\netcoreapp3.1\Content\CubeFaces\posx.xnb
@@ -16,6 +17,8 @@ C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillDxSharpGltf\b
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillDxSharpGltf\bin\Debug\netcoreapp3.1\Content\CubeFaces\_left256.xnb
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillDxSharpGltf\bin\Debug\netcoreapp3.1\Content\CubeFaces\_right256.xnb
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillDxSharpGltf\bin\Debug\netcoreapp3.1\Content\CubeFaces\_top256.xnb
+C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillDxSharpGltf\bin\Debug\netcoreapp3.1\Content\HdrIBLEffectTest.xnb
+C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillDxSharpGltf\bin\Debug\netcoreapp3.1\Content\hdr_01.xnb
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillDxSharpGltf\bin\Debug\netcoreapp3.1\Content\ibl_brdf_lut.xnb
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillDxSharpGltf\bin\Debug\netcoreapp3.1\Content\ibl_ldr_generatedStPeters.xnb
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillDxSharpGltf\bin\Debug\netcoreapp3.1\Content\ibl_ldr_generatedWater.xnb
@@ -94,7 +97,6 @@ C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillDxSharpGltf\b
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillDxSharpGltf\bin\Debug\netcoreapp3.1\runtimes\win7-arm\native\libuv.dll
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillDxSharpGltf\bin\Debug\netcoreapp3.1\runtimes\win7-x64\native\libuv.dll
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillDxSharpGltf\bin\Debug\netcoreapp3.1\runtimes\win7-x86\native\libuv.dll
-C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillDxSharpGltf\bin\Debug\netcoreapp3.1\MonoGame.Framework.Graphics.EffectsPBR.dll
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillDxSharpGltf\bin\Debug\netcoreapp3.1\MonoGame.Framework.Graphics.Model3D.dll
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillDxSharpGltf\bin\Debug\netcoreapp3.1\MonoGame.Framework.Graphics.Scene3D.dll
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillDxSharpGltf\bin\Debug\netcoreapp3.1\MonoGame.Framework.Pipeline.GLTF.dll
@@ -109,6 +111,4 @@ C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillDxSharpGltf\o
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillDxSharpGltf\obj\Debug\netcoreapp3.1\WillDxSharpGltf.dll
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillDxSharpGltf\obj\Debug\netcoreapp3.1\WillDxSharpGltf.pdb
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillDxSharpGltf\obj\Debug\netcoreapp3.1\WillDxSharpGltf.genruntimeconfig.cache
-C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillDxSharpGltf\bin\Debug\netcoreapp3.1\Content\HdrIBLEffectTest.xnb
-C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillDxSharpGltf\bin\Debug\netcoreapp3.1\Content\hdr_01.xnb
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillDxSharpGltf\obj\Debug\netcoreapp3.1\WillDxSharpGltf.csprojAssemblyReference.cache

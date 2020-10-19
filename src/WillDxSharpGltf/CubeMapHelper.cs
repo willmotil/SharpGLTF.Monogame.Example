@@ -9,14 +9,17 @@ namespace WillDxSharpGltf
 {
     public static class CubeMapHelper
     {
-        public const int FACE_LEFT = 0; // NegativeX
-        public const int FACE_BOTTOM = 1; // NegativeY
-        public const int FACE_BACK = 2; // NegativeZ
-        public const int FACE_RIGHT = 3; // PositiveX
-        public const int FACE_TOP = 4; // PositiveY
-        public const int FACE_FRONT = 5; // PositiveZ
+        public const int FACE_LEFT = (int)CubeMapFace.NegativeX; // NegativeX 1
+        public const int FACE_FRONT = (int)CubeMapFace.NegativeZ; // NegativeZ 5
+        public const int FACE_RIGHT = (int)CubeMapFace.PositiveX; // PositiveX 0
+        public const int FACE_BACK = (int)CubeMapFace.PositiveZ; // PositiveZ 4
+        public const int FACE_TOP = (int)CubeMapFace.PositiveY; // PositiveY 2
+        public const int FACE_BOTTOM = (int)CubeMapFace.NegativeY; // NegativeY 3
+
 
         public const float PI = (float)Math.PI;
+
+        public static Matrix GetRenderTargetCubeProjectionMatrix(GraphicsDevice _device) { return Matrix.CreatePerspectiveFieldOfView(90 * (float)((3.14159265358f) / 180f), _device.Viewport.Width / _device.Viewport.Height, 0.01f, 1000f); }
 
         /// <summary>
         /// Set faces to cubemap by name, neg xyz,  pos  xyz.  tested passes.
@@ -442,20 +445,21 @@ namespace WillDxSharpGltf
                         case FACE_LEFT:
                             mapColorData[eqIndex] = leftColorData[findex]; // NegativeX;
                             break;
-                        case FACE_BOTTOM:
-                            mapColorData[eqIndex] = bottomColorData[findex]; // NegativeY;
-                            break;
-                        case FACE_BACK:
-                            mapColorData[eqIndex] = backColorData[findex]; // NegativeZ;
+                        case FACE_FRONT:
+                            mapColorData[eqIndex] = frontColorData[findex]; // PositiveZ;
                             break;
                         case FACE_RIGHT:
                             mapColorData[eqIndex] = rightColorData[findex]; // PositiveX;
                             break;
+                        case FACE_BACK:
+                            mapColorData[eqIndex] = backColorData[findex]; // NegativeZ;
+                            break;
+
                         case FACE_TOP:
                             mapColorData[eqIndex] = topColorData[findex]; // PositiveY;
                             break;
-                        case FACE_FRONT:
-                            mapColorData[eqIndex] = frontColorData[findex]; // PositiveZ;
+                        case FACE_BOTTOM:
+                            mapColorData[eqIndex] = bottomColorData[findex]; // NegativeY;
                             break;
                         default:
                             mapColorData[eqIndex] = leftColorData[findex]; // PositiveZ;
@@ -516,19 +520,19 @@ namespace WillDxSharpGltf
             Vector2 uv;
             if (vAbs.Z >= vAbs.X && vAbs.Z >= vAbs.Y)
             {
-                faceIndex = v.Z < 0.0 ? FACE_BACK : FACE_FRONT; //5 : 4;  // z major axis.
+                faceIndex = v.Z < 0.0 ? FACE_FRONT : FACE_BACK;   // z major axis.  we designate negative z forward.
                 ma = 0.5f / vAbs.Z;
                 uv = new Vector2(v.Z < 0.0f ? -v.X : v.X, -v.Y);
             }
             else if (vAbs.Y >= vAbs.X)
             {
-                faceIndex = v.Y < 0.0f ? FACE_BOTTOM : FACE_TOP; // 3 : 2; // y major axis.
+                faceIndex = v.Y < 0.0f ? FACE_BOTTOM : FACE_TOP;  // y major axis.
                 ma = 0.5f / vAbs.Y;
                 uv = new Vector2(v.X, v.Y < 0.0 ? -v.Z : v.Z);
             }
             else
             {
-                faceIndex = v.X < 0.0 ? FACE_LEFT : FACE_RIGHT; // 1 : 0; // x major axis.
+                faceIndex = v.X < 0.0 ? FACE_LEFT : FACE_RIGHT; // x major axis.
                 ma = 0.5f / vAbs.X;
                 uv = new Vector2(v.X < 0.0 ? v.Z : -v.Z, -v.Y);
             }
@@ -545,24 +549,26 @@ namespace WillDxSharpGltf
             Vector3 dir = new Vector3(0f, 0f, 1f);
             switch (faceIndex)
             {
-                case FACE_BACK: 
-                    dir = new Vector3(-1f, v, -u); 
+                case FACE_LEFT:
+                    dir = new Vector3(-1f, v, -u);          
                     break;
-                case FACE_TOP: 
-                    dir = new Vector3(v, -1f, u); 
-                    break;
-                case FACE_LEFT: 
-                    dir = new Vector3(u, v, -1f); 
-                    break;
-                case FACE_FRONT: 
-                    dir = new Vector3(1f, v, u);
-                    break;
-                case FACE_BOTTOM:
-                    dir = new Vector3(-v, 1f, u); 
+                case FACE_FRONT:
+                    dir = new Vector3(u, v, -1f);         
                     break;
                 case FACE_RIGHT:
-                    dir = new Vector3(-u, v, 1f); 
+                    dir = new Vector3(1f, v, u);
                     break;
+                case FACE_BACK:
+                    dir = new Vector3(-u, v, 1f);
+                    break;
+
+                case FACE_TOP:
+                    dir = new Vector3(-v, -1f, -u);
+                    break;
+                case FACE_BOTTOM:
+                    dir = new Vector3(v, 1f, -u);
+                    break;
+
                 default:
                     dir = new Vector3(-1f, -1f, -1f); // na
                     break;
@@ -572,6 +578,36 @@ namespace WillDxSharpGltf
             return dir;
         }
 
+        //public static Vector3 FlipFace(Vector3 n, int faceIndex)
+        //{
+        //    var u = n.X;
+        //    var v = n.Y;
+        //    var dir = new Vector3(0, 0, -1);
+        //    switch (faceIndex)
+        //    {
+        //        case FACE_LEFT: //FACE_LEFT: CubeMapFace.NegativeX
+        //            dir = new Vector3(1.0f, v, -u);
+        //            break;
+        //        case FACE_FRONT: // FACE_FORWARD: CubeMapFace.NegativeZ
+        //            dir = new Vector3(u, v, 1.0f);
+        //            break;
+        //        case FACE_RIGHT: //FACE_RIGHT: CubeMapFace.PositiveX
+        //            dir = new Vector3(-1.0f, v, u);
+        //            break;
+        //        case FACE_BACK: //FACE_BACK: CubeMapFace.PositiveZ
+        //            dir = new Vector3(-u, v, -1.0f);
+        //            break;
+
+        //        case FACE_TOP: //FACE_TOP: CubeMapFace.PositiveY
+        //            dir = new Vector3(-v, 1.0f, -u);
+        //            break;
+        //        case FACE_BOTTOM: //FACE_BOTTOM : CubeMapFace.NegativeY
+        //            dir = new Vector3(v, -1.0f, -u);
+        //            break;
+        //    }
+        //    return dir;
+        //}
+
         /// <summary>
         /// Gets the Cube Face enum from the corresponding integer used in a switch case.
         /// </summary>
@@ -580,80 +616,31 @@ namespace WillDxSharpGltf
             CubeMapFace f;
             switch (face)
             {
-                case FACE_LEFT:
+                case (int)CubeMapFace.NegativeX:
                     f = CubeMapFace.NegativeX;
                     break;
-                case FACE_BOTTOM:
-                    f = CubeMapFace.NegativeY;
-                    break;
-                case FACE_BACK:
+                case (int)CubeMapFace.NegativeZ:
                     f = CubeMapFace.NegativeZ;
                     break;
-                case FACE_RIGHT:
+                case (int)CubeMapFace.PositiveX:
                     f = CubeMapFace.PositiveX;
                     break;
-                case FACE_TOP:
+                case (int)CubeMapFace.PositiveZ:
+                    f = CubeMapFace.PositiveZ;
+                    break;
+
+                case (int)CubeMapFace.PositiveY:
                     f = CubeMapFace.PositiveY;
                     break;
-                case FACE_FRONT:
-                    f = CubeMapFace.PositiveZ;
+                case (int)CubeMapFace.NegativeY:
+                    f = CubeMapFace.NegativeY;
                     break;
+
                 default:
-                    f = CubeMapFace.PositiveZ;
+                    f = CubeMapFace.PositiveZ; // technically i should throw a error here but im not gonna bloat things worse.
                     break;
             }
             return f;
-        }
-
-        public static VertexPositionTexture[] CreatePrimitiveCube()
-        {
-            var r = new Rectangle(-1, -1, 2, 2);
-            var cubesFaces = new VertexPositionTexture[36];
-            int i = 0;
-            for (int faceIndex = 0; faceIndex < 6; faceIndex++)
-            {
-                //RasterizerState.CullClockwise
-                //t1
-                cubesFaces[i + 0] = new VertexPositionTexture(FlipFace(new Vector3(r.Left, r.Top, 0f), faceIndex), new Vector2(0f, 0f));  // p1
-                cubesFaces[i + 1] = new VertexPositionTexture(FlipFace(new Vector3(r.Left, r.Bottom, 0f), faceIndex), new Vector2(0f, 1f)); // p0
-                cubesFaces[i + 2] = new VertexPositionTexture(FlipFace(new Vector3(r.Right, r.Bottom, 0f), faceIndex), new Vector2(1f, 1f));// p3
-                //t2
-                cubesFaces[i + 3] = new VertexPositionTexture(FlipFace(new Vector3(r.Right, r.Bottom, 0f), faceIndex), new Vector2(1f, 1f));// p3
-                cubesFaces[i + 4] = new VertexPositionTexture(FlipFace(new Vector3(r.Right, r.Top, 0f), faceIndex), new Vector2(1f, 0f));// p2
-                cubesFaces[i + 5] = new VertexPositionTexture(FlipFace(new Vector3(r.Left, r.Top, 0f), faceIndex), new Vector2(0f, 0f)); // p1
-                i += 6;
-            }
-            return cubesFaces;
-        }
-
-        public static Vector3 FlipFace(Vector3 n, int faceIndex)
-        {
-            var u = n.X;
-            var v = n.Y;
-            var dir = new Vector3(0, 0, -1);
-            switch (faceIndex)
-            {
-                case 0: // FACE_FORWARD: CubeMapFace.NegativeZ
-                    dir = new Vector3(-1.0f, v, u);
-                    break;
-                case 2: //FACE_LEFT: CubeMapFace.NegativeX
-                    dir = new Vector3(u, v, 1.0f);
-                    break;
-                case 3: //FACE_BACK: CubeMapFace.PositiveZ
-                    dir = new Vector3(1.0f, v, -u);
-                    break;
-                case 5: //FACE_RIGHT: CubeMapFace.PositiveX
-                    dir = new Vector3(-u, v, -1.0f);
-                    break;
-
-                case 1: //FACE_TOP: CubeMapFace.PositiveY
-                    dir = new Vector3(-v, 1.0f, -u);
-                    break;
-                case 4: //FACE_BOTTOM : CubeMapFace.NegativeY
-                    dir = new Vector3(v, -1.0f, u);
-                    break;
-            }
-            return dir;
         }
 
         public static Vector2 UvFromTexturePixel(Texture2D texture, Vector2 pixel)
@@ -774,165 +761,125 @@ namespace WillDxSharpGltf
             if (n < 0) return -n; else return n;
         }
     }
-}
 
+    public class CubePrimitive
+    {
+        public static Matrix matrixNegativeX = Matrix.CreateWorld(Vector3.Zero, new Vector3(-1.0f, 0, 0), Vector3.Up);
+        public static Matrix matrixNegativeZ = Matrix.CreateWorld(Vector3.Zero, new Vector3(0, 0, -1.0f), Vector3.Up);
+        public static Matrix matrixPositiveX = Matrix.CreateWorld(Vector3.Zero, new Vector3(1.0f, 0, 0), Vector3.Up);
+        public static Matrix matrixPositiveZ = Matrix.CreateWorld(Vector3.Zero, new Vector3(0, 0, 1.0f), Vector3.Up); 
+        public static Matrix matrixPositiveY = Matrix.CreateWorld(Vector3.Zero, new Vector3(0, 1.0f, 0), Vector3.Backward);
+        public static Matrix matrixNegativeY = Matrix.CreateWorld(Vector3.Zero, new Vector3(0, -1.0f, 0), Vector3.Forward);
 
-// First were ill tackle the diffuse portion and get a irradiance map.
-// for the moment im using a ix sided low dynamic range (LDR)
-/*
+        public VertexPositionNormalTexture[] cubesFaces;
 
- https://learnopengl.com/PBR/IBL/Diffuse-irradiance
- cubemap environment map  > irradiance map
+        public CubePrimitive()
+        {
+            CreatePrimitiveCube(1, false, true, true);
+        }
+        public CubePrimitive(float scale, bool clockwise, bool invert, bool directionalFaces)
+        {
+            CreatePrimitiveCube(scale, clockwise, invert, directionalFaces);
+        }
 
- https://learnopengl.com/PBR/IBL/Specular-IBL
+        public void CreatePrimitiveCube(float scale , bool clockwise, bool invert, bool directionalFaces)
+        {
+            var r = new Rectangle(-1, -1, 2, 2);
+            cubesFaces = new VertexPositionNormalTexture[36];
 
- http://www.hdrlabs.com/sibl/archive.html  equirectangular map  https://floyd.lbl.gov/radiance/refer/Notes/picture_format.html
-what the CubeMapGen code does http://www.rorydriscoll.com/2012/01/15/cubemap-texel-solid-angle/
-cross image ldr maps http://www.humus.name/index.php?page=Textures
-discussion https://stackoverflow.com/questions/29678510/convert-21-equirectangular-panorama-to-cube-map lots of code.
-https://stackoverflow.com/questions/34250742/converting-a-cubemap-into-equirectangular-panorama?noredirect=1&lq=1
-http://www.adriancourreges.com/blog/2016/09/09/doom-2016-graphics-study/
+            float depth = -scale;
+            if (invert)
+                depth = -depth;
 
-*/
-/* Hlsl stuff that is related gonna have to figure out how to fit this in as well as other stuff.
+            var p0 = new Vector3(r.Left * scale, r.Top * scale, depth);
+            var p1 = new Vector3(r.Left * scale, r.Bottom * scale, depth);
+            var p2 = new Vector3(r.Right * scale, r.Bottom * scale, depth);
+            var p3 = new Vector3(r.Right * scale, r.Bottom * scale, depth);
+            var p4 = new Vector3(r.Right * scale, r.Top * scale, depth);
+            var p5 = new Vector3(r.Left * scale, r.Top * scale, depth);
 
-TextureCube CubeMap;
-sampler CubeMapSampler = sampler_state
-{
-texture = <CubeMap>;
-magfilter = linear; /// set it to point ect
-minfilter = linear;
-mipfilter = linear;
-AddressU = clamp;
-AddressV = clamp;
-//AddressW = clamp;
-};
-
-// Placed after point lights.
-
-//____________________________________________________________________
-// Enviromental reflections and refraction.
-//____________________________________________________________________
-
-float maxMipLevel = 9;
-float mipLevel = roughness * maxMipLevel;
-float scaledRoughness = (roughness * 0.5f + 0.5f);
-float3 F = xfresnelSchlickRoughness(max(dot(N, V), 0.0f), F0, roughness);
-float3 InvF = (1.0f - F);
-float3 kS = F;
-float3 kD = InvF * dielectricity;
-float3 NR = N * roughness + R * smoothness;
-float3 irradiance = texCUBElod(CubeMapSampler, float4(NR, maxMipLevel * roughness)).rgb;
-float3 diffuse = (irradiance.r + irradiance.g + irradiance.b) * 0.3333f * albedo; //albedo * irradiance;
-float3 specular = irradiance * albedo; 
-float3 ambient = (kD * diffuse + kS * specular); // * occlusion;
-// add env light and point lights
-float3 outColor = ambient + Lo;
-
-
-// used to determine the inflection placement position from point a to a normal opposite the plane. \|/
-float3 InflectionPositionFromPlane(float3 anyPositionOnPlaneP, float3 theSurfaceNormalN, float3 theCameraPostionC)
-{
-// also gives the length when placed againsts a unit normal so any unit n * a distance is the distance to that normals plane no matter the normals direction. 
-float camToPlaneDist = dot(theSurfaceNormalN, theCameraPostionC - anyPositionOnPlaneP);
-return theCameraPostionC - theSurfaceNormalN * camToPlaneDist * 2;
-}
-
-// thanks to pumkin pudding for this function.
-float3 Function2dSphericalUvCoordinatesTo3dCubeMapNormal(float2 uvCoords)
-{
-float pi = 3.14159265358f;
-float3 v = float3(0.0f, 0.0f, 0.0f);
-float2 uv = uvCoords;
-uv *= float2(2.0f * pi, pi);
-float siny = sin(uv.y);
-v.x = -sin(uv.x) * siny;
-v.y = cos(uv.y);
-v.z = -cos(uv.x) * siny;
-return v;
-}
-
-// thanks to pumkin pudding for this function.
-float2 Function3dCubeMapNormalTo2dSphericalUvCoordinates(float3 normal)
-{
-const float2 INVERT_ATAN = float2(0.1591f, 0.3183f);
-float2 uv = float2(atan2(normal.z, normal.x), asin(normal.y));
-uv *= INVERT_ATAN;
-uv += 0.5f;
-return uv;
-}
-
-
-        ///// <summary>
-        ///// Ok so this is a destination pixel version this doesn't handle mipmaps correctly that needs to be fixed up.
-        ///// </summary>
-        //public static TextureCube GetCubeMapFromEquaRectangularMap(GraphicsDevice gd, Texture2D equaRectangularMap, int faceSize)
-        //{
-        //    TextureCube cubeMap;
-        //    cubeMap = new TextureCube(gd, faceSize, true, SurfaceFormat.Color);
-        //    Color[] mapColorData = new Color[equaRectangularMap.Width * equaRectangularMap.Height];
-        //    equaRectangularMap.GetData<Color>(mapColorData);
-        //    int eqw = equaRectangularMap.Width;
-        //    int eqh = equaRectangularMap.Height;
-        //    var eqLevelCount = equaRectangularMap.LevelCount;
-        //    // ...
-        //    Texture2D[] textureFaces = new Texture2D[6];
-        //    var wh = new Vector2(faceSize - 1, faceSize - 1);
-        //    for (int index = 0; index < 6; index++)
-        //    {
-        //        var cubeMapFace = GetFaceFromInt(index);
-        //        Color[] faceData = new Color[faceSize * faceSize];
-        //        textureFaces[index] = new Texture2D(gd, faceSize, faceSize);
-        //        // For each face set its pixels from the equaRectangularMap.
-        //        for (int y = 0; y < faceSize; y++)
-        //        {
-        //            for (int x = 0; x < faceSize; x++)
-        //            {
-        //                var fuv = new Vector2(x, y) / wh;
-        //                var v = UvFaceToCubeMapVector(fuv, index);
-        //                var uv = CubeMapNormalTo2dEquaRectangularMapUvCoordinates(v);
-        //                var eqIndex = (int)(uv.X * eqw) + ((int)(uv.Y * eqh) * eqw);
-        //                faceData[x + (y * faceSize)] = mapColorData[eqIndex];
-        //            }
-        //        }
-        //        textureFaces[index].SetData<Color>(faceData);
-        //    }
-        //    for (int index = 0; index < 6; index++)
-        //    {
-        //        // Set Texture To Cube Map Face. 
-        //        var t = textureFaces[index];
-        //        var face = GetFaceFromInt(index);
-        //        for (int level = 0; level < t.LevelCount; level += 1)
-        //        {
-        //            // Allocations here so be mindful of when you load.
-        //            var data = new Color[(t.Width >> level) * (t.Height >> level)];
-        //            t.GetData(level, null, data, 0, data.Length);
-        //            cubeMap.SetData(face, level, null, data, 0, data.Length);
-        //        }
-        //    }
-        //    return cubeMap;
-        //}
-
-        //public static void SetTextureToCubeMapFace(TextureCube cubeMap, Texture2D textureFace, CubeMapFace faceId)
-        //{
-        //    for (int level = 0; level < textureFace.LevelCount; level += 1)
-        //    {
-        //        // Allocations here so be mindful of when you load.
-        //        var faceData = new Color[(textureFace.Width >> level) * (textureFace.Height >> level)];
-        //        textureFace.GetData(level, null, faceData, 0, faceData.Length);
-        //        cubeMap.SetData(faceId, level, null, faceData, 0, faceData.Length);
-        //    }
-        //}
-
-#define PI 3.141592653589793
-                inline float2 RadialCoords(float3 a_coords)
+            int i = 0;
+            for (int faceIndex = 0; faceIndex < 6; faceIndex++)
+            {
+                if (clockwise == false)
                 {
-                    float3 a_coords_n = normalize(a_coords);
-                    float lon = atan2(a_coords_n.z, a_coords_n.x);
-                    float lat = acos(a_coords_n.y);
-                    float2 sphereCoords = float2(lon, lat) * (1.0 / PI);
-                    return float2(sphereCoords.x * 0.5 + 0.5, 1 - sphereCoords.y);
+                    //t1
+                    cubesFaces[i + 0] = GetVertice(p0, faceIndex, directionalFaces, depth, new Vector2(0f, 0f)); // p0
+                    cubesFaces[i + 1] = GetVertice(p1, faceIndex, directionalFaces, depth, new Vector2(0f, 1f)); // p1
+                    cubesFaces[i + 2] = GetVertice(p2, faceIndex, directionalFaces, depth, new Vector2(1f, 1f)); // p2
+                    //t2                                                                                                                                                    
+                    cubesFaces[i + 3] = GetVertice(p3, faceIndex, directionalFaces, depth, new Vector2(1f, 1f)); // p3
+                    cubesFaces[i + 4] = GetVertice(p4, faceIndex, directionalFaces, depth, new Vector2(1f, 0f)); // p4
+                    cubesFaces[i + 5] = GetVertice(p5, faceIndex, directionalFaces, depth, new Vector2(0f, 0f)); // p5
                 }
+                else
+                {
+                    //t1
+                    cubesFaces[i + 0] = GetVertice(p0, faceIndex, directionalFaces, depth, new Vector2(0f, 0f)); // 0-p0
+                    cubesFaces[i + 2] = GetVertice(p1, faceIndex, directionalFaces, depth, new Vector2(0f, 1f)); // 2-p1
+                    cubesFaces[i + 1] = GetVertice(p2, faceIndex, directionalFaces, depth, new Vector2(1f, 1f)); // 1-p2
+                    //t2                                                                                                                                                      
+                    cubesFaces[i + 4] = GetVertice(p3, faceIndex, directionalFaces, depth, new Vector2(1f, 1f)); // 4-p3
+                    cubesFaces[i + 3] = GetVertice(p4, faceIndex, directionalFaces, depth, new Vector2(1f, 0f)); // 3-p4
+                    cubesFaces[i + 5] = GetVertice(p5, faceIndex, directionalFaces, depth, new Vector2(0f, 0f)); // 5-p5
+                }
+                i += 6;
+            }
+        }
 
-*/
+        private VertexPositionNormalTexture GetVertice(Vector3 v, int faceIndex, bool directionalFaces, float depth, Vector2 uv)
+        {
+            return new VertexPositionNormalTexture(Vector3.Transform(v, GetWorldFaceMatrix(faceIndex)), FlatFaceOrDirectional(v, faceIndex, directionalFaces, depth), uv);
+        }
 
+        private Vector3 FlatFaceOrDirectional(Vector3 v, int faceIndex, bool directionalFaces, float depth)
+        {
+            if (directionalFaces == false)
+                v = new Vector3(0, 0, depth);
+            v = Vector3.Normalize(v);
+            return Vector3.Transform(v, GetWorldFaceMatrix(faceIndex));
+        }
+
+        public void DrawPrimitiveCubeFace(GraphicsDevice gd, Effect effect, TextureCube cubeTexture, int cubeFaceToRender)
+        {
+            effect.Parameters["CubeMap"].SetValue(cubeTexture);
+            foreach (EffectPass pass in effect.CurrentTechnique.Passes)
+            {
+                pass.Apply();
+                gd.DrawUserPrimitives(PrimitiveType.TriangleList, cubesFaces, cubeFaceToRender * 6, 2, VertexPositionNormalTexture.VertexDeclaration);
+            }
+        }
+        public void DrawPrimitiveCube(GraphicsDevice gd, Effect effect, TextureCube cubeTexture)
+        {
+            effect.Parameters["CubeMap"].SetValue(cubeTexture);
+            foreach (EffectPass pass in effect.CurrentTechnique.Passes)
+            {
+                pass.Apply();
+                gd.DrawUserPrimitives(PrimitiveType.TriangleList, cubesFaces, 0, 12, VertexPositionNormalTexture.VertexDeclaration);
+            }
+        }
+
+        public static Matrix GetWorldFaceMatrix(int i)
+        {
+            switch (i)
+            {
+                case (int)CubeMapFace.NegativeX: // FACE_LEFT
+                    return matrixNegativeX;
+                case (int)CubeMapFace.NegativeZ: // FACE_FORWARD
+                    return matrixNegativeZ;
+                case (int)CubeMapFace.PositiveX: // FACE_RIGHT
+                    return matrixPositiveX;
+                case (int)CubeMapFace.PositiveZ: // FACE_BACK
+                    return matrixPositiveZ;
+                case (int)CubeMapFace.PositiveY: // FACE_TOP
+                    return matrixPositiveY;
+                case (int)CubeMapFace.NegativeY: // FACE_BOTTOM
+                    return matrixNegativeY;
+                default:
+                    return matrixNegativeZ;
+            }
+        }
+    }
+
+
+}

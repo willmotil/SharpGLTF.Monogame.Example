@@ -14,10 +14,9 @@ namespace Microsoft.Xna.Framework.Graphics
         public ModelDrawingContext(GraphicsDevice graphics)
         {
             _Device = graphics;
-
-            _Device.DepthStencilState = DepthStencilState.Default;            
-
+            _Device.DepthStencilState = DepthStencilState.Default;
             _View = Matrix.Invert(Matrix.Identity);
+            _Projection = SceneUtils.CreatePerspectiveFieldOfView(_FieldOfView, _Device.Viewport.AspectRatio, _NearPlane);
             _DistanceComparer = ModelInstance.GetDistanceComparer(-_View.Translation);
         }
         
@@ -30,7 +29,7 @@ namespace Microsoft.Xna.Framework.Graphics
         private float _FieldOfView = MathHelper.PiOver4;
         private float _NearPlane = 1f;
         
-        private Matrix _View;
+        private Matrix _View, _Projection;
         private IComparer<ModelInstance> _DistanceComparer;
 
         private static readonly HashSet<Effect> _SceneEffects = new HashSet<Effect>();
@@ -59,7 +58,12 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public Matrix GetProjectionMatrix()
         {
-            return SceneUtils.CreatePerspectiveFieldOfView(_FieldOfView, _Device.Viewport.AspectRatio, _NearPlane);
+            return _Projection;
+        }
+
+        public void SetProjectionMatrix(Matrix projectionMatrix)
+        {
+            _Projection = projectionMatrix;
         }
 
         public void SetCamera(Matrix cameraMatrix)
@@ -156,6 +160,8 @@ namespace Microsoft.Xna.Framework.Graphics
             // todo: find the closest lights for each visible instance.
 
             // render opaque parts from closest to farthest
+
+            //_Device.DepthStencilState = DepthStencilState.Default;
 
             foreach (var instance in _SceneInstances)
             {
