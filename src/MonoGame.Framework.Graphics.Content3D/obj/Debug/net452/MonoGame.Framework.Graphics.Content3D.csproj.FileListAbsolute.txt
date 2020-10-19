@@ -1,0 +1,11 @@
+C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\MonoGame.Framework.Graphics.Content3D\bin\Debug\net452\MonoGame.Framework.Graphics.Content3D.dll
+C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\MonoGame.Framework.Graphics.Content3D\bin\Debug\net452\MonoGame.Framework.Graphics.Content3D.pdb
+C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\MonoGame.Framework.Graphics.Content3D\bin\Debug\net452\MonoGame.Framework.dll
+C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\MonoGame.Framework.Graphics.Content3D\bin\Debug\net452\System.ValueTuple.dll
+C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\MonoGame.Framework.Graphics.Content3D\obj\Debug\net452\MonoGame.Framework.Graphics.Content3D.csprojAssemblyReference.cache
+C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\MonoGame.Framework.Graphics.Content3D\obj\Debug\net452\MonoGame.Framework.Graphics.Content3D.AssemblyInfoInputs.cache
+C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\MonoGame.Framework.Graphics.Content3D\obj\Debug\net452\MonoGame.Framework.Graphics.Content3D.AssemblyInfo.cs
+C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\MonoGame.Framework.Graphics.Content3D\obj\Debug\net452\MonoGame.Framework.Graphics.Content3D.csproj.CoreCompileInputs.cache
+C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\MonoGame.Framework.Graphics.Content3D\obj\Debug\net452\MonoGame.Framework.Graphics.Content3D.csproj.CopyComplete
+C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\MonoGame.Framework.Graphics.Content3D\obj\Debug\net452\MonoGame.Framework.Graphics.Content3D.dll
+C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\MonoGame.Framework.Graphics.Content3D\obj\Debug\net452\MonoGame.Framework.Graphics.Content3D.pdb

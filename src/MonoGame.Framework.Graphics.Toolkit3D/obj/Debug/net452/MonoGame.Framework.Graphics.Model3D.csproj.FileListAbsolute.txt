@@ -14,3 +14,5 @@ C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\MonoGame.Framewor
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\MonoGame.Framework.Graphics.Toolkit3D\obj\Debug\net452\MonoGame.Framework.Graphics.Model3D.csproj.CopyComplete
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\MonoGame.Framework.Graphics.Toolkit3D\obj\Debug\net452\MonoGame.Framework.Graphics.Model3D.dll
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\MonoGame.Framework.Graphics.Toolkit3D\obj\Debug\net452\MonoGame.Framework.Graphics.Model3D.pdb
+C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\MonoGame.Framework.Graphics.Toolkit3D\bin\Debug\net452\MonoGame.Framework.Graphics.Content3D.dll
+C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\MonoGame.Framework.Graphics.Toolkit3D\bin\Debug\net452\MonoGame.Framework.Graphics.Content3D.pdb

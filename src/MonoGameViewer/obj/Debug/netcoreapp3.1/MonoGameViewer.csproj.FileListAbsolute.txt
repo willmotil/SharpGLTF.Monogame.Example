@@ -55,3 +55,12 @@ C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\MonoGameViewer\ob
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\MonoGameViewer\obj\Debug\netcoreapp3.1\MonoGameViewer.dll
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\MonoGameViewer\obj\Debug\netcoreapp3.1\MonoGameViewer.pdb
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\MonoGameViewer\obj\Debug\netcoreapp3.1\MonoGameViewer.genruntimeconfig.cache
+C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\MonoGameViewer\bin\Debug\netcoreapp3.1\AssimpNet.dll
+C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\MonoGameViewer\bin\Debug\netcoreapp3.1\runtimes\linux-x64\native\libassimp.so
+C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\MonoGameViewer\bin\Debug\netcoreapp3.1\runtimes\osx-x64\native\libassimp.dylib
+C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\MonoGameViewer\bin\Debug\netcoreapp3.1\runtimes\win-x64\native\assimp.dll
+C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\MonoGameViewer\bin\Debug\netcoreapp3.1\runtimes\win-x86\native\assimp.dll
+C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\MonoGameViewer\bin\Debug\netcoreapp3.1\MonoGame.Framework.Graphics.Content3D.dll
+C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\MonoGameViewer\bin\Debug\netcoreapp3.1\MonoGame.Framework.Pipeline.Assimp.dll
+C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\MonoGameViewer\bin\Debug\netcoreapp3.1\MonoGame.Framework.Pipeline.Assimp.pdb
+C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\MonoGameViewer\bin\Debug\netcoreapp3.1\MonoGame.Framework.Graphics.Content3D.pdb

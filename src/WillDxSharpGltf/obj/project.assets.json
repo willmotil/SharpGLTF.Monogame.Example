@@ -2280,9 +2280,22 @@
           "lib/netstandard1.3/System.Xml.XPath.XDocument.dll": {}
         }
       },
+      "MonoGame.Framework.Graphics.Content3D/1.0.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v2.0",
+        "compile": {
+          "bin/placeholder/MonoGame.Framework.Graphics.Content3D.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/MonoGame.Framework.Graphics.Content3D.dll": {}
+        }
+      },
       "MonoGame.Framework.Graphics.EffectsPBR/1.0.0": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
+        "dependencies": {
+          "MonoGame.Framework.Graphics.Content3D": "1.0.0"
+        },
         "compile": {
           "bin/placeholder/MonoGame.Framework.Graphics.EffectsPBR.dll": {}
         },
@@ -7406,6 +7419,11 @@
         "system.xml.xpath.xdocument.4.0.1.nupkg.sha512",
         "system.xml.xpath.xdocument.nuspec"
       ]
+    },
+    "MonoGame.Framework.Graphics.Content3D/1.0.0": {
+      "type": "project",
+      "path": "../MonoGame.Framework.Graphics.Content3D/MonoGame.Framework.Graphics.Content3D.csproj",
+      "msbuildProject": "../MonoGame.Framework.Graphics.Content3D/MonoGame.Framework.Graphics.Content3D.csproj"
     },
     "MonoGame.Framework.Graphics.EffectsPBR/1.0.0": {
       "type": "project",

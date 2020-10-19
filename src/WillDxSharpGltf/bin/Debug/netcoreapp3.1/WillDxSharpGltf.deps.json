@@ -1492,7 +1492,15 @@
           "System.Xml.XPath": "4.0.1"
         }
       },
+      "MonoGame.Framework.Graphics.Content3D/1.0.0": {
+        "runtime": {
+          "MonoGame.Framework.Graphics.Content3D.dll": {}
+        }
+      },
       "MonoGame.Framework.Graphics.EffectsPBR/1.0.0": {
+        "dependencies": {
+          "MonoGame.Framework.Graphics.Content3D": "1.0.0"
+        },
         "runtime": {
           "MonoGame.Framework.Graphics.EffectsPBR.dll": {}
         }
@@ -2394,6 +2402,11 @@
       "sha512": "sha512-I34S5UB3t7uyamVpJc51Ng8PQm8SoN26YozIaah2VY6wQkfYV9ZknAF9yE4+XHNDl7yzso2ifX/hyX957P9Q+g==",
       "path": "system.xml.xpath.xdocument/4.0.1",
       "hashPath": "system.xml.xpath.xdocument.4.0.1.nupkg.sha512"
+    },
+    "MonoGame.Framework.Graphics.Content3D/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
     },
     "MonoGame.Framework.Graphics.EffectsPBR/1.0.0": {
       "type": "project",

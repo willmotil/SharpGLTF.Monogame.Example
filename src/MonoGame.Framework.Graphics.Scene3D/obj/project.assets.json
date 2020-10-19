@@ -91,10 +91,24 @@
           "lib/netstandard1.0/System.ValueTuple.dll": {}
         }
       },
+      "MonoGame.Framework.Graphics.Content3D/1.0.0": {
+        "type": "project",
+        "framework": ".NETFramework,Version=v4.5.2",
+        "dependencies": {
+          "System.ValueTuple": "4.5.0"
+        },
+        "compile": {
+          "bin/placeholder/MonoGame.Framework.Graphics.Content3D.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/MonoGame.Framework.Graphics.Content3D.dll": {}
+        }
+      },
       "MonoGame.Framework.Graphics.EffectsPBR/1.0.0": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.5.2",
         "dependencies": {
+          "MonoGame.Framework.Graphics.Content3D": "1.0.0",
           "System.ValueTuple": "4.5.0"
         },
         "compile": {
@@ -232,9 +246,22 @@
           "lib/netstandard2.0/System.Runtime.CompilerServices.Unsafe.dll": {}
         }
       },
+      "MonoGame.Framework.Graphics.Content3D/1.0.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v2.0",
+        "compile": {
+          "bin/placeholder/MonoGame.Framework.Graphics.Content3D.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/MonoGame.Framework.Graphics.Content3D.dll": {}
+        }
+      },
       "MonoGame.Framework.Graphics.EffectsPBR/1.0.0": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
+        "dependencies": {
+          "MonoGame.Framework.Graphics.Content3D": "1.0.0"
+        },
         "compile": {
           "bin/placeholder/MonoGame.Framework.Graphics.EffectsPBR.dll": {}
         },
@@ -596,6 +623,11 @@
         "useSharedDesignerContext.txt",
         "version.txt"
       ]
+    },
+    "MonoGame.Framework.Graphics.Content3D/1.0.0": {
+      "type": "project",
+      "path": "../MonoGame.Framework.Graphics.Content3D/MonoGame.Framework.Graphics.Content3D.csproj",
+      "msbuildProject": "../MonoGame.Framework.Graphics.Content3D/MonoGame.Framework.Graphics.Content3D.csproj"
     },
     "MonoGame.Framework.Graphics.EffectsPBR/1.0.0": {
       "type": "project",

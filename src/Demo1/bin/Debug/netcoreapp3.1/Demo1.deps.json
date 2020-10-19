@@ -77,7 +77,15 @@
         }
       },
       "System.Memory/4.5.4": {},
+      "MonoGame.Framework.Graphics.Content3D/1.0.0": {
+        "runtime": {
+          "MonoGame.Framework.Graphics.Content3D.dll": {}
+        }
+      },
       "MonoGame.Framework.Graphics.EffectsPBR/1.0.0": {
+        "dependencies": {
+          "MonoGame.Framework.Graphics.Content3D": "1.0.0"
+        },
         "runtime": {
           "MonoGame.Framework.Graphics.EffectsPBR.dll": {}
         }
@@ -146,6 +154,11 @@
       "sha512": "sha512-1MbJTHS1lZ4bS4FmsJjnuGJOu88ZzTT2rLvrhW7Ygic+pC0NWA+3hgAen0HRdsocuQXCkUTdFn9yHJJhsijDXw==",
       "path": "system.memory/4.5.4",
       "hashPath": "system.memory.4.5.4.nupkg.sha512"
+    },
+    "MonoGame.Framework.Graphics.Content3D/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
     },
     "MonoGame.Framework.Graphics.EffectsPBR/1.0.0": {
       "type": "project",

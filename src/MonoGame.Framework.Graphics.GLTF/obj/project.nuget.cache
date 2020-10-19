@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "X+VeAgNjecUmm5lz8+gJftenoP0OHDxZdtsHV7I9aJUtY3zXlBsITy4KaFK/VyAAWi+Ko5h0Sz0y4c4nj0WyjQ==",
+  "dgSpecHash": "phJzv36wwmlinDUJRIKRo03cYF5lLF12vag7zuLObuJH5iH5dc+h4fXycFRx1+Y2AyJld9GNwjnKxqNVvA0Ydg==",
   "success": true,
   "projectFilePath": "C:\\Users\\will\\MainFiles\\GitPrjs\\SharpGLTF.Monogame.Example\\src\\MonoGame.Framework.Graphics.GLTF\\MonoGame.Framework.Pipeline.GLTF.csproj",
   "expectedPackageFiles": [

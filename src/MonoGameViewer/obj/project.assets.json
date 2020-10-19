@@ -2,6 +2,39 @@
   "version": 3,
   "targets": {
     ".NETCoreApp,Version=v3.1": {
+      "AssimpNet/5.0.0-beta1": {
+        "type": "package",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1"
+        },
+        "compile": {
+          "lib/netstandard1.3/AssimpNet.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard1.3/AssimpNet.dll": {}
+        },
+        "build": {
+          "build/_._": {}
+        },
+        "runtimeTargets": {
+          "runtimes/linux-x64/native/libassimp.so": {
+            "assetType": "native",
+            "rid": "linux-x64"
+          },
+          "runtimes/osx-x64/native/libassimp.dylib": {
+            "assetType": "native",
+            "rid": "osx-x64"
+          },
+          "runtimes/win-x64/native/assimp.dll": {
+            "assetType": "native",
+            "rid": "win-x64"
+          },
+          "runtimes/win-x86/native/assimp.dll": {
+            "assetType": "native",
+            "rid": "win-x86"
+          }
+        }
+      },
       "Libuv/1.9.1": {
         "type": "package",
         "dependencies": {
@@ -2297,9 +2330,22 @@
           "lib/netstandard1.3/System.Xml.XPath.XDocument.dll": {}
         }
       },
+      "MonoGame.Framework.Graphics.Content3D/1.0.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v2.0",
+        "compile": {
+          "bin/placeholder/MonoGame.Framework.Graphics.Content3D.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/MonoGame.Framework.Graphics.Content3D.dll": {}
+        }
+      },
       "MonoGame.Framework.Graphics.EffectsPBR/1.0.0": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
+        "dependencies": {
+          "MonoGame.Framework.Graphics.Content3D": "1.0.0"
+        },
         "compile": {
           "bin/placeholder/MonoGame.Framework.Graphics.EffectsPBR.dll": {}
         },
@@ -2336,6 +2382,21 @@
           "bin/placeholder/MonoGame.Framework.Graphics.Scene3D.dll": {}
         }
       },
+      "MonoGame.Framework.Pipeline.Assimp/1.0.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v2.0",
+        "dependencies": {
+          "AssimpNet": "5.0.0-beta1",
+          "MonoGame.Framework.Graphics.EffectsPBR": "1.0.0",
+          "MonoGame.Framework.Graphics.Model3D": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/MonoGame.Framework.Pipeline.Assimp.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/MonoGame.Framework.Pipeline.Assimp.dll": {}
+        }
+      },
       "MonoGame.Framework.Pipeline.GLTF/1.0.0": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
@@ -2354,6 +2415,32 @@
     }
   },
   "libraries": {
+    "AssimpNet/5.0.0-beta1": {
+      "sha512": "oiUmn2KNaLThdbr6oT461uyCwclsqfZ0UB36vqkAUm8ttBWjKOCBmtp9V+X6xDGZmQaJe9YknW5eoyATTikUNQ==",
+      "type": "package",
+      "path": "assimpnet/5.0.0-beta1",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "AssimpNet Documentation (October 2018).chm",
+        "ChangeLog.txt",
+        "License.txt",
+        "assimpnet.5.0.0-beta1.nupkg.sha512",
+        "assimpnet.nuspec",
+        "build/AssimpNet.targets",
+        "lib/net35/AssimpNet.dll",
+        "lib/net35/AssimpNet.xml",
+        "lib/net40/AssimpNet.dll",
+        "lib/net40/AssimpNet.xml",
+        "lib/netstandard1.3/AssimpNet.dll",
+        "lib/netstandard1.3/AssimpNet.xml",
+        "logo.png",
+        "runtimes/linux-x64/native/libassimp.so",
+        "runtimes/osx-x64/native/libassimp.dylib",
+        "runtimes/win-x64/native/assimp.dll",
+        "runtimes/win-x86/native/assimp.dll"
+      ]
+    },
     "Libuv/1.9.1": {
       "sha512": "FW1oZwoHXbw5y7VTZOdBC1yNUQA3sWrq7aBKZAZn57gaXffdmxkIo//edg2nhzOlGYy71kaft4CUFHeV9hDApg==",
       "type": "package",
@@ -7395,6 +7482,11 @@
         "system.xml.xpath.xdocument.nuspec"
       ]
     },
+    "MonoGame.Framework.Graphics.Content3D/1.0.0": {
+      "type": "project",
+      "path": "../MonoGame.Framework.Graphics.Content3D/MonoGame.Framework.Graphics.Content3D.csproj",
+      "msbuildProject": "../MonoGame.Framework.Graphics.Content3D/MonoGame.Framework.Graphics.Content3D.csproj"
+    },
     "MonoGame.Framework.Graphics.EffectsPBR/1.0.0": {
       "type": "project",
       "path": "../MonoGame.Framework.Graphics.PBR/MonoGame.Framework.Graphics.EffectsPBR.csproj",
@@ -7410,6 +7502,11 @@
       "path": "../MonoGame.Framework.Graphics.Scene3D/MonoGame.Framework.Graphics.Scene3D.csproj",
       "msbuildProject": "../MonoGame.Framework.Graphics.Scene3D/MonoGame.Framework.Graphics.Scene3D.csproj"
     },
+    "MonoGame.Framework.Pipeline.Assimp/1.0.0": {
+      "type": "project",
+      "path": "../MonoGame.Framework.Pipeline.Assimp/MonoGame.Framework.Pipeline.Assimp.csproj",
+      "msbuildProject": "../MonoGame.Framework.Pipeline.Assimp/MonoGame.Framework.Pipeline.Assimp.csproj"
+    },
     "MonoGame.Framework.Pipeline.GLTF/1.0.0": {
       "type": "project",
       "path": "../MonoGame.Framework.Graphics.GLTF/MonoGame.Framework.Pipeline.GLTF.csproj",
@@ -7419,6 +7516,7 @@
   "projectFileDependencyGroups": {
     ".NETCoreApp,Version=v3.1": [
       "MonoGame.Framework.Graphics.Scene3D >= 1.0.0",
+      "MonoGame.Framework.Pipeline.Assimp >= 1.0.0",
       "MonoGame.Framework.Pipeline.GLTF >= 1.0.0",
       "MonoGame.Framework.WindowsDX >= 3.8.0.1375-develop",
       "PropertyTools.Wpf >= 3.1.0-alpha0041",
@@ -7460,6 +7558,9 @@
             },
             "C:\\Users\\will\\MainFiles\\GitPrjs\\SharpGLTF.Monogame.Example\\src\\MonoGame.Framework.Graphics.Scene3D\\MonoGame.Framework.Graphics.Scene3D.csproj": {
               "projectPath": "C:\\Users\\will\\MainFiles\\GitPrjs\\SharpGLTF.Monogame.Example\\src\\MonoGame.Framework.Graphics.Scene3D\\MonoGame.Framework.Graphics.Scene3D.csproj"
+            },
+            "C:\\Users\\will\\MainFiles\\GitPrjs\\SharpGLTF.Monogame.Example\\src\\MonoGame.Framework.Pipeline.Assimp\\MonoGame.Framework.Pipeline.Assimp.csproj": {
+              "projectPath": "C:\\Users\\will\\MainFiles\\GitPrjs\\SharpGLTF.Monogame.Example\\src\\MonoGame.Framework.Pipeline.Assimp\\MonoGame.Framework.Pipeline.Assimp.csproj"
             }
           }
         }

@@ -56,6 +56,19 @@
         "runtime": {
           "lib/netstandard1.0/System.ValueTuple.dll": {}
         }
+      },
+      "MonoGame.Framework.Graphics.Content3D/1.0.0": {
+        "type": "project",
+        "framework": ".NETFramework,Version=v4.5.2",
+        "dependencies": {
+          "System.ValueTuple": "4.5.0"
+        },
+        "compile": {
+          "bin/placeholder/MonoGame.Framework.Graphics.Content3D.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/MonoGame.Framework.Graphics.Content3D.dll": {}
+        }
       }
     },
     ".NETStandard,Version=v2.0": {
@@ -127,6 +140,16 @@
         },
         "build": {
           "build/netstandard2.0/NETStandard.Library.targets": {}
+        }
+      },
+      "MonoGame.Framework.Graphics.Content3D/1.0.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v2.0",
+        "compile": {
+          "bin/placeholder/MonoGame.Framework.Graphics.Content3D.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/MonoGame.Framework.Graphics.Content3D.dll": {}
         }
       }
     }
@@ -343,15 +366,22 @@
         "useSharedDesignerContext.txt",
         "version.txt"
       ]
+    },
+    "MonoGame.Framework.Graphics.Content3D/1.0.0": {
+      "type": "project",
+      "path": "../MonoGame.Framework.Graphics.Content3D/MonoGame.Framework.Graphics.Content3D.csproj",
+      "msbuildProject": "../MonoGame.Framework.Graphics.Content3D/MonoGame.Framework.Graphics.Content3D.csproj"
     }
   },
   "projectFileDependencyGroups": {
     ".NETFramework,Version=v4.5.2": [
       "MonoGame.Framework.DesktopGL >= 3.8.0.1375-develop",
+      "MonoGame.Framework.Graphics.Content3D >= 1.0.0",
       "System.ValueTuple >= 4.5.0"
     ],
     ".NETStandard,Version=v2.0": [
       "MonoGame.Framework.DesktopGL >= 3.8.0.1375-develop",
+      "MonoGame.Framework.Graphics.Content3D >= 1.0.0",
       "NETStandard.Library >= 2.0.3"
     ]
   },
@@ -386,10 +416,18 @@
       },
       "frameworks": {
         "net452": {
-          "projectReferences": {}
+          "projectReferences": {
+            "C:\\Users\\will\\MainFiles\\GitPrjs\\SharpGLTF.Monogame.Example\\src\\MonoGame.Framework.Graphics.Content3D\\MonoGame.Framework.Graphics.Content3D.csproj": {
+              "projectPath": "C:\\Users\\will\\MainFiles\\GitPrjs\\SharpGLTF.Monogame.Example\\src\\MonoGame.Framework.Graphics.Content3D\\MonoGame.Framework.Graphics.Content3D.csproj"
+            }
+          }
         },
         "netstandard2.0": {
-          "projectReferences": {}
+          "projectReferences": {
+            "C:\\Users\\will\\MainFiles\\GitPrjs\\SharpGLTF.Monogame.Example\\src\\MonoGame.Framework.Graphics.Content3D\\MonoGame.Framework.Graphics.Content3D.csproj": {
+              "projectPath": "C:\\Users\\will\\MainFiles\\GitPrjs\\SharpGLTF.Monogame.Example\\src\\MonoGame.Framework.Graphics.Content3D\\MonoGame.Framework.Graphics.Content3D.csproj"
+            }
+          }
         }
       },
       "warningProperties": {

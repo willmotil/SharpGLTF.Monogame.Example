@@ -34,3 +34,6 @@ C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\Demo3\obj\Debug\n
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\Demo3\obj\Debug\netcoreapp3.1\Demo3.dll
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\Demo3\obj\Debug\netcoreapp3.1\Demo3.pdb
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\Demo3\obj\Debug\netcoreapp3.1\Demo3.genruntimeconfig.cache
+C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\Demo3\bin\Debug\netcoreapp3.1\MonoGame.Framework.Graphics.Content3D.dll
+C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\Demo3\bin\Debug\netcoreapp3.1\MonoGame.Framework.Graphics.Content3D.pdb
+C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\Demo3\obj\Debug\netcoreapp3.1\Demo3.csprojAssemblyReference.cache

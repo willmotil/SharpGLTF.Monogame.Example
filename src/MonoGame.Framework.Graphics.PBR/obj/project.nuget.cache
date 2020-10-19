@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "rtKDyOrJuAmugcQSs5dGjuUojMRyv/omJhGcGG30FJsBBEbihGzM78zSbE6d7YSKXAsSr9R3UM4xCMHpg/AYgA==",
+  "dgSpecHash": "bmveRsaoLaCK13lOLk2JPPM6ULbzO6UA9n5Um2syWIR1Nju9rdws24XyuM0CLBL13hFtDBikUNVX9fawLsNXdQ==",
   "success": true,
   "projectFilePath": "C:\\Users\\will\\MainFiles\\GitPrjs\\SharpGLTF.Monogame.Example\\src\\MonoGame.Framework.Graphics.PBR\\MonoGame.Framework.Graphics.EffectsPBR.csproj",
   "expectedPackageFiles": [
