@@ -9,6 +9,9 @@ using GLTFNODE = SharpGLTF.Schema2.Node;
 
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
+    /// <summary>
+    /// Helper class used to create an <see cref="ArmatureTemplate"/> and help in creating the <see cref="IDrawableTemplate"/> objects.
+    /// </summary>
     class GLTFArmatureFactory : ArmatureFactory<GLTFNODE>
     {
         #region constructor
@@ -76,6 +79,13 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         #endregion
 
         #region API
+
+        public ModelTemplate CreateModel(SharpGLTF.Schema2.Scene scene, ArmatureTemplate armature, IReadOnlyList<IMeshDecoder<MaterialContent>> meshDecoders)
+        {
+            var model = CreateModel(scene, armature);
+            model.ModelBounds = MeshFactory.EvaluateBoundingSphere(model.CreateInstance(), meshDecoders);
+            return model;
+        }
 
         public ModelTemplate CreateModel(SharpGLTF.Schema2.Scene scene, ArmatureTemplate armature)
         {

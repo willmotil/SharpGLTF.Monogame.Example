@@ -26,6 +26,8 @@ namespace Microsoft.Xna.Framework.Graphics
 
         private GraphicsDevice _Device;
 
+        private readonly Stack<_GraphicsState> _PreserveState = new Stack<_GraphicsState>();
+
         private float _FieldOfView = MathHelper.PiOver4;
         private float _NearPlane = 1f;
         
@@ -56,6 +58,18 @@ namespace Microsoft.Xna.Framework.Graphics
 
         #region API
 
+        protected void PushState()
+        {
+            var state = new _GraphicsState(_Device);
+            _PreserveState.Push(state);
+        }
+
+        protected void PopState()
+        {
+            var state = _PreserveState.Pop();
+            state.Apply(_Device);
+        }
+
         public Matrix GetProjectionMatrix()
         {
             return _Projection;
@@ -79,6 +93,8 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             var proj = GetProjectionMatrix();
 
+            PushState();
+
             foreach (var e in mesh.OpaqueEffects)
             {               
                 ModelInstance.UpdateProjViewTransforms(e, proj, _View);
@@ -96,6 +112,8 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
             mesh.DrawTranslucid();
+
+            PopState();
         }
 
         /// <summary>
@@ -109,7 +127,9 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </remarks>
         public void DrawModelInstance(PBREnvironment environment, ModelInstance modelInstance)
         {
-            var proj = GetProjectionMatrix();
+            PushState();
+
+            var proj = GetProjectionMatrix();            
 
             foreach (var e in modelInstance.Template.SharedEffects)
             {
@@ -118,6 +138,8 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
             modelInstance.DrawAllParts(proj, _View);
+
+            PopState();
         }
 
         /// <summary>
@@ -136,6 +158,8 @@ namespace Microsoft.Xna.Framework.Graphics
         /// </remarks>
         public void DrawSceneInstances(PBREnvironment environment, params ModelInstance[] modelInstances)
         {
+            PushState();
+
             // todo: fustrum culling goes here
 
             var proj = GetProjectionMatrix();
@@ -178,8 +202,41 @@ namespace Microsoft.Xna.Framework.Graphics
                 foreach (var e in instance.Template.SharedEffects) environment.ApplyTo(e);
                 instance.DrawTranslucidParts();
             }
+
+            PopState();
         }
 
         #endregion        
+    }
+
+    /// <summary>
+    /// Preserves all the monogame states that might be
+    /// modified when rendering a model.
+    /// </summary>
+    readonly struct _GraphicsState
+    {
+        public _GraphicsState(GraphicsDevice graphics)
+        {
+            _Rasterizer = graphics.RasterizerState;
+            _Blend = graphics.BlendState;
+
+            _Sampler0 = graphics.SamplerStates[0];
+            _Sampler1 = graphics.SamplerStates[1];            
+        }
+
+        private readonly RasterizerState _Rasterizer;
+        private readonly BlendState _Blend;
+
+        private readonly SamplerState _Sampler0;
+        private readonly SamplerState _Sampler1;        
+
+        public void Apply(GraphicsDevice graphics)
+        {
+            graphics.RasterizerState = _Rasterizer;
+            graphics.BlendState = _Blend;
+
+            graphics.SamplerStates[0] = _Sampler0;
+            graphics.SamplerStates[1] = _Sampler1;            
+        }
     }
 }

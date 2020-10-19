@@ -4,24 +4,25 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 
+using VERTEXINFLUENCES = Microsoft.Xna.Framework.Graphics.VertexInfluences;
+
 namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 {
-    readonly struct _MeshDecoder<TMaterial> : IMeshDecoder<TMaterial>
-        where TMaterial : class
+    readonly struct _MeshDecoder : IMeshDecoder<MaterialContent>        
     {
         #region constructor
-        public _MeshDecoder(SharpGLTF.Runtime.IMeshDecoder<TMaterial> mesh)
+        public _MeshDecoder(SharpGLTF.Runtime.IMeshDecoder<SharpGLTF.Schema2.Material> mesh, IReadOnlyList<MaterialContent> materials)
         {
             _Source = mesh;
-            _Primitives = mesh.Primitives.Select(item => _MeshPrimitiveDecoder<TMaterial>.Create(item)).ToArray();
+            _Primitives = mesh.Primitives.Select(item => _MeshPrimitiveDecoder.Create(item, materials)).ToArray();
         }
 
         #endregion
 
         #region data
 
-        private readonly SharpGLTF.Runtime.IMeshDecoder<TMaterial> _Source;
-        private readonly IMeshPrimitiveDecoder<TMaterial>[] _Primitives;
+        private readonly SharpGLTF.Runtime.IMeshDecoder<SharpGLTF.Schema2.Material> _Source;
+        private readonly IMeshPrimitiveDecoder<MaterialContent>[] _Primitives;
 
         #endregion
 
@@ -29,38 +30,43 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
 
         public string Name => _Source.Name;       
 
-        public IReadOnlyList<IMeshPrimitiveDecoder<TMaterial>> Primitives => _Primitives;
+        public IReadOnlyList<IMeshPrimitiveDecoder<MaterialContent>> Primitives => _Primitives;
 
         public object Tag => null; // might return Extras.
 
         #endregion
     }
 
-    readonly struct _MeshPrimitiveDecoder<TMaterial> : IMeshPrimitiveDecoder<TMaterial>
-    where TMaterial:class
+    readonly struct _MeshPrimitiveDecoder : IMeshPrimitiveDecoder<MaterialContent>    
     {
         #region constructor
 
-        public static IMeshPrimitiveDecoder<TMaterial> Create(SharpGLTF.Runtime.IMeshPrimitiveDecoder<TMaterial> primitive)
+        private static readonly MaterialContent _DefaultMaterial = new MaterialContent();
+
+        public static IMeshPrimitiveDecoder<MaterialContent> Create(SharpGLTF.Runtime.IMeshPrimitiveDecoder<SharpGLTF.Schema2.Material> primitive, IReadOnlyList<MaterialContent> materials)
         {
-            return new _MeshPrimitiveDecoder<TMaterial>(primitive);
+            var material = primitive.Material == null ? _DefaultMaterial : materials[primitive.Material.LogicalIndex];
+
+            return new _MeshPrimitiveDecoder(primitive, material);
         }
-        public _MeshPrimitiveDecoder(SharpGLTF.Runtime.IMeshPrimitiveDecoder<TMaterial> primitive)
+        private _MeshPrimitiveDecoder(SharpGLTF.Runtime.IMeshPrimitiveDecoder<SharpGLTF.Schema2.Material> primitive, MaterialContent material)
         {
             _Source = primitive;
+            _Material = material;
         }
 
         #endregion
 
         #region data
 
-        private readonly SharpGLTF.Runtime.IMeshPrimitiveDecoder<TMaterial> _Source;
+        private readonly SharpGLTF.Runtime.IMeshPrimitiveDecoder<SharpGLTF.Schema2.Material> _Source;
+        private readonly MaterialContent _Material;
 
         #endregion
 
         #region properties
 
-        public TMaterial Material => _Source.Material;
+        public MaterialContent Material => _Material;
 
         public int VertexCount => _Source.VertexCount;
 
@@ -83,7 +89,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
         public Vector3 GetPosition(int vertexIndex) { return _Source.GetPosition(vertexIndex).ToXna(); }
         public Vector3 GetNormal(int vertexIndex) { return _Source.GetNormal(vertexIndex).ToXna(); }
         public Vector4 GetTangent(int vertexIndex) { return _Source.GetTangent(vertexIndex).ToXna(); }
-        public VertexSkinning GetSkinWeights(int vertexIndex)
+        public VERTEXINFLUENCES GetSkinWeights(int vertexIndex)
         {
             var sparse = _Source
                 .GetSkinWeights(vertexIndex)
@@ -92,11 +98,7 @@ namespace Microsoft.Xna.Framework.Content.Pipeline.Graphics
             var indices = new Vector4(sparse.Index0, sparse.Index1, sparse.Index2, sparse.Index3);
             var weights = new Vector4(sparse.Weight0, sparse.Weight1, sparse.Weight2, sparse.Weight3);
 
-            return new VertexSkinning
-            {
-                Indices = new Framework.Graphics.PackedVector.Short4(indices),
-                Weights = weights
-            };
+            return new VERTEXINFLUENCES(indices, weights);
         }
 
         
