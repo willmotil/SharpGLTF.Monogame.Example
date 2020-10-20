@@ -7,7 +7,6 @@
 	#define PS_SHADERMODEL ps_4_0 //_level_9_1
 #endif
 
-//matrix WorldViewProjection;  Anisotropic
 
 matrix World;
 matrix View;
@@ -15,12 +14,14 @@ matrix Projection;
 float3 CameraPosition;
 int testValue1;
 //int testValue2;
-//
+
+
 //Texture2D TextureA; // primary texture.
 //sampler2D TextureSamplerDiffuse = sampler_state
 //{
 //    texture = <TextureA>;
 //};
+
 TextureCube CubeMap;
 //sampler CubeMapSampler = sampler_state
 samplerCUBE CubeMapSampler = sampler_state

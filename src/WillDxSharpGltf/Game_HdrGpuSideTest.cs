@@ -40,7 +40,6 @@ namespace WillDxSharpGltf
     /// </summary>
     public class Game_HdrGpuSideTest : Game
     {
-
         private readonly GraphicsDeviceManager _Graphics;
         private PBREnvironment _LightsAndFog = PBREnvironment.CreateDefault();
 
@@ -67,8 +66,8 @@ namespace WillDxSharpGltf
         string msg = "";
 
         private Texture2D _textureHdrEnvMap;
-        private Texture2D _premadeLut;
         private Texture2D _generatedTexture;
+        private Texture2D _premadeLut;
 
         int _envMapToDraw = 0; // env =1,  envdif = 2, 
 
@@ -415,22 +414,28 @@ namespace WillDxSharpGltf
                 {
                     case (int)CubeMapFace.NegativeX: // FACE_LEFT
                         GraphicsDevice.SetRenderTarget(renderTargetCube, CubeMapFace.NegativeX);
+                        _hdrIblEffect.Parameters["CubeMapFaceNormal"].SetValue( CubePrimitive.matrixNegativeX );
                         break;
                     case (int)CubeMapFace.NegativeZ: // FACE_FORWARD
                         GraphicsDevice.SetRenderTarget(renderTargetCube, CubeMapFace.NegativeZ);
+                        _hdrIblEffect.Parameters["CubeMapFaceNormal"].SetValue(CubePrimitive.matrixNegativeZ);
                         break;
                     case (int)CubeMapFace.PositiveX: // FACE_RIGHT
                         GraphicsDevice.SetRenderTarget(renderTargetCube, CubeMapFace.PositiveX);
+                        _hdrIblEffect.Parameters["CubeMapFaceNormal"].SetValue(CubePrimitive.matrixPositiveX);
                         break;
                     case (int)CubeMapFace.PositiveZ: // FACE_BACK
                         GraphicsDevice.SetRenderTarget(renderTargetCube, CubeMapFace.PositiveZ);
+                        _hdrIblEffect.Parameters["CubeMapFaceNormal"].SetValue(CubePrimitive.matrixPositiveZ);
                         break;
 
                     case (int)CubeMapFace.PositiveY: // FACE_TOP
                         GraphicsDevice.SetRenderTarget(renderTargetCube, CubeMapFace.PositiveY);
+                        _hdrIblEffect.Parameters["CubeMapFaceNormal"].SetValue(CubePrimitive.matrixPositiveY);
                         break; 
                     case (int)CubeMapFace.NegativeY: // FACE_BOTTOM
                         GraphicsDevice.SetRenderTarget(renderTargetCube, CubeMapFace.NegativeY);
+                        _hdrIblEffect.Parameters["CubeMapFaceNormal"].SetValue(CubePrimitive.matrixNegativeY);
                         break;
 
                         //default:
