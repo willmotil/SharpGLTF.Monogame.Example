@@ -221,8 +221,8 @@ float4 GetIrradiance(float2 pixelpos, int faceToMap)
     float totalSampleCount = 0;
 
     // to radians from degrees 
-    float numberOfSamplesHemisphere = 15; //16.0f; //6.0f;  // seems to be a ratio that affects quality between the hemisphere and circular sampling direction, maybe i should try to use a spiral like on the golden ratio.
-    float numberOfSamplesAround = 30; //16.0f; // 32.0f;//12.0f;
+    float numberOfSamplesHemisphere = 25; //16.0f; //6.0f;  // seems to be a ratio that affects quality between the hemisphere and circular sampling direction, maybe i should try to use a spiral like on the golden ratio.
+    float numberOfSamplesAround = 4; //16.0f; // 32.0f;//12.0f;
     float hemisphereMaxAngle = 45.0f; // 30.0f; //50.0f;
     float minimumAdjustment = 2.1f; //3.5f; //2.1f;
     float mipSampleLevel = 4;
