@@ -114,4 +114,7 @@ C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillDxSharpGltf\o
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillDxSharpGltf\obj\Debug\netcoreapp3.1\WillDxSharpGltf.dll
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillDxSharpGltf\obj\Debug\netcoreapp3.1\WillDxSharpGltf.pdb
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillDxSharpGltf\obj\Debug\netcoreapp3.1\WillDxSharpGltf.genruntimeconfig.cache
+C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillDxSharpGltf\bin\Debug\netcoreapp3.1\Content\hdr_colorful_studio_2k.xnb
+C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillDxSharpGltf\bin\Debug\netcoreapp3.1\Content\TextureCubeBuildEffect.xnb
+C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillDxSharpGltf\bin\Debug\netcoreapp3.1\Content\TextureCubeDrawEffect.xnb
 C:\Users\will\MainFiles\GitPrjs\SharpGLTF.Monogame.Example\src\WillDxSharpGltf\obj\Debug\netcoreapp3.1\WillDxSharpGltf.csprojAssemblyReference.cache

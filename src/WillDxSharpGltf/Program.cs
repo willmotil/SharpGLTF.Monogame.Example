@@ -9,7 +9,8 @@ namespace WillDxSharpGltf
         {
             //using (var game = new Game1()) game.Run();
             //using (var game = new Game2()) game.Run();
-            using (var game = new Game_HdrGpuSideTest()) game.Run();
+            //using (var game = new Game_HdrGpuSideTest()) game.Run();
+            using (var game = new Game_MapCreationGpuV2()) game.Run();
         }
     }
 }

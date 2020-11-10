@@ -496,7 +496,7 @@ namespace WillDxSharpGltf
 
         public void SetupCamera()
         {
-            _camera = new DemoCamera(GraphicsDevice, _spriteBatch, null, new Vector3(2, 2, 10), new Vector3(0, 0, 0), Vector3.UnitY, 0.1f, 10000f, 1f, true, false);
+            _camera = new DemoCamera(GraphicsDevice, _spriteBatch, null, new Vector3(2, 2, 10), new Vector3(0, 0, 0), Vector3.UnitY, 0.1f, 10000f, 1f, true, false, false);
             _camera.TransformCamera(_camera.World.Translation, ModelTestSuiteExecution._testTarget, _camera.World.Up);
             _camera.Up = Vector3.Up;
             _camera.WayPointCycleDurationInTotalSeconds = 50f;
