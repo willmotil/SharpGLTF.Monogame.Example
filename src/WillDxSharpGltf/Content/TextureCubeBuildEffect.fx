@@ -121,60 +121,6 @@ float4x4 CreateFromAxisAngle(float3 axis, float angle)
 
 // I made this up to do this tranform because i couldn't find the code to do it anywere.
 
-
-//// used by SphericalToCubeMap  CubeMapToTexture (includes CubeMapToCubeMap)  GetIrradiance
-////
-//FaceStruct PosUvFaceToNormal(float2 pos, int faceIndex)
-//{
-//    FaceStruct output = (FaceStruct)0;
-//    float u = pos.x;
-//    float v = -pos.y; // -pos.y changes top and bottom via negation and flips y this will also affect uv for top and bottom
-//    switch (abs(faceIndex))
-//    {
-//    case 1: //FACE_LEFT: CubeMapFace.NegativeX
-//        output.PositionNormal = float3(-1.0f, v, u);
-//        output.FaceNormal = float3(-1.0f, 0, 0);
-//        output.FaceUp = float3(0, 1, 0);
-//        break;
-//    case 5: // FACE_FORWARD: CubeMapFace.NegativeZ
-//        output.PositionNormal = float3(-u, v, -1.0f);
-//        output.FaceNormal = float3(0, 0, -1.0f);
-//        output.FaceUp = float3(0, 1, 0);
-//        break;
-//    case 0: //FACE_RIGHT: CubeMapFace.PositiveX
-//        output.PositionNormal = float3(1.0f, v, -u);
-//        output.FaceNormal = float3(1.0f, 0, 0);
-//        output.FaceUp = float3(0, 1, 0);
-//        break;
-//    case 4: //FACE_BACK: CubeMapFace.PositiveZ
-//        output.PositionNormal = float3(u, v, 1.0f);
-//        output.FaceNormal = float3(0, 0, 1.0f);
-//        output.FaceUp = float3(0, 1, 0);
-//        break;
-//
-//    case 3: //FACE_TOP: CubeMapFace.PositiveY  2 
-//        output.PositionNormal = float3(u, 1.0f, -v);
-//        output.FaceNormal = float3(0, 1.0f, 0);
-//        output.FaceUp = float3(0, 0, 1);
-//        break;
-//    case 2: //FACE_BOTTOM : CubeMapFace.NegativeY  3
-//        output.PositionNormal = float3(u, -1.0f, v);   // dir = float3(v, -1.0f, u);
-//        output.FaceNormal = float3(0, -1.0f, 0);
-//        output.FaceUp = float3(0, 0, -1);
-//        break;
-//
-//    default:
-//        output.PositionNormal = float3(-1.0f, v, u); // na
-//        output.FaceNormal = float3(-1.0f, 0, 0);
-//        output.FaceUp = float3(0, 1, 0);
-//        break;
-//    }
-//    output.Uv = (pos.xy + 1.0f) / 2.0f;
-//    //output.PositionNormal = new Vector3(output.PositionNormal.z, -output.PositionNormal.y, output.PositionNormal.x); // invert
-//    output.PositionNormal = normalize(output.PositionNormal);
-//    return output;
-//}
-
 FaceStruct PosUvFaceToNormal(float2 pos, int faceIndex)
 {
     FaceStruct output = (FaceStruct)0;
@@ -341,15 +287,15 @@ float4 GetCubeIrradiance(float2 pixelpos, int faceToMap)
     //float3 right = normalize(cross(up, input.FaceNormal));
     //up = cross(input.FaceNormal, right);
 
-    //float3 normal = input.PositionNormal;
-    //float3 up = float3(0, -1, 0);
-    //float3 right = normalize(cross(up, input.PositionNormal));
-    //up = cross(input.PositionNormal, right);
-
     float3 normal = normalize(input.PositionNormal);
-    float3 up = input.FaceUp;
+    float3 up = float3(0, -1, 0);
     float3 right = normalize(cross(up, input.PositionNormal));
     up = cross(input.PositionNormal, right);
+
+    //float3 normal = normalize(input.PositionNormal);
+    //float3 up = input.FaceUp;
+    //float3 right = normalize(cross(up, input.PositionNormal));
+    //up = cross(input.PositionNormal, right);
 
     // the following values are in degrees.
     float numberOfSamplesHemisphere = 10.0f; // we want the smallest amount with good quality
@@ -375,16 +321,16 @@ float4 GetCubeIrradiance(float2 pixelpos, int faceToMap)
             float3 temp = normalize(rotatePointAboutYaxis(normal, theta));
             for (float phi = 0.01f; phi < 6.283f; phi += stepPhi) // z rot.
             {
-                //// calculate the new vector around the normal to sample rotationally.
-                // float3 temp = cos(phi) * right + sin(phi) * up;
-                // float4 sampleVector = float4(cos(theta) * normal + sin(theta) * temp, mipSampleLevel);
-                // sampleVector.rgb = normalize(sampleVector.rgb);
-                // float3 sampledColor = texCUBElod(CubeMapSampler, sampleVector).rgb;
+                // calculate the new vector around the normal to sample rotationally.
+                 float3 temp = cos(phi) * right + sin(phi) * up;
+                 float4 sampleVector = float4(cos(theta) * normal + sin(theta) * temp, mipSampleLevel);
+                 sampleVector.rgb = normalize(sampleVector.rgb);
+                 float3 sampledColor = texCUBElod(CubeMapSampler, sampleVector).rgb;
 
-                float4x4 zrot = CreateFromAxisAngle(normal, phi);
-                float4 sampleVector = mul(float4(temp, 1.0f), zrot);
-                sampleVector.w = mipSampleLevel;
-                float3 sampledColor = texCUBElod(CubeMapSampler, sampleVector).rgb;
+                //float4x4 zrot = CreateFromAxisAngle(normal, phi);
+                //float4 sampleVector = mul(float4(temp, 1.0f), zrot);
+                //sampleVector.w = mipSampleLevel;
+                //float3 sampledColor = texCUBElod(CubeMapSampler, sampleVector).rgb;
 
                 //// some possible weighting functions.
 
@@ -394,11 +340,11 @@ float4 GetCubeIrradiance(float2 pixelpos, int faceToMap)
 
                 // accumulate and weigh the geometrical sampled pattern ... here is the hard part.
 
-                accumulatedColor += sampledColor;
-                totalWeight++;
+                //accumulatedColor += sampledColor;
+                //totalWeight++;
 
-                //accumulatedColor += sampledColor * NdotS;
-                //totalWeight += NdotS;
+                accumulatedColor += sampledColor * NdotS;
+                totalWeight += NdotS;
 
                 //accumulatedColor += sampledColor * (cos(theta) * sin(theta));
                 //totalWeight += cos(theta) * sin(theta);
